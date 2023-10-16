@@ -6,6 +6,7 @@ import android.os.CountDownTimer
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -20,7 +21,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val playButton = findViewById<Button>(R.id.play)
+        val playButton = findViewById<ImageButton>(R.id.play)
         val timerText = findViewById<TextView>(R.id.Contatore)
         val userText = findViewById<EditText>(R.id.editTextTime)
         val background = findViewById<View>(R.id.conta)
