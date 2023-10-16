@@ -1,18 +1,21 @@
 package it.polito.did
 
+import android.app.Activity
+import android.content.Context
 import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
+import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-
-import android.util.Log
+import androidx.fragment.app.Fragment
 
 
 class MainActivity : AppCompatActivity() {
@@ -46,6 +49,7 @@ class MainActivity : AppCompatActivity() {
         progressBar.visibility = View.INVISIBLE
         timerText.visibility = View.GONE
         var firstTime = true
+
         timerText.setOnClickListener {
             timerText.visibility = View.INVISIBLE
             userText.visibility = View.VISIBLE
@@ -60,9 +64,37 @@ class MainActivity : AppCompatActivity() {
             if (firstTime) firstTime = false
         }
 
+
+        userText.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
+                val view = this.currentFocus
+                if (view != null) {
+                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(view.windowToken, 0)
+                }
+
+                userText.clearFocus()
+                background.requestFocus()
+                return@OnKeyListener true
+            }
+            false
+        })
+
         background.setOnClickListener{
             Log.d("BG", "Cliccato BG")
+
+            //NON CANCELLARE
+            val view = this.currentFocus
+            if (view != null) {
+                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(view.windowToken, 0)
+            }
+
             userText.clearFocus()
+
+            background.requestFocus()
+
+            //TODO far sparire la tastiera
         }
 
         playButton.setOnClickListener {
@@ -97,7 +129,9 @@ class MainActivity : AppCompatActivity() {
                         val totalSeconds = millisUntilFinished / 1000
                         val minutes = totalSeconds / 60
                         val hours = totalSeconds / 3600
-                        timerText.setText("$hours:${minutes%60}:${totalSeconds%60}")    //TODO sistemare formattazione
+
+                        //timerText.setText("$hours:${minutes%60}:${totalSeconds%60}")    //TODO sistemare formattazione
+                        timerText.setText(String.format("%02d:%02d:%02d", hours, minutes%60, totalSeconds%60))
                     }
 
                     override fun onFinish() {
@@ -123,7 +157,8 @@ class MainActivity : AppCompatActivity() {
                         val totalSeconds = millisUntilFinished / 1000
                         val minutes = totalSeconds / 60
                         val hours = totalSeconds / 3600
-                        timerText.setText("$hours:${minutes%60}:${totalSeconds%60}")    //TODO sistemare formattazione
+                        //timerText.setText("$hours:${minutes%60}:${totalSeconds%60}")    //TODO sistemare formattazione
+                        timerText.setText(String.format("%02d:%02d:%02d", hours, minutes%60, totalSeconds%60))
                     }
 
                     override fun onFinish() {
@@ -196,7 +231,8 @@ class MainActivity : AppCompatActivity() {
                     val totalSeconds = millisUntilFinished / 1000
                     val minutes = totalSeconds / 60
                     val hours = totalSeconds / 3600
-                    timerText.setText("$hours:${minutes%60}:${totalSeconds%60}")    //TODO sistemare formattazione
+                    //timerText.setText("$hours:${minutes%60}:${totalSeconds%60}")    //TODO sistemare formattazione
+                    timerText.setText(String.format("%02d:%02d:%02d", hours, minutes%60, totalSeconds%60))
                 }
 
                 override fun onFinish() {
@@ -219,3 +255,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+
+/*
+fun Fragment.hideKeyboard() {
+    view?.let { activity?.hideKeyboard(it) }
+}
+
+fun Activity.hideKeyboard() {
+    hideKeyboard(currentFocus ?: View(this))
+}
+
+fun Context.hideKeyboard(view: View) {
+    val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+}
+
+ */
