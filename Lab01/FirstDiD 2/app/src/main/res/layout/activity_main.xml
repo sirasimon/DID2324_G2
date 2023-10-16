@@ -9,6 +9,8 @@
     android:visibility="visible"
     tools:context=".MainActivity"
 
+    android:configChanges="keyboardHidden|orientation|screenSize"
+
     >
 
     <ImageButton

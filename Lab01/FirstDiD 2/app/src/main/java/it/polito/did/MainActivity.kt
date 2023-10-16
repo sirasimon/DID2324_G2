@@ -42,6 +42,8 @@ class MainActivity : AppCompatActivity() {
         val stopButton = findViewById<ImageButton>(R.id.stop)
         val resetButton = findViewById<ImageButton>(R.id.reset)
 
+        var lastKeyCode : Int      //ultimo tasto premuto
+
         val timerText = findViewById<TextView>(R.id.Contatore)      //testo che scende (non editabile)
         val userText = findViewById<EditText>(R.id.editTextTime)    //timer impostato dall'utente
         val background = findViewById<View>(R.id.conta)
@@ -57,7 +59,10 @@ class MainActivity : AppCompatActivity() {
 
         userText.setOnFocusChangeListener{
             _,b -> if (!b && ! firstTime) {
-                userText.visibility = View.INVISIBLE
+
+                if(!userText.text.isBlank())
+                    userText.visibility = View.INVISIBLE
+
                 timerText.visibility = View.VISIBLE
                 timerText.text = userText.text
             }
@@ -66,6 +71,11 @@ class MainActivity : AppCompatActivity() {
 
 
         userText.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+            lastKeyCode = keyCode
+
+            Log.d("LAST KC", "KeyCode detected $lastKeyCode")   //Due punti sarebbe 59+74
+
+
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
                 val view = this.currentFocus
                 if (view != null) {
@@ -98,7 +108,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         playButton.setOnClickListener {
-            if(userText.text!=null){
+            if(!userText.text.isBlank()){
                 val userInput = userText.text
                 val strs = userInput.split(":").toTypedArray()
                 var millis : Long = 0
