@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#181818"
+    android:visibility="visible"
     tools:context=".MainActivity">
 
     <ImageButton
@@ -146,6 +147,8 @@
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_marginTop="224dp"
+        android:max="1"
+        android:progress="1"
         android:progressTint="#D50101"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"

@@ -12,6 +12,8 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 
+import android.util.Log
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -59,8 +61,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         background.setOnClickListener{
+            Log.d("BG", "Cliccato BG")
             userText.clearFocus()
-
         }
 
         playButton.setOnClickListener {
@@ -81,12 +83,17 @@ class MainActivity : AppCompatActivity() {
             pauseButton.visibility = View.VISIBLE
             resetButton.visibility = View.VISIBLE
             addMinButton.visibility = View.VISIBLE
+            //progressBar.visibility = View.VISIBLE
+
+            progressBar.max = millis.toInt()
 
             if(currentMillis==0L){
                 timer = object : CountDownTimer(millis, 1000) {                 //creazione timer
 
                     override fun onTick(millisUntilFinished: Long) {
                         currentMillis = millisUntilFinished
+                        //progressBar.progress = currentMillis.toInt()
+
                         val totalSeconds = millisUntilFinished / 1000
                         val minutes = totalSeconds / 60
                         val hours = totalSeconds / 3600
@@ -111,6 +118,8 @@ class MainActivity : AppCompatActivity() {
 
                     override fun onTick(millisUntilFinished: Long) {
                         currentMillis = millisUntilFinished
+                        //progressBar.progress = currentMillis.toInt()
+
                         val totalSeconds = millisUntilFinished / 1000
                         val minutes = totalSeconds / 60
                         val hours = totalSeconds / 3600
@@ -182,6 +191,8 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onTick(millisUntilFinished: Long) {
                     currentMillis = millisUntilFinished
+                    //progressBar.progress = currentMillis.toInt()
+
                     val totalSeconds = millisUntilFinished / 1000
                     val minutes = totalSeconds / 60
                     val hours = totalSeconds / 3600
@@ -205,7 +216,6 @@ class MainActivity : AppCompatActivity() {
             stopButton.visibility = View.INVISIBLE
             resetButton.visibility = View.VISIBLE
             pauseButton.visibility = View.VISIBLE
-
         }
     }
 }
