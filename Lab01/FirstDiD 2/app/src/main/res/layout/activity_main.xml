@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="#181818"
     android:visibility="visible"
-    tools:context=".MainActivity"
+    tools:context=".CountdownActivity"
 
     android:configChanges="keyboardHidden|orientation|screenSize"
 
