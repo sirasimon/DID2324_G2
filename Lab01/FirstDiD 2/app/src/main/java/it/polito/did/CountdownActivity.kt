@@ -23,11 +23,12 @@ class CountdownActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // NOTIFICATION SOUND
         val notification =
             RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
         val alarmSound = RingtoneManager.getRingtone(applicationContext, notification)
 
-        //BUTTONS
+        // BUTTONS
         val playButton = findViewById<ImageButton>(R.id.play)
         val pauseButton = findViewById<ImageButton>(R.id.pause)
         val addMinButton = findViewById<ImageButton>(R.id.add_minute)
@@ -36,12 +37,18 @@ class CountdownActivity : AppCompatActivity() {
 
         var lastKeyCode : Int      //ultimo tasto premuto
 
+        // TEXT FIELDS
         val timerText = findViewById<TextView>(R.id.Contatore)      //testo che scende (non editabile)
         val userText = findViewById<EditText>(R.id.editTextTime)    //timer impostato dall'utente
+
+        // OTHER ELEMENTS
         val background = findViewById<View>(R.id.conta)
         val progressBar = findViewById<ProgressBar>(R.id.progressBar2)
+
+        // UI INITIALIZATION
         progressBar.visibility = View.INVISIBLE
         timerText.visibility = View.GONE
+
         var firstTime = true
 
         timerText.setOnClickListener {
@@ -60,7 +67,6 @@ class CountdownActivity : AppCompatActivity() {
             }
             if (firstTime) firstTime = false
         }
-
 
         userText.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
             lastKeyCode = keyCode
@@ -185,27 +191,43 @@ class CountdownActivity : AppCompatActivity() {
             pauseButton.visibility = View.VISIBLE
         }
 
-        // OSSERVA I VALORI E FAI QUALCOSA
+        // OBSERVERS TO VM
+        /* Osservo da qui il valore del timer contenuto nel view model,
+         * quindi quando cambia il valore timerValue, aggiorno il valore di currentMillis
+         * e il testo contenuto da timerText (chiedendo a vm di fornire una stringa
+         */
         vm.timerValue.observe(this){it ->
             currentMillis = vm.getTimerValue()
             timerText.text = vm.getTimerString()
         }
 
+        /* Osservo da qui il valore isTimeout contenuto nel view model,
+         * quindi...
+         */
         vm.isTimeout.observe(this){it ->
+            /* se è vero e il timer non è nullo, cioè esiste un timer che ha finito di contare,
+             * allora avvio la ringtone e modifico la visibilità dei bottoni
+             */
             if(it && !vm.isTimerNull()){
                 alarmSound.play()
                 pauseButton.visibility = View.INVISIBLE
                 stopButton.visibility = View.VISIBLE
                 resetButton.visibility = View.INVISIBLE
             }
+            /* se invece è falso e il timer è non nullo, cioè esiste un timer che sta contando,
+             * allora disattivo il suono, se sta suonando disattivo il suono e modifico la visibilità dei bottoni
+             */
             else if(!it && !vm.isTimerNull()){
-                alarmSound.stop();
+                if(alarmSound.isPlaying)  alarmSound.stop();
                 stopButton.visibility = View.INVISIBLE
                 resetButton.visibility = View.VISIBLE
                 pauseButton.visibility = View.VISIBLE
             }
+            /* se invece è falso e il timer è  nullo, cioè non esiste un timer che sta contando,
+             * allora disattivo il suono, se sta suonando disattivo il suono e modifico la visibilità dei bottoni
+             */
             else if(!it && vm.isTimerNull()){
-                alarmSound.stop();
+                if(alarmSound.isPlaying)  alarmSound.stop();
                 stopButton.visibility = View.INVISIBLE
                 resetButton.visibility = View.INVISIBLE
                 pauseButton.visibility = View.INVISIBLE

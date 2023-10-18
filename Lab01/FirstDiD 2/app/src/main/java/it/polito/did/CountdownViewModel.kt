@@ -34,14 +34,25 @@ class CountdownViewModel : ViewModel(){
         }.start()
     }
 
+    /**
+     * Cancellazione del timer se in esecuzione
+     */
     fun cancelTimer(){
         _timer?.cancel();
     }
 
+    /**
+     * Richiede gli attuali millisecondi dell'eventuale timer in esecuzione
+     * @return gli attuali millisecondi del timer
+     */
     fun getTimerValue() : Long{
         return _timerValue.value ?: 0;
     }
 
+    /**
+     * Richiede la stringa formattata correttamente corrispondente agli attuali millisecondi dell'eventuale timer
+     * @return stringa nel formato HH:mm:ss
+     */
     fun getTimerString() : String{
         val totalSeconds = _timerValue.value?.div(1000)
         val minutes = totalSeconds?.div(60)
@@ -50,6 +61,9 @@ class CountdownViewModel : ViewModel(){
         return String.format("%02d:%02d:%02d", hours, minutes?.mod(60), totalSeconds?.mod(60))
     }
 
+    /**
+     * Fornisce vero se non c'è alcun timer attivo, falso se ne esiste uno.
+     */
     fun isTimerNull() : Boolean{
         return _timer==null
     }
