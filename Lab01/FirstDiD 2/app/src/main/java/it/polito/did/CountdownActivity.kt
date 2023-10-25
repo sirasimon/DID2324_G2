@@ -71,6 +71,10 @@ class CountdownActivity : AppCompatActivity() {
         userText.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
             lastKeyCode = keyCode
 
+            if(keyCode == 74 && lastKeyCode == keyCode) {
+                userText.setText(userText.text.dropLast(1))
+                Log.d("LAST KC", "è entrato")   //Due punti sarebbe 59+74
+            }
             Log.d("LAST KC", "KeyCode detected $lastKeyCode")   //Due punti sarebbe 59+74
 
 
