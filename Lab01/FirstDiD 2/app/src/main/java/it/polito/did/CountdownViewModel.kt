@@ -39,6 +39,7 @@ class CountdownViewModel : ViewModel(){
      */
     fun cancelTimer(){
         _timer?.cancel();
+        _timer = null
     }
 
     /**

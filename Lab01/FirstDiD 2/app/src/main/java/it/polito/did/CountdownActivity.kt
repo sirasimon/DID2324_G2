@@ -2,6 +2,8 @@ package it.polito.did
 
 import android.media.RingtoneManager
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
@@ -52,9 +54,16 @@ class CountdownActivity : AppCompatActivity() {
         var firstTime = true
 
         timerText.setOnClickListener {
-            timerText.visibility = View.INVISIBLE
-            userText.visibility = View.VISIBLE
+            if (vm.isTimerNull()) {
+                timerText.visibility = View.INVISIBLE
+                userText.visibility = View.VISIBLE
+                userText.requestFocus()
+                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(userText, InputMethodManager.SHOW_IMPLICIT)
+            }
         }
+
+
 
         userText.setOnFocusChangeListener{
             _,b -> if (!b && ! firstTime) {
@@ -67,17 +76,20 @@ class CountdownActivity : AppCompatActivity() {
             }
             if (firstTime) firstTime = false
         }
+        userText.addTextChangedListener(object : TextWatcher {
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                if (s.count() >= 2 && s.last() == ':' && s.get(s.count() - 2) == ':') {
+                    userText.setText(userText.text.dropLast(1))
+                    userText.setSelection(userText.text.count())
+                }
+            }
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
+            override fun afterTextChanged(p0: Editable?) { }
+
+        })
 
         userText.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
             lastKeyCode = keyCode
-
-            if(keyCode == 74 && lastKeyCode == keyCode) {
-                userText.setText(userText.text.dropLast(1))
-                Log.d("LAST KC", "è entrato")   //Due punti sarebbe 59+74
-            }
-            Log.d("LAST KC", "KeyCode detected $lastKeyCode")   //Due punti sarebbe 59+74
-
-
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
                 val view = this.currentFocus
                 if (view != null) {
@@ -121,13 +133,14 @@ class CountdownActivity : AppCompatActivity() {
                     millis = strs[1].toLong() * 1000 + strs[0].toLong() * 60 * 1000
                 }
                 else if (strs.count() == 3) {
-                    millis = strs[2].toLong() * 1000 + strs[1].toLong() * 60 * 1000 + strs[2].toLong() * 3600 * 1000
+                    millis = strs[2].toLong() * 1000 + strs[1].toLong() * 60 * 1000 + strs[0].toLong() * 3600 * 1000
                 }
 
                 playButton.visibility = View.INVISIBLE
                 pauseButton.visibility = View.VISIBLE
                 resetButton.visibility = View.VISIBLE
                 addMinButton.visibility = View.VISIBLE
+
                 //progressBar.visibility = View.VISIBLE
 
                 progressBar.max = millis.toInt()
@@ -237,5 +250,12 @@ class CountdownActivity : AppCompatActivity() {
                 pauseButton.visibility = View.INVISIBLE
             }
         }
+    }
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val background = findViewById<View>(R.id.conta)
+        val userText = findViewById<EditText>(R.id.editTextTime)
+        userText.clearFocus()
+        background.requestFocus()
     }
 }
