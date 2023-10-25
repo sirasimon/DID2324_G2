@@ -1,10 +1,7 @@
 package it.polito.did
 
-import android.app.Activity
-import android.content.Context
 import android.media.RingtoneManager
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
@@ -15,27 +12,23 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 
 
-class MainActivity : AppCompatActivity() {
+class CountdownActivity : AppCompatActivity() {
 
-    private val vm by viewModels<MainViewModel>()
-    private var timer : CountDownTimer ?= null
+    private val vm by viewModels<CountdownViewModel>()
     private var currentMillis : Long = 0
-
-    //private var notification : Uri ?= null
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // NOTIFICATION SOUND
         val notification =
             RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-        val r = RingtoneManager.getRingtone(applicationContext, notification)
+        val alarmSound = RingtoneManager.getRingtone(applicationContext, notification)
 
-        //BUTTONS
+        // BUTTONS
         val playButton = findViewById<ImageButton>(R.id.play)
         val pauseButton = findViewById<ImageButton>(R.id.pause)
         val addMinButton = findViewById<ImageButton>(R.id.add_minute)
@@ -44,12 +37,18 @@ class MainActivity : AppCompatActivity() {
 
         var lastKeyCode : Int      //ultimo tasto premuto
 
+        // TEXT FIELDS
         val timerText = findViewById<TextView>(R.id.Contatore)      //testo che scende (non editabile)
         val userText = findViewById<EditText>(R.id.editTextTime)    //timer impostato dall'utente
+
+        // OTHER ELEMENTS
         val background = findViewById<View>(R.id.conta)
         val progressBar = findViewById<ProgressBar>(R.id.progressBar2)
+
+        // UI INITIALIZATION
         progressBar.visibility = View.INVISIBLE
         timerText.visibility = View.GONE
+
         var firstTime = true
 
         timerText.setOnClickListener {
@@ -69,10 +68,13 @@ class MainActivity : AppCompatActivity() {
             if (firstTime) firstTime = false
         }
 
-
         userText.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
             lastKeyCode = keyCode
 
+            if(keyCode == 74 && lastKeyCode == keyCode) {
+                userText.setText(userText.text.dropLast(1))
+                Log.d("LAST KC", "è entrato")   //Due punti sarebbe 59+74
+            }
             Log.d("LAST KC", "KeyCode detected $lastKeyCode")   //Due punti sarebbe 59+74
 
 
@@ -131,80 +133,22 @@ class MainActivity : AppCompatActivity() {
                 progressBar.max = millis.toInt()
 
                 if(currentMillis==0L){
-                    timer = object : CountDownTimer(millis, 1000) {                 //creazione timer
-
-                        override fun onTick(millisUntilFinished: Long) {
-                            currentMillis = millisUntilFinished
-                            //progressBar.progress = currentMillis.toInt()
-
-                            val totalSeconds = millisUntilFinished / 1000
-                            val minutes = totalSeconds / 60
-                            val hours = totalSeconds / 3600
-
-                            //timerText.setText("$hours:${minutes%60}:${totalSeconds%60}")    //TODO sistemare formattazione
-                            timerText.setText(String.format("%02d:%02d:%02d", hours, minutes%60, totalSeconds%60))
-                        }
-
-                        override fun onFinish() {
-                            //val notification =
-                            //    RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-                            //val r = RingtoneManager.getRingtone(applicationContext, notification)
-
-                            pauseButton.visibility = View.INVISIBLE
-                            stopButton.visibility = View.VISIBLE
-                            resetButton.visibility = View.INVISIBLE
-                            //addMinButton.visibility = View.INVISIBLE
-
-                            r.play()
-                        }
-                    }.start()
+                    vm.createTimer(millis)
                 }else {
-                    timer = object :
-                        CountDownTimer(currentMillis, 1000) {                 //creazione timer
-
-                        override fun onTick(millisUntilFinished: Long) {
-                            currentMillis = millisUntilFinished
-                            //progressBar.progress = currentMillis.toInt()
-
-                            val totalSeconds = millisUntilFinished / 1000
-                            val minutes = totalSeconds / 60
-                            val hours = totalSeconds / 3600
-                            //timerText.setText("$hours:${minutes%60}:${totalSeconds%60}")    //TODO sistemare formattazione
-                            timerText.setText(
-                                String.format(
-                                    "%02d:%02d:%02d",
-                                    hours,
-                                    minutes % 60,
-                                    totalSeconds % 60
-                                )
-                            )
-                        }
-
-                        override fun onFinish() {
-                            //val notification =
-                            //    RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-                            //val r = RingtoneManager.getRingtone(applicationContext, notification)
-                            pauseButton.visibility = View.INVISIBLE
-                            stopButton.visibility = View.VISIBLE
-                            resetButton.visibility = View.INVISIBLE
-                            //addMinButton.visibility = View.INVISIBLE
-
-                            r.play()
-                        }
-                    }.start()
+                    vm.createTimer(currentMillis)
                 }
             }
         }
 
         pauseButton.setOnClickListener{
-            timer?.cancel()
+            vm.cancelTimer()
 
             pauseButton.visibility = View.INVISIBLE
             playButton.visibility = View.VISIBLE
         }
 
         stopButton.setOnClickListener{
-            r.stop()
+            alarmSound.stop()
 
             stopButton.visibility = View.INVISIBLE
             playButton.visibility = View.VISIBLE
@@ -220,7 +164,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         resetButton.setOnClickListener {
-            timer?.cancel()
+            vm.cancelTimer();
 
             stopButton.visibility = View.INVISIBLE
             pauseButton.visibility = View.INVISIBLE
@@ -238,57 +182,60 @@ class MainActivity : AppCompatActivity() {
         }
 
         addMinButton.setOnClickListener {
-            timer?.cancel()
-
+            vm.cancelTimer()
 
             currentMillis += 60000
 
-            timer = object : CountDownTimer(currentMillis, 1000) {                 //creazione timer
+            vm.createTimer(currentMillis)
 
-                override fun onTick(millisUntilFinished: Long) {
-                    currentMillis = millisUntilFinished
-                    //progressBar.progress = currentMillis.toInt()
+            alarmSound.stop();
 
-                    val totalSeconds = millisUntilFinished / 1000
-                    val minutes = totalSeconds / 60
-                    val hours = totalSeconds / 3600
-                    //timerText.setText("$hours:${minutes%60}:${totalSeconds%60}")    //TODO sistemare formattazione
-                    timerText.setText(String.format("%02d:%02d:%02d", hours, minutes%60, totalSeconds%60))
-                }
-
-                override fun onFinish() {
-                    //val notification =
-                    //    RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-                    //val r = RingtoneManager.getRingtone(applicationContext, notification)
-                    pauseButton.visibility = View.INVISIBLE
-                    stopButton.visibility = View.VISIBLE
-                    resetButton.visibility = View.INVISIBLE
-                    //addMinButton.visibility = View.INVISIBLE
-
-                    r.play()
-                }
-            }.start()
-
-            r.stop();
             stopButton.visibility = View.INVISIBLE
             resetButton.visibility = View.VISIBLE
             pauseButton.visibility = View.VISIBLE
         }
+
+        // OBSERVERS TO VM
+        /* Osservo da qui il valore del timer contenuto nel view model,
+         * quindi quando cambia il valore timerValue, aggiorno il valore di currentMillis
+         * e il testo contenuto da timerText (chiedendo a vm di fornire una stringa
+         */
+        vm.timerValue.observe(this){it ->
+            currentMillis = vm.getTimerValue()
+            timerText.text = vm.getTimerString()
+        }
+
+        /* Osservo da qui il valore isTimeout contenuto nel view model,
+         * quindi...
+         */
+        vm.isTimeout.observe(this){it ->
+            /* se è vero e il timer non è nullo, cioè esiste un timer che ha finito di contare,
+             * allora avvio la ringtone e modifico la visibilità dei bottoni
+             */
+            if(it && !vm.isTimerNull()){
+                alarmSound.play()
+                pauseButton.visibility = View.INVISIBLE
+                stopButton.visibility = View.VISIBLE
+                resetButton.visibility = View.INVISIBLE
+            }
+            /* se invece è falso e il timer è non nullo, cioè esiste un timer che sta contando,
+             * allora disattivo il suono, se sta suonando disattivo il suono e modifico la visibilità dei bottoni
+             */
+            else if(!it && !vm.isTimerNull()){
+                if(alarmSound.isPlaying)  alarmSound.stop();
+                stopButton.visibility = View.INVISIBLE
+                resetButton.visibility = View.VISIBLE
+                pauseButton.visibility = View.VISIBLE
+            }
+            /* se invece è falso e il timer è  nullo, cioè non esiste un timer che sta contando,
+             * allora disattivo il suono, se sta suonando disattivo il suono e modifico la visibilità dei bottoni
+             */
+            else if(!it && vm.isTimerNull()){
+                if(alarmSound.isPlaying)  alarmSound.stop();
+                stopButton.visibility = View.INVISIBLE
+                resetButton.visibility = View.INVISIBLE
+                pauseButton.visibility = View.INVISIBLE
+            }
+        }
     }
 }
-
-/*
-fun Fragment.hideKeyboard() {
-    view?.let { activity?.hideKeyboard(it) }
-}
-
-fun Activity.hideKeyboard() {
-    hideKeyboard(currentFocus ?: View(this))
-}
-
-fun Context.hideKeyboard(view: View) {
-    val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-    inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
-}
-
- */

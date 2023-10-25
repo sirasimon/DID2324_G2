@@ -13,7 +13,7 @@
         android:theme="@style/Theme.FirstDiD"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".CountdownActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
