@@ -1,12 +1,14 @@
 package com.example.shoppinglist
 
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
@@ -21,17 +23,24 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShoppingScreen(vm : PurchaseViewModel){
+fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
 
     Scaffold (
-        topBar = { Header{vm.switchAppMode()} },
-        floatingActionButton = { FilterButton() },
+        topBar = { Header{navController.navigate("ComposingScreen")} },
+        //floatingActionButton = { FilterButton() },
         floatingActionButtonPosition = FabPosition.End
     ){
             paddingValues ->
@@ -44,10 +53,9 @@ fun ShoppingScreen(vm : PurchaseViewModel){
             Column(Modifier.fillMaxSize()){
                 LinearDeterminateIndicator()
 
-                for(i in 1..5){
-                    ShoppingListItem()
+                for(cat in vm.getCategories()){
+                    CategorySection(cat, vm)
                 }
-                Divider()
             }
         }
     }
@@ -55,21 +63,48 @@ fun ShoppingScreen(vm : PurchaseViewModel){
 
 @Composable
 fun LinearDeterminateIndicator() {
-    //TODO
+
+}
+
+@Composable
+fun CategorySection(cat: ItemCategory, vm: PurchaseViewModel){
+    //TODO Prendi la lista salvata in vm, filtrala per stampare le categorie e per ogni categoria stampa le voci
+    Text(text = "$cat",
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.background(Color.LightGray)
+            .fillMaxWidth()
+            .padding(10.dp)
+    )
+
+    for(i in vm.getItems().filter { item -> item.category==cat }){
+        ShoppingListItem(i)//TODO ci devo passare il purchasableItem
+    }
+
+    Divider()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShoppingListItem(){
+fun ShoppingListItem(item: PurchasableItem){
+    val (checked, setChecked) = remember{
+        mutableStateOf(item.purchased)
+    }
+
     ListItem(
-        headlineText = { Text("[Item description]") },
+        headlineText = { Text("${item.name}") },
         leadingContent = {
-            Checkbox(checked = false, onCheckedChange = {/*TODO*/})
+            Checkbox(checked = checked, onCheckedChange = {
+                item.purchased = !checked
+                setChecked(!checked)
+                /*TODO devo cambiare il valore dell'elemento anche*/
+
+                Log.d("ShoScr", "ShoppingListItem > Updated item is $item")})
         }
     )
 }
 
-
+/*
 @Composable
 fun FilterButton(/*onClick : () -> Unit*/){
     FloatingActionButton(
@@ -81,6 +116,7 @@ fun FilterButton(/*onClick : () -> Unit*/){
         Icon(Icons.Filled.List, "Filter categories")
     }
 }
+ */
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,13 +128,20 @@ private fun Header(onClick : () -> Unit){
                 textAlign = TextAlign.Center)
         },
         navigationIcon = {
-            IconButton(onClick = { onClick } ) {
+            IconButton(onClick = onClick ) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Back to composing mode",
-
+                    contentDescription = "Back to composing mode"
                 )
             }
         },
+        actions = {
+            IconButton(onClick = { onClick } ) {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = "Search"
+                )
+            }
+        }
     )
 }
