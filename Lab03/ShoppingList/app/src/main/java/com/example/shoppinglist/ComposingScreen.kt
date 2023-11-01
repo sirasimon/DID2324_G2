@@ -44,6 +44,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -52,6 +55,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -64,19 +68,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ComposingScreen(navController : NavController, vm : PurchaseViewModel){
 
     var (openDialog, setOpen) = remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold (
         topBar = { Header() },
         floatingActionButton = { ShoppingModeButton {
             navController.navigate("ShoppingScreen")
             vm.switchAppMode() } },
-        floatingActionButtonPosition = FabPosition.End
+        floatingActionButtonPosition = FabPosition.End,
+        snackbarHost = {SnackbarHost(hostState = snackbarHostState)}
     ){
         paddingValues ->
         Surface(
@@ -89,22 +97,16 @@ fun ComposingScreen(navController : NavController, vm : PurchaseViewModel){
 
                 //Prendi gli elementi inseriti e conservati nel vm, passali al modulo ComposingListItem e costruisci le voci
                 for(i in vm.getItems()){
-                    ComposingListItem(i, vm)
+                    ComposingListItem(i, vm, {msg -> scope.launch { snackbarHostState.showSnackbar(message = msg, duration = SnackbarDuration.Short) }})
                 }
 
                 AddNewItemButton{setOpen(true)}
 
                 if(openDialog){
-                    AddItemDialog(//TODO cambiare i parametri e passare il vm
+                    AddItemDialog(
                         closeDialog = { setOpen(false) },
-                        vm = vm
-                        /*
-                        onConfirmation = {
-                            setOpen(false)
-                            println("Confirmation registered") // Add logic here to handle confirmation.
-                        }
-
-                         */
+                        vm = vm,
+                        snackbarMsg = {msg -> scope.launch { snackbarHostState.showSnackbar(message = msg, duration = SnackbarDuration.Short) }}
                     )
                 }
             }
@@ -114,7 +116,7 @@ fun ComposingScreen(navController : NavController, vm : PurchaseViewModel){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ComposingListItem(item : PurchasableItem, vm : PurchaseViewModel){
+fun ComposingListItem(item : PurchasableItem, vm : PurchaseViewModel, msg : (String) -> Unit){
     ListItem(
         headlineText = { Text("${item.name}") },
         leadingContent = {
@@ -138,7 +140,10 @@ fun ComposingListItem(item : PurchasableItem, vm : PurchaseViewModel){
             }
         },
         trailingContent = {
-            IconButton({vm.deleteItem(item)}){
+            IconButton({
+                vm.deleteItem(item)
+                msg("Deleting item ${item.name} from category ${item.category}")
+            }){
                 Icon(
                     Icons.Filled.Delete,
                     contentDescription = "Delete item",
@@ -167,7 +172,8 @@ fun ShoppingModeButton(onClick : () -> Unit){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddItemDialog(closeDialog: () -> Unit,
-                  vm: PurchaseViewModel
+                  vm: PurchaseViewModel,
+                  snackbarMsg : (String) -> Unit
 ){
     var itemDescription by remember {mutableStateOf("") }
     var categoryExpanded by remember { mutableStateOf(false) }
@@ -268,6 +274,7 @@ fun AddItemDialog(closeDialog: () -> Unit,
                         onClick = {
                             vm.addItem(PurchasableItem(itemDescription, ItemCategory.valueOf(categorySelected), false))
                             closeDialog()
+                            snackbarMsg("Added new item $itemDescription in category $categorySelected")
                                   },
                         modifier = Modifier.padding(8.dp),
                     ) {

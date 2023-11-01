@@ -23,11 +23,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        vm.addItem(PurchasableItem("PANE", ItemCategory.FORNO, false))
-        Log.d("TEST", "${vm.getItems()}")
+        //vm.addItem(PurchasableItem("PANE", ItemCategory.FORNO, false))
+        //Log.d("TEST", "${vm.getItems()}")
 
-        vm.addItem(PurchasableItem("ABC", ItemCategory.FORNO, true))
-        Log.d("TEST", "${vm.getItems()}")
+        //vm.addItem(PurchasableItem("ABC", ItemCategory.FORNO, true))
+        //Log.d("TEST", "${vm.getItems()}")
 
         setContent {
             ShoppingListTheme {

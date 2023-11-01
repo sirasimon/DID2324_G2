@@ -38,6 +38,18 @@ class PurchaseViewModel : ViewModel() {
         return _items.count()
     }
 
+    fun getProgress(): Float{
+
+        if(getPurchasedNum()==0 && getTotalItems()==0) {
+            Log.d("Progress", "getProgress > Current progress is 0")
+            return 0f
+        }
+        else {
+            Log.d("Progress", "getProgress > Current progress is ${(getPurchasedNum().toFloat() / getTotalItems())}")
+            return getPurchasedNum().toFloat() / getTotalItems()
+        }
+    }
+
     fun getCategories() : List<ItemCategory>{
         return _items.map{it -> it.category}.toSet().sorted()
     }
@@ -53,7 +65,7 @@ class PurchaseViewModel : ViewModel() {
     }
 
     fun getItems(): List<PurchasableItem>{
-        return _itemsLiveData.value?.toList()?.sortedBy { it -> it.name } ?: listOf()
+        return _itemsLiveData.value?.toList() ?: listOf()
     }
 
     fun clearItems(){
