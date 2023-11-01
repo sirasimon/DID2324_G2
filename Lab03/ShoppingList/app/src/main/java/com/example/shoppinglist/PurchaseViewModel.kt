@@ -5,30 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class PurchaseViewModel : ViewModel() {
-    private val _mode = MutableLiveData<AppMode>().also { it.value=AppMode.SHOPPING }   //TODO: silenziare e modificare (è superfluo)
-
     private val _items = mutableSetOf<PurchasableItem>()
     private val _itemsLiveData = MutableLiveData<Set<PurchasableItem>>()
-
-
-
-    fun switchAppMode(){
-        Log.d("AppMode", "changeAppMode > App mode is ${_mode.value}")
-
-        when(_mode.value){
-            AppMode.COMPOSING -> _mode.value = AppMode.SHOPPING
-            AppMode.SHOPPING -> _mode.value = AppMode.COMPOSING
-            else -> {
-                Log.w("AppMode", "changeAppMode > else statement entered")
-            }
-        }
-
-        Log.d("AppMode", "changeAppMode > New app mode is ${_mode.value}")
-    }
-
-    fun getAppMode() : AppMode{
-        return _mode.value?:AppMode.COMPOSING
-    }
 
     fun getPurchasedNum(): Int{
         return _items.count { it -> it.purchased } ?: 0
@@ -73,7 +51,11 @@ class PurchaseViewModel : ViewModel() {
     }
 
     fun deleteItem(target : PurchasableItem){
-        _items.remove(_items.find { it -> it.name == target.name })
+        //_items.remove(_items.find {it.name == target.name })
+        _items.remove(target)
+
+        Log.d("ItemMgm", "deleteItem > Updated item list is $_items\nand related live data is ${_itemsLiveData.value}")
+
     }
 
     fun setPurchase(item: PurchasableItem, p: Boolean){

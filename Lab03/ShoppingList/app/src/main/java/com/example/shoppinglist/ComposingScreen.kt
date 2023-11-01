@@ -82,7 +82,7 @@ fun ComposingScreen(navController : NavController, vm : PurchaseViewModel){
         topBar = { Header() },
         floatingActionButton = { ShoppingModeButton {
             navController.navigate("ShoppingScreen")
-            vm.switchAppMode() } },
+        } },
         floatingActionButtonPosition = FabPosition.End,
         snackbarHost = {SnackbarHost(hostState = snackbarHostState)}
     ){
