@@ -1,56 +1,55 @@
 package com.example.shoppinglist
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppinglist.ui.theme.ShoppingListTheme
 
+// Per caricare dei valori demo
+const val LOAD_DEMO_DATA = true
+
 class MainActivity : ComponentActivity() {
 
     private val vm by viewModels<PurchaseViewModel>()
 
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //vm.addItem(PurchasableItem("PANE", ItemCategory.FORNO, false))
-        //Log.d("TEST", "${vm.getItems()}")
-
-        //vm.addItem(PurchasableItem("ABC", ItemCategory.FORNO, true))
-        //Log.d("TEST", "${vm.getItems()}")
+        // Se true carica 3 oggetti demo
+        if(LOAD_DEMO_DATA){
+            vm.addItem(PurchasableItem("PANE", ItemCategory.FORNO, true))
+            vm.addItem(PurchasableItem("FOCACCIA", ItemCategory.FORNO, false))
+            vm.addItem(PurchasableItem("PESCHE", ItemCategory.ORTOFRUTTA, false))
+        }
 
         setContent {
             ShoppingListTheme {
                 // A surface container using the 'background' color from the theme
 
-                Navigation(vm)
+                Navigation()
             }
         }
     }
-}
 
-@Composable
-fun Navigation(vm : PurchaseViewModel){
-    val navController = rememberNavController()
+    @Composable
+    fun Navigation(){
+        val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "ComposingScreen"){
-        composable("ComposingScreen") {
-            ComposingScreen(navController = navController, vm)
-        }
-        composable("ShoppingScreen") {
-            ShoppingScreen(navController = navController, vm)
+        NavHost(navController = navController, startDestination = "ShoppingScreen"){
+            composable("ComposingScreen") {
+                ComposingScreen(navController = navController, vm)
+            }
+            composable("ShoppingScreen") {
+                ShoppingScreen(navController = navController, vm)
+            }
         }
     }
+
 }
 
 /*

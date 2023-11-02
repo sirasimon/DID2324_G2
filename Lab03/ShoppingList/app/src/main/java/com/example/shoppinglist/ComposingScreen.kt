@@ -10,13 +10,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -27,7 +28,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,6 +50,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontStyle
@@ -69,11 +70,7 @@ fun ComposingScreen(navController : NavController, vm : PurchaseViewModel){
     val items by vm.itemsLiveData.observeAsState()
 
     Scaffold (
-        topBar = { Header() },
-        floatingActionButton = { ShoppingModeButton {
-            navController.navigate("ShoppingScreen")
-        } },
-        floatingActionButtonPosition = FabPosition.End,
+        topBar = { Header(onClick = { navController.navigate("ShoppingScreen") }) },
         snackbarHost = {SnackbarHost(hostState = snackbarHostState)}
     ){
         paddingValues ->
@@ -109,25 +106,30 @@ fun ComposingScreen(navController : NavController, vm : PurchaseViewModel){
             }
         }
     }
+
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ComposingListItem(item : PurchasableItem, vm : PurchaseViewModel, msg : (String) -> Unit){
     ListItem(
+        modifier = Modifier.height(50.dp),
         headlineText = { Text("${item.name}") },
         leadingContent = {
-            /*
             Icon(
-                Icons.Filled.PlayArrow,
+                //Icons.Filled.Clear,
+                painter = painterResource(R.drawable.baseline_circle_24),
+                tint = catColors[item.category]!!.bg,
                 contentDescription = "Localized description",
+                modifier = Modifier.height(16.dp).width(16.dp)
             )
-
-             */
         },
         supportingText = {
             BadgedBox(badge = {}) {
-                Badge{
+                Badge(
+                    containerColor = catColors[item.category]!!.bg,
+                    contentColor = catColors[item.category]!!.txt){
                     Text("${item.category}",
                         modifier = Modifier.semantics {
                             contentDescription = "Category of item is ${item.category}"
@@ -136,6 +138,7 @@ fun ComposingListItem(item : PurchasableItem, vm : PurchaseViewModel, msg : (Str
                 }
             }
         },
+        /*
         trailingContent = {
             IconButton({
                 vm.deleteItem(item)
@@ -147,6 +150,7 @@ fun ComposingListItem(item : PurchasableItem, vm : PurchaseViewModel, msg : (Str
                 )
             }
         }
+        */
     )
 }
 
@@ -246,7 +250,8 @@ fun AddItemDialog(closeDialog: () -> Unit,
                                         onClick = {
                                             categorySelected = item
                                             categoryExpanded = false
-                                        }
+                                        },
+                                        modifier = Modifier.height(30.dp)
                                     )
                                 }
                             }
@@ -306,12 +311,20 @@ fun AddNewItemButton(setOpen: () -> Unit){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Header(){
+private fun Header(onClick : () -> Unit){
     CenterAlignedTopAppBar(
         title = {
             Text(text = "COMPOSING MODE",
                 maxLines = 1,
                 textAlign = TextAlign.Center)
-        }
+        },
+        navigationIcon = {
+            IconButton(onClick = onClick ) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Back to shopping mode"
+                )
+            }
+        },
     )
 }

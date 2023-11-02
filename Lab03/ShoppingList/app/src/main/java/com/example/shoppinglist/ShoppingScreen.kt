@@ -1,11 +1,8 @@
 package com.example.shoppinglist
 
 import android.util.Log
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -13,15 +10,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
@@ -30,6 +26,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -39,7 +36,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -50,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -64,17 +61,20 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
+    // STRUTTURE DATI
+
+    // Dialog filtri e operazioni di filtraggio
     var (openFilterDialog, setOpen) = remember { mutableStateOf(false) }
     val filterList = remember { mutableListOf<ItemCategory>() }
 
+    // Progress bar
     var currentProgress by remember { mutableFloatStateOf(vm.getProgress()) }
     val progressScope = rememberCoroutineScope() // Create a coroutine scope
 
 
-
     Scaffold (
-        topBar = { Header(onClick = { navController.navigate("ComposingScreen") }, onFilter = { setOpen(true) })},
-        //floatingActionButton = { FilterButton() },
+        topBar = { Header(onFilter = { setOpen(true) }, hasItems = vm.itemsLiveData.value?.isNotEmpty())},
+        floatingActionButton = { EditButton(onClick = { navController.navigate("ComposingScreen") }) },
         floatingActionButtonPosition = FabPosition.End
     ){
             paddingValues ->
@@ -84,57 +84,97 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
                 .padding(paddingValues),
             color = MaterialTheme.colorScheme.background
         ) {
-            Column(Modifier.fillMaxSize()){
-                LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth(),
-                    progress = currentProgress
-                )
+            if(vm.itemsLiveData.value?.isEmpty() == true || vm.itemsLiveData.value == null){
+                Column(horizontalAlignment = Alignment.CenterHorizontally,
+                    //verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .offset(y = LocalConfiguration.current.screenHeightDp.dp / 3)
+                ) {
+                    Text(
+                        text = "Your shopping list is empty\n\nTry adding new items\nby tapping on the edit icon below",
+                        textAlign = TextAlign.Center,
+                        fontStyle = FontStyle.Italic,
+                        color = Color(127, 127, 127)
+                    )
+                }
+            }else {
+                Column(Modifier.fillMaxSize()) {
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth(),
+                        progress = currentProgress
+                    )
 
-                var catList = listOf<ItemCategory>()
-                if(filterList.isNotEmpty())
-                    catList=filterList
-                else
-                    catList=vm.getCategories()
+                    var catList: List<ItemCategory>
 
-                for(cat in catList){
-                    CategorySection(cat, vm)
-                    vm.getItems()
-                        .filter { item -> item.category==cat }
-                        .forEach { item ->
-                            ShoppingListItem(item, vm) {
-                                progressScope.launch {
-                                    currentProgress = vm.getProgress()
+                    if (filterList.isNotEmpty())
+                        catList = filterList
+                    else
+                        catList = vm.getCategories()
+
+                    for (cat in catList) {
+                        CategorySection(cat)
+                        vm.getItems()
+                            .filter { item -> item.category == cat }
+                            .forEach { item ->
+                                ShoppingListItem(item, vm) {
+                                    progressScope.launch {
+                                        currentProgress = vm.getProgress()
+                                    }
                                 }
                             }
-                        }
-                    Divider()
-                }
+                        Divider()
+                    }
 
-                if(openFilterDialog){
-                    FilterDialog(
-                        closeDialog = {setOpen(false) },
-                        filterList = filterList,
-                        updateFilterList = {it, add ->
-                            if(it!=null)
-                                if(add) filterList.add(it)
-                                else    filterList.remove(it)
-                            else
-                                filterList.clear()
-                        })
+                    if (openFilterDialog) {
+                        FilterDialog(
+                            closeDialog = { setOpen(false) },
+                            filterList = filterList,
+                            updateFilterList = { it, add ->
+                                if (it != null)
+                                    if (add) filterList.add(it)
+                                    else filterList.remove(it)
+                                else
+                                    filterList.clear()
+                            })
+                    }
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategorySection(cat: ItemCategory, vm: PurchaseViewModel){
+private fun Header(onFilter : () -> Unit, hasItems: Boolean?){
+    CenterAlignedTopAppBar(
+        title = {
+            Text(text = "SHOPPING MODE",
+                maxLines = 1,
+                textAlign = TextAlign.Center)
+        },
+        actions = {
+            IconButton(onClick = onFilter ) {
+                if(hasItems!=null && hasItems) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_filter_list_24),
+                        contentDescription = "Search"
+                    )
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun CategorySection(cat: ItemCategory){
     //TODO Prendi la lista salvata in vm, filtrala per stampare le categorie e per ogni categoria stampa le voci
     Text(text = "$cat",
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
+        color = catColors[cat]!!.txt,
         modifier = Modifier
-            .background(Color.LightGray)
+            .background(catColors[cat]!!.bg)
             .fillMaxWidth()
             .padding(10.dp)
     )
@@ -161,23 +201,10 @@ fun ShoppingListItem(item: PurchasableItem, vm : PurchaseViewModel, updateProgre
 
                 Log.d("ShoScr", "ShoppingListItem > Updated item is $item\n(also: ${vm.getItems()})")})
         },
-        //modifier = Modifier.draggable()
+        modifier = Modifier.height(45.dp)
+            //.draggable()
     )
 }
-
-/*
-@Composable
-fun FilterButton(/*onClick : () -> Unit*/){
-    FloatingActionButton(
-        onClick = { /*onClick()*/ },
-        shape = CircleShape,
-        modifier = Modifier
-            .padding(16.dp)
-    ) {
-        Icon(Icons.Filled.List, "Filter categories")
-    }
-}
- */
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -270,30 +297,17 @@ fun FilterDialog(closeDialog: () -> Unit,
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+/***
+ * Bottone che permette di passare alla schermata di modifica della lista
+ */
 @Composable
-private fun Header(onClick : () -> Unit, onFilter : () -> Unit){
-    CenterAlignedTopAppBar(
-        title = {
-            Text(text = "SHOPPING MODE",
-                maxLines = 1,
-                textAlign = TextAlign.Center)
-        },
-        navigationIcon = {
-            IconButton(onClick = onClick ) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Back to composing mode"
-                )
-            }
-        },
-        actions = {
-            IconButton(onClick = onFilter ) {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_filter_list_24),
-                    contentDescription = "Search"
-                )
-            }
-        }
-    )
+fun EditButton(onClick : () -> Unit){
+    FloatingActionButton(
+        onClick = { onClick() },
+        shape = CircleShape,
+        modifier = Modifier
+            .padding(16.dp)
+    ) {
+        Icon(Icons.Filled.Edit, "Go to composing mode")
+    }
 }

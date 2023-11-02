@@ -1,7 +1,21 @@
 package com.example.shoppinglist
 
+import androidx.compose.ui.graphics.Color
+
 enum class ItemCategory {
-    NONE, FORNO, ORTOFRUTTA, GASTRONOMIA, SALUMERIA, CASALINGHI, DETERSIVI, CANCELLERIA
+    NONE, BEVANDE, CURA_PERSONA, CURA_CASA, FORNO, FRESCHI, GASTRONOMIA, ORTOFRUTTA, SURGELATI
 }
 
-// TODO mappare categorie con colori
+data class ItemUI(val bg: Color, val txt:Color)
+
+val catColors = mapOf<ItemCategory, ItemUI>(
+    ItemCategory.NONE to ItemUI(Color.LightGray, Color.Black),
+    ItemCategory.BEVANDE to ItemUI(Color.Blue, Color.Black),
+    ItemCategory.CURA_PERSONA to ItemUI(Color.Blue, Color.Black),
+    ItemCategory.CURA_CASA to ItemUI(Color.LightGray, Color.Black),
+    ItemCategory.FORNO to ItemUI(Color.Yellow, Color.Black),
+    ItemCategory.FRESCHI to ItemUI(Color.Blue, Color.Black),
+    ItemCategory.GASTRONOMIA to ItemUI(Color.Red, Color.Black),
+    ItemCategory.ORTOFRUTTA to ItemUI(Color.Green, Color.Black),
+    ItemCategory.SURGELATI to ItemUI(Color.Blue, Color.Black),
+)
