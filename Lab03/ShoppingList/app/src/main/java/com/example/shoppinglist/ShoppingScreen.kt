@@ -3,6 +3,7 @@ package com.example.shoppinglist
 import android.util.Log
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,8 +51,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -145,7 +148,10 @@ fun ShoppingListItem(item: PurchasableItem, vm : PurchaseViewModel, updateProgre
     }
 
     ListItem(
-        headlineText = { Text(item.name) },
+        headlineText = {
+            Text(text = item.name,
+                textDecoration = (if(checked) TextDecoration.LineThrough else null )
+            ) },
         leadingContent = {
             Checkbox(checked = checked, onCheckedChange = {
                 item.purchased = !checked
@@ -154,7 +160,8 @@ fun ShoppingListItem(item: PurchasableItem, vm : PurchaseViewModel, updateProgre
                 updateProgress()
 
                 Log.d("ShoScr", "ShoppingListItem > Updated item is $item\n(also: ${vm.getItems()})")})
-        }
+        },
+        //modifier = Modifier.draggable()
     )
 }
 

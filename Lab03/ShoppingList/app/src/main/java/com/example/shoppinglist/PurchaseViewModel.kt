@@ -1,13 +1,15 @@
 package com.example.shoppinglist
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class PurchaseViewModel : ViewModel() {
-    private val _items = mutableSetOf<PurchasableItem>()
+    private var _items = setOf<PurchasableItem>()
     private val _itemsLiveData = MutableLiveData<Set<PurchasableItem>>()
 
+    val itemsLiveData: LiveData<Set<PurchasableItem>> = _itemsLiveData
     fun getPurchasedNum(): Int{
         return _items.count { it -> it.purchased } ?: 0
     }
@@ -35,7 +37,7 @@ class PurchaseViewModel : ViewModel() {
     fun addItem(newItem : PurchasableItem){
         Log.d("ItemMgm", "addItem > Trying to add new Item ($newItem)")
 
-        _items.add(newItem)
+        _items = _items +newItem
         _itemsLiveData.value = _items
 
         Log.d("ItemMgm", "addItem > Updated item list is $_items\nand related live data is ${_itemsLiveData.value}")
@@ -47,18 +49,34 @@ class PurchaseViewModel : ViewModel() {
     }
 
     fun clearItems(){
-        _items.clear()
+        _items = emptySet()
+        _itemsLiveData.value = _items
     }
 
     fun deleteItem(target : PurchasableItem){
-        //_items.remove(_items.find {it.name == target.name })
-        _items.remove(target)
+        Log.d("ItemMgm", "deleteItem > Trying to delete $target\n\tOld item list is $_items\n\tAnd ${_itemsLiveData.value}")
 
-        Log.d("ItemMgm", "deleteItem > Updated item list is $_items\nand related live data is ${_itemsLiveData.value}")
+        var flag : Boolean
+
+        Log.d("ItemMgm", "deleteItem > Found = ${_items.find {it.name == target.name }}")
+
+
+        _items  = _items.filter{it.name != target.name }.toSet()
+
+        _itemsLiveData.value = _items
+        //flag = _items.remove(target)
+
+       // Log.d("ItemMgm", "deleteItem > [$flag] Updated item list is $_items\nAnd related live data is ${_itemsLiveData.value}")
 
     }
 
     fun setPurchase(item: PurchasableItem, p: Boolean){
-        _items.find { it -> it.name == item.name }?.purchased = p
+        _items = _items.map { it ->
+            if (it.name == item.name)
+                PurchasableItem(it.name, it.category, p)
+            else
+                it
+        }.toSet()
+        _itemsLiveData.value = _items
     }
 }
