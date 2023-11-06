@@ -18,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -80,7 +81,8 @@ fun ComposingScreen(navController : NavController, vm : PurchaseViewModel){
                 .padding(paddingValues),
             color = MaterialTheme.colorScheme.background
         ) {
-            Column(Modifier.fillMaxSize()){
+            Column(Modifier.fillMaxSize()
+                .verticalScroll(rememberScrollState())){
 
                 //Prendi gli elementi inseriti e conservati nel vm, passali al modulo ComposingListItem e costruisci le voci
                 items?.forEach { i ->
@@ -138,7 +140,6 @@ fun ComposingListItem(item : PurchasableItem, vm : PurchaseViewModel, msg : (Str
                 }
             }
         },
-        /*
         trailingContent = {
             IconButton({
                 vm.deleteItem(item)
@@ -150,7 +151,6 @@ fun ComposingListItem(item : PurchasableItem, vm : PurchaseViewModel, msg : (Str
                 )
             }
         }
-        */
     )
 }
 

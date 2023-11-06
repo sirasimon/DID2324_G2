@@ -115,7 +115,7 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
                     for (cat in catList) {
                         CategorySection(cat)
                         vm.getItems()
-                            .filter { item -> item.category == cat }
+                            .filter { item -> item.category == cat && !item.purchased}
                             .forEach { item ->
                                 ShoppingListItem(item, vm) {
                                     progressScope.launch {
@@ -123,6 +123,18 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
                                     }
                                 }
                             }
+
+                        vm.getItems()
+                            .filter { item -> item.category == cat && item.purchased}
+                            .forEach { item ->
+                                ShoppingListItem(item, vm) {
+                                    progressScope.launch {
+                                        currentProgress = vm.getProgress()
+                                    }
+                                }
+                            }
+
+
                         Divider()
                     }
 
