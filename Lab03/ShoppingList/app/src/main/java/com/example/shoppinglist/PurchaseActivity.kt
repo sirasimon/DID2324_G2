@@ -22,9 +22,9 @@ class MainActivity : ComponentActivity() {
 
         // Se true carica 3 oggetti demo
         if(LOAD_DEMO_DATA){
-            vm.addItem(PurchasableItem("PANE", ItemCategory.FORNO, true))
-            vm.addItem(PurchasableItem("FOCACCIA", ItemCategory.FORNO, false))
-            vm.addItem(PurchasableItem("PESCHE", ItemCategory.ORTOFRUTTA, false))
+            vm.addItem(PurchasableItem("Pane", ItemCategory.FORNO, true))
+            vm.addItem(PurchasableItem("Focaccia", ItemCategory.FORNO, false))
+            vm.addItem(PurchasableItem("Pesche", ItemCategory.ORTOFRUTTA, false))
         }
 
         setContent {

@@ -65,7 +65,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ComposingScreen(navController : NavController, vm : PurchaseViewModel){
 
-    var (openDialog, setOpen) = remember { mutableStateOf(false) }
+    val (openDialog, setOpen) = remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val items by vm.itemsLiveData.observeAsState()
@@ -117,7 +117,7 @@ fun ComposingScreen(navController : NavController, vm : PurchaseViewModel){
 fun ComposingListItem(item : PurchasableItem, vm : PurchaseViewModel, msg : (String) -> Unit){
     ListItem(
         modifier = Modifier.height(50.dp),
-        headlineText = { Text("${item.name}") },
+        headlineText = { Text(item.name) },
         leadingContent = {
             Icon(
                 //Icons.Filled.Clear,
@@ -246,7 +246,7 @@ fun AddItemDialog(closeDialog: () -> Unit,
                             ) {
                                 categoryList.forEach { item ->
                                     DropdownMenuItem(
-                                        text = { Text(text = item) },
+                                        text = { Text(text = item.replace("_", " ")) },
                                         onClick = {
                                             categorySelected = item
                                             categoryExpanded = false

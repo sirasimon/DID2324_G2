@@ -1,17 +1,15 @@
 package com.example.shoppinglist
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class PurchaseViewModel : ViewModel() {
     private var _items = setOf<PurchasableItem>()
-    private val _itemsLiveData = MutableLiveData<Set<PurchasableItem>>()
+    val itemsLiveData = MutableLiveData<Set<PurchasableItem>>()
 
-    val itemsLiveData: LiveData<Set<PurchasableItem>> = _itemsLiveData
     fun getPurchasedNum(): Int{
-        return _items.count { it -> it.purchased } ?: 0
+        return _items.count {it.purchased }
     }
 
     fun getTotalItems(): Int{
@@ -31,30 +29,29 @@ class PurchaseViewModel : ViewModel() {
     }
 
     fun getCategories() : List<ItemCategory>{
-        return _items.map{it -> it.category}.toSet().sorted()
+        return _items.map{it.category}.toSet().sorted()
     }
 
     fun addItem(newItem : PurchasableItem){
         Log.d("ItemMgm", "addItem > Trying to add new Item ($newItem)")
 
         _items = _items +newItem
-        _itemsLiveData.value = _items
+        itemsLiveData.value = _items
 
-        Log.d("ItemMgm", "addItem > Updated item list is $_items\nand related live data is ${_itemsLiveData.value}")
-
+        Log.d("ItemMgm", "addItem > Updated item list is $_items\nand related live data is ${itemsLiveData.value}")
     }
 
     fun getItems(): List<PurchasableItem>{
-        return _itemsLiveData.value?.toList() ?: listOf()
+        return itemsLiveData.value?.toList() ?: listOf()
     }
 
     fun clearItems(){
         _items = emptySet()
-        _itemsLiveData.value = _items
+        itemsLiveData.value = _items
     }
 
     fun deleteItem(target : PurchasableItem){
-        Log.d("ItemMgm", "deleteItem > Trying to delete $target\n\tOld item list is $_items\n\tAnd ${_itemsLiveData.value}")
+        Log.d("ItemMgm", "deleteItem > Trying to delete $target\n\tOld item list is $_items\n\tAnd ${itemsLiveData.value}")
 
         var flag : Boolean
 
@@ -63,7 +60,7 @@ class PurchaseViewModel : ViewModel() {
 
         _items  = _items.filter{it.name != target.name }.toSet()
 
-        _itemsLiveData.value = _items
+        itemsLiveData.value = _items
         //flag = _items.remove(target)
 
        // Log.d("ItemMgm", "deleteItem > [$flag] Updated item list is $_items\nAnd related live data is ${_itemsLiveData.value}")
@@ -77,6 +74,7 @@ class PurchaseViewModel : ViewModel() {
             else
                 it
         }.toSet()
-        _itemsLiveData.value = _items
+
+        itemsLiveData.value = _items
     }
 }

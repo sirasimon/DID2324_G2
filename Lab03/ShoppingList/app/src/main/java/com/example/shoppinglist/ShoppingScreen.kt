@@ -1,6 +1,10 @@
 package com.example.shoppinglist
 
 import android.util.Log
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,7 +42,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -62,18 +66,28 @@ import kotlinx.coroutines.launch
 @Composable
 fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
     // STRUTTURE DATI
+    val items by vm.itemsLiveData.observeAsState()
 
     // Dialog filtri e operazioni di filtraggio
-    var (openFilterDialog, setOpen) = remember { mutableStateOf(false) }
+    val (openFilterDialog, setOpen) = remember { mutableStateOf(false) }
     val filterList = remember { mutableListOf<ItemCategory>() }
 
     // Progress bar
-    var currentProgress by remember { mutableFloatStateOf(vm.getProgress()) }
+    val currentProgress = remember { Animatable(vm.getProgress()) }
     val progressScope = rememberCoroutineScope() // Create a coroutine scope
 
+    var completed by remember{mutableStateOf(false)}
+
+    val defaultColor = Color(95,95,95)
+    val endColor = Color.Green
+    val progressColor by animateColorAsState(
+        if(completed) endColor else defaultColor,
+        animationSpec = tween(1500, easing = EaseInOut),
+        label = "ColorChange"
+    )
 
     Scaffold (
-        topBar = { Header(onFilter = { setOpen(true) }, hasItems = vm.itemsLiveData.value?.isNotEmpty())},
+        topBar = { Header(onFilter = { setOpen(true) }, hasItems = items?.isNotEmpty())},
         floatingActionButton = { EditButton(onClick = { navController.navigate("ComposingScreen") }) },
         floatingActionButtonPosition = FabPosition.End
     ){
@@ -84,7 +98,9 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
                 .padding(paddingValues),
             color = MaterialTheme.colorScheme.background
         ) {
-            if(vm.itemsLiveData.value?.isEmpty() == true || vm.itemsLiveData.value == null){
+
+            //if(vm.itemsLiveData.value?.isEmpty() == true || vm.itemsLiveData.value == null){
+            if(items?.isEmpty() == true || items == null){
                 Column(horizontalAlignment = Alignment.CenterHorizontally,
                     //verticalArrangement = Arrangement.Center,
                     modifier = Modifier
@@ -102,10 +118,11 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
                 Column(Modifier.fillMaxSize()) {
                     LinearProgressIndicator(
                         modifier = Modifier.fillMaxWidth(),
-                        progress = currentProgress
+                        progress = currentProgress.value,
+                        color = progressColor
                     )
 
-                    var catList: List<ItemCategory>
+                    val catList: List<ItemCategory>
 
                     if (filterList.isNotEmpty())
                         catList = filterList
@@ -114,26 +131,41 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
 
                     for (cat in catList) {
                         CategorySection(cat)
-                        vm.getItems()
-                            .filter { item -> item.category == cat && !item.purchased}
-                            .forEach { item ->
+
+                        items
+                            ?.filter { item -> item.category == cat && !item.purchased}
+                            ?.forEach { item ->
                                 ShoppingListItem(item, vm) {
                                     progressScope.launch {
-                                        currentProgress = vm.getProgress()
+                                        if(vm.getProgress()==1f){
+                                            completed = true
+                                        }else if(vm.getPurchasedNum() != vm.getTotalItems()){
+                                            completed = false
+                                        }
+
+                                        currentProgress.animateTo(vm.getProgress(), animationSpec = tween(1500, easing = EaseInOut))
                                     }
                                 }
                             }
 
-                        vm.getItems()
-                            .filter { item -> item.category == cat && item.purchased}
-                            .forEach { item ->
+                        Divider()
+
+                        items
+                            ?.filter { item -> item.category == cat && item.purchased}
+                            ?.forEach { item ->
                                 ShoppingListItem(item, vm) {
                                     progressScope.launch {
-                                        currentProgress = vm.getProgress()
+
+                                        if(vm.getProgress()==1f){
+                                            completed = true
+                                        }else if(vm.getPurchasedNum() != vm.getTotalItems()){
+                                            completed = false
+                                        }
+
+                                        currentProgress.animateTo(vm.getProgress(), animationSpec = tween(1500, easing = EaseInOut))
                                     }
                                 }
                             }
-
 
                         Divider()
                     }
@@ -148,7 +180,8 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
                                     else filterList.remove(it)
                                 else
                                     filterList.clear()
-                            })
+                            }
+                        )
                     }
                 }
             }
@@ -181,7 +214,7 @@ private fun Header(onFilter : () -> Unit, hasItems: Boolean?){
 @Composable
 fun CategorySection(cat: ItemCategory){
     //TODO Prendi la lista salvata in vm, filtrala per stampare le categorie e per ogni categoria stampa le voci
-    Text(text = "$cat",
+    Text(text = cat.toString().replace("_", " "),
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
         color = catColors[cat]!!.txt,
@@ -195,20 +228,25 @@ fun CategorySection(cat: ItemCategory){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShoppingListItem(item: PurchasableItem, vm : PurchaseViewModel, updateProgress: () -> Unit){
+
     val (checked, setChecked) = remember{
         mutableStateOf(item.purchased)
     }
 
+    val targetItem by vm.itemsLiveData.observeAsState()
+
     ListItem(
         headlineText = {
             Text(text = item.name,
-                textDecoration = (if(checked) TextDecoration.LineThrough else null )
+                textDecoration = (if(targetItem?.find{it.name==item.name}?.purchased == true) TextDecoration.LineThrough else null ),
+                fontStyle = (if(targetItem?.find{it.name==item.name}?.purchased == true) FontStyle.Italic else null )
             ) },
         leadingContent = {
-            Checkbox(checked = checked, onCheckedChange = {
-                item.purchased = !checked
-                setChecked(!checked)
-                vm.setPurchase(item, !checked)
+            Checkbox(checked = targetItem?.find{it.name==item.name}?.purchased ?: false, onCheckedChange = { it ->
+                //item.purchased = it
+                //setChecked(it)
+                vm.setPurchase(item, it)
+                setChecked(targetItem?.find{it.name==item.name}?.purchased ?: false)
                 updateProgress()
 
                 Log.d("ShoScr", "ShoppingListItem > Updated item is $item\n(also: ${vm.getItems()})")})
