@@ -17,8 +17,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
@@ -117,7 +119,9 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
                     )
                 }
             }else {
-                Column(Modifier.fillMaxSize()) {
+                Column(
+                    Modifier
+                        .fillMaxSize()) {
                     LinearProgressIndicator(
                         modifier = Modifier.fillMaxWidth(),
                         progress = currentProgress.value,
@@ -132,45 +136,50 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
                         else
                             vm.getCategories()
 
-                    for (cat in catList) {
-                        CategorySection(cat)
+                    Column(Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())){
+                        for (cat in catList) {
+                            CategorySection(cat)
 
-                        items
-                            ?.filter { item -> item.category == cat && !item.purchased}
-                            ?.forEach { item ->
-                                ShoppingListItem(item, vm) {
-                                    progressScope.launch {
-                                        if(vm.getProgress()==1f){
-                                            completed = true
-                                        }else if(vm.getPurchasedNum() != vm.getTotalItems()){
-                                            completed = false
+                            items
+                                ?.filter { item -> item.category == cat && !item.purchased}
+                                ?.forEach { item ->
+                                    ShoppingListItem(item, vm) {
+                                        progressScope.launch {
+                                            if(vm.getProgress()==1f){
+                                                completed = true
+                                            }else if(vm.getPurchasedNum() != vm.getTotalItems()){
+                                                completed = false
+                                            }
+
+                                            currentProgress.animateTo(vm.getProgress(), animationSpec = tween(ANIM_TIMING, easing = EaseInOut))
                                         }
-
-                                        currentProgress.animateTo(vm.getProgress(), animationSpec = tween(ANIM_TIMING, easing = EaseInOut))
                                     }
                                 }
-                            }
 
-                        Divider()
+                            Divider()
 
-                        items
-                            ?.filter { item -> item.category == cat && item.purchased}
-                            ?.forEach { item ->
-                                ShoppingListItem(item, vm) {
-                                    progressScope.launch {
+                            items
+                                ?.filter { item -> item.category == cat && item.purchased}
+                                ?.forEach { item ->
+                                    ShoppingListItem(item, vm) {
+                                        progressScope.launch {
 
-                                        if(vm.getProgress()==1f){
-                                            completed = true
-                                        }else if(vm.getPurchasedNum() != vm.getTotalItems()){
-                                            completed = false
+                                            if(vm.getProgress()==1f){
+                                                completed = true
+                                            }else if(vm.getPurchasedNum() != vm.getTotalItems()){
+                                                completed = false
+                                            }
+
+                                            currentProgress.animateTo(vm.getProgress(), animationSpec = tween(ANIM_TIMING, easing = EaseInOut))
                                         }
-
-                                        currentProgress.animateTo(vm.getProgress(), animationSpec = tween(ANIM_TIMING, easing = EaseInOut))
                                     }
                                 }
-                            }
 
-                        Divider()
+                            Divider()
+                        }
+
                     }
 
                     if (openFilterDialog) {
@@ -199,7 +208,8 @@ private fun Header(onFilter : () -> Unit, hasItems: Boolean?){
         title = {
             Text(text = "SHOPPING MODE",
                 maxLines = 1,
-                textAlign = TextAlign.Center)
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold)
         },
         actions = {
             IconButton(onClick = onFilter ) {
@@ -317,8 +327,6 @@ fun FilterDialog(closeDialog: () -> Unit,
                             },
                         )
                     }
-
-
                 }
 
                 // Ultima riga di bottoni

@@ -25,6 +25,15 @@ class MainActivity : ComponentActivity() {
             vm.addItem(PurchasableItem("Pane", ItemCategory.FORNO, true))
             vm.addItem(PurchasableItem("Focaccia", ItemCategory.FORNO, false))
             vm.addItem(PurchasableItem("Pesche", ItemCategory.ORTOFRUTTA, false))
+            vm.addItem(PurchasableItem("Dentifricio", ItemCategory.CURA_PERSONA, false))
+            vm.addItem(PurchasableItem("Filo interdentale", ItemCategory.CURA_PERSONA, false))
+            vm.addItem(PurchasableItem("Colluttorio", ItemCategory.CURA_PERSONA, false))
+            vm.addItem(PurchasableItem("Sale lavastoviglie", ItemCategory.CURA_CASA, true))
+            vm.addItem(PurchasableItem("Sapone per piatti", ItemCategory.CURA_CASA, false))
+            vm.addItem(PurchasableItem("Detersivo vestiti", ItemCategory.CURA_CASA, false))
+            vm.addItem(PurchasableItem("Bastoncini", ItemCategory.SURGELATI, false))
+            vm.addItem(PurchasableItem("Pizza", ItemCategory.SURGELATI, false))
+            vm.addItem(PurchasableItem("Gelato", ItemCategory.SURGELATI, false))
         }
 
         setContent {
