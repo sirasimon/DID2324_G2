@@ -62,6 +62,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 
+const val ANIM_TIMING = 500
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
@@ -82,7 +84,7 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
     val endColor = Color.Green
     val progressColor by animateColorAsState(
         if(completed) endColor else defaultColor,
-        animationSpec = tween(1500, easing = EaseInOut),
+        animationSpec = tween(ANIM_TIMING, easing = EaseInOut),
         label = "ColorChange"
     )
 
@@ -124,10 +126,11 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
 
                     val catList: List<ItemCategory>
 
-                    if (filterList.isNotEmpty())
-                        catList = filterList
-                    else
-                        catList = vm.getCategories()
+                    catList =
+                        if (filterList.isNotEmpty())
+                            filterList
+                        else
+                            vm.getCategories()
 
                     for (cat in catList) {
                         CategorySection(cat)
@@ -143,7 +146,7 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
                                             completed = false
                                         }
 
-                                        currentProgress.animateTo(vm.getProgress(), animationSpec = tween(1500, easing = EaseInOut))
+                                        currentProgress.animateTo(vm.getProgress(), animationSpec = tween(ANIM_TIMING, easing = EaseInOut))
                                     }
                                 }
                             }
@@ -162,7 +165,7 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
                                             completed = false
                                         }
 
-                                        currentProgress.animateTo(vm.getProgress(), animationSpec = tween(1500, easing = EaseInOut))
+                                        currentProgress.animateTo(vm.getProgress(), animationSpec = tween(ANIM_TIMING, easing = EaseInOut))
                                     }
                                 }
                             }
