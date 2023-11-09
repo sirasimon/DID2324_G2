@@ -11,7 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.shoppinglist.ui.theme.ShoppingListTheme
 
 // Per caricare dei valori demo
-const val LOAD_DEMO_DATA = false
+const val LOAD_DEMO_DATA = true
 
 class MainActivity : ComponentActivity() {
 

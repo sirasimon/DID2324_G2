@@ -51,6 +51,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -118,13 +119,23 @@ fun ComposingListItem(item : PurchasableItem, vm : PurchaseViewModel, msg : (Str
         modifier = Modifier.height(50.dp),
         headlineText = { Text(item.name) },
         leadingContent = {
-            Icon(
-                //Icons.Filled.Clear,
-                painter = painterResource(R.drawable.baseline_circle_24),
-                tint = catColors[item.category]!!.bg,
-                contentDescription = "Localized description",
-                modifier = Modifier.height(16.dp).width(16.dp)
-            )
+            if(item.category == ItemCategory.SURGELATI){
+                Icon(
+                    //Icons.Filled.Clear,
+                    painter = painterResource(R.drawable.resource_null),
+                    contentDescription = "Localized description",
+                    tint = Color(0xFFFFC107)
+                    //modifier = Modifier.height(16.dp).width(16.dp)
+                )
+            }else{
+                Icon(
+                    //Icons.Filled.Clear,
+                    painter = painterResource(R.drawable.baseline_circle_24),
+                    tint = catColors[item.category]!!.bg,
+                    contentDescription = "Localized description",
+                    modifier = Modifier.height(16.dp).width(16.dp)
+                )
+            }
         },
         supportingText = {
             BadgedBox(badge = {}) {

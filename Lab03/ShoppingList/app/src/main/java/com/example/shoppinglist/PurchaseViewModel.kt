@@ -77,4 +77,18 @@ class PurchaseViewModel : ViewModel() {
 
         itemsLiveData.value = _items
     }
+
+    fun setPurchase(item: PurchasableItem){
+
+        var p = _items.find{it->it.name==item.name}?.purchased ?: false
+
+        _items = _items.map { it ->
+            if (it.name == item.name)
+                PurchasableItem(it.name, it.category, !p)
+            else
+                it
+        }.toSet()
+
+        itemsLiveData.value = _items
+    }
 }
