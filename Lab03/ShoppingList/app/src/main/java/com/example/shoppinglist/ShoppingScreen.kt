@@ -5,6 +5,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,17 +18,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilterChip
@@ -38,10 +37,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -52,6 +54,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
@@ -66,7 +69,7 @@ import kotlinx.coroutines.launch
 
 const val ANIM_TIMING = 500
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
     // STRUTTURE DATI
@@ -89,9 +92,32 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
         animationSpec = tween(ANIM_TIMING, easing = EaseInOut),
         label = "ColorChange"
     )
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     Scaffold (
-        topBar = { Header(onFilter = { setOpen(true) }, hasItems = items?.isNotEmpty())},
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            MediumTopAppBar(
+                title = {
+                    Text(text = "SHOPPING MODE",
+                        maxLines = 1,
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold)
+                },
+                actions = {
+                    IconButton(onClick = { setOpen(true) } ) {
+                        if(items?.isNotEmpty() == true) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_filter_list_24),
+                                contentDescription = "Search"
+                            )
+                        }
+                    }
+                },
+                scrollBehavior = scrollBehavior
+            )
+            //Header(onFilter = { setOpen(true) }, hasItems = items?.isNotEmpty())
+        },
         floatingActionButton = { EditButton(onClick = { navController.navigate("ComposingScreen") }) },
         floatingActionButtonPosition = FabPosition.End
     ){
@@ -103,7 +129,7 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
             color = MaterialTheme.colorScheme.background
         ) {
 
-            //if(vm.itemsLiveData.value?.isEmpty() == true || vm.itemsLiveData.value == null){
+            // Se la lista è vuota, mostra messaggio
             if(items?.isEmpty() == true || items == null){
                 Column(horizontalAlignment = Alignment.CenterHorizontally,
                     //verticalArrangement = Arrangement.Center,
@@ -118,27 +144,57 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
                         color = Color(127, 127, 127)
                     )
                 }
+
+            // Se la lista non è vuota, riempila
             }else {
                 Column(
                     Modifier
-                        .fillMaxSize()) {
+                        .fillMaxSize()
+                ) {
+
+                    val catList: List<ItemCategory> =
+                        if (filterList.isNotEmpty())
+                            filterList
+                        else
+                            vm.getCategories()
+
                     LinearProgressIndicator(
                         modifier = Modifier.fillMaxWidth(),
                         progress = currentProgress.value,
                         color = progressColor
                     )
 
-                    val catList: List<ItemCategory>
+                    LazyColumn(){
+                        catList.forEach {
+                            stickyHeader { CategoryHeader(label = it.name.replace("_"," ")) }
 
-                    catList =
-                        if (filterList.isNotEmpty())
-                            filterList
-                        else
-                            vm.getCategories()
+                            items( items = items!!.toList().filter{ item -> item.category == it}
+                                .sortedWith(compareBy<PurchasableItem> { it.purchased }
+                                    .thenBy { it.name }
+                                ),
+                                key={it.name}
+                            ){
+                                ShoppingListItem(it, vm, Modifier.animateItemPlacement(animationSpec = tween(ANIM_TIMING, easing = EaseInOut) )) {
+                                    progressScope.launch {
+                                        if(vm.getProgress()==1f){
+                                            completed = true
+                                        }else if(vm.getPurchasedNum() != vm.getTotalItems()){
+                                            completed = false
+                                        }
 
-                    Column(Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())){
+                                        currentProgress.animateTo(vm.getProgress(), animationSpec = tween(ANIM_TIMING, easing = EaseInOut))
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // OLD VERSION
+                    /*
+                    Column(
+                        Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())){
                         for (cat in catList) {
                             CategorySection(cat)
 
@@ -181,6 +237,7 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
                         }
 
                     }
+                    */
 
                     if (openFilterDialog) {
                         FilterDialog(
@@ -201,26 +258,16 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Header(onFilter : () -> Unit, hasItems: Boolean?){
-    CenterAlignedTopAppBar(
-        title = {
-            Text(text = "SHOPPING MODE",
-                maxLines = 1,
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold)
-        },
-        actions = {
-            IconButton(onClick = onFilter ) {
-                if(hasItems!=null && hasItems) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_filter_list_24),
-                        contentDescription = "Search"
-                    )
-                }
-            }
-        }
+private fun CategoryHeader(label: String, modifier: Modifier = Modifier){
+    Text(
+        text = label,
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .padding(16.dp)
     )
 }
 
@@ -240,11 +287,7 @@ fun CategorySection(cat: ItemCategory){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShoppingListItem(item: PurchasableItem, vm : PurchaseViewModel, updateProgress: () -> Unit){
-
-    val (checked, setChecked) = remember{
-        mutableStateOf(item.purchased)
-    }
+fun ShoppingListItem(item: PurchasableItem, vm : PurchaseViewModel, modifier : Modifier = Modifier, updateProgress: () -> Unit){
 
     val targetItem by vm.itemsLiveData.observeAsState()
 
@@ -256,16 +299,12 @@ fun ShoppingListItem(item: PurchasableItem, vm : PurchaseViewModel, updateProgre
             ) },
         leadingContent = {
             Checkbox(checked = targetItem?.find{it.name==item.name}?.purchased ?: false, onCheckedChange = { it ->
-                //item.purchased = it
-                //setChecked(it)
                 vm.setPurchase(item, it)
-                setChecked(targetItem?.find{it.name==item.name}?.purchased ?: false)
                 updateProgress()
 
                 Log.d("ShoScr", "ShoppingListItem > Updated item is $item\n(also: ${vm.getItems()})")})
         },
-        modifier = Modifier.height(45.dp)
-            //.draggable()
+        modifier = modifier.height(45.dp)
     )
 }
 
@@ -313,7 +352,7 @@ fun FilterDialog(closeDialog: () -> Unit,
                                 updateFilterList(it, !selected)
                                 selected = !selected
                                       },
-                            label = { Text(text = it.name)},
+                            label = { Text(text = it.name.replace("_", " "))},
                             leadingIcon = if (filterList.contains(it)) {
                                 {
                                     Icon(

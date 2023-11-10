@@ -142,7 +142,7 @@ fun ComposingListItem(item : PurchasableItem, vm : PurchaseViewModel, msg : (Str
                 Badge(
                     containerColor = catColors[item.category]!!.bg,
                     contentColor = catColors[item.category]!!.txt){
-                    Text("${item.category}",
+                    Text("${item.category.toString().replace("_", " ")}",
                         modifier = Modifier.semantics {
                             contentDescription = "Category of item is ${item.category}"
                         }
