@@ -12,14 +12,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
@@ -29,7 +27,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -38,6 +35,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -63,6 +61,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 
+private var lastDeleted = PurchasableItem("none", ItemCategory.NONE, false)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ComposingScreen(navController : NavController, vm : PurchaseViewModel){
@@ -83,17 +83,24 @@ fun ComposingScreen(navController : NavController, vm : PurchaseViewModel){
                 .padding(paddingValues),
             color = MaterialTheme.colorScheme.background
         ) {
-            Column(Modifier.fillMaxSize()
-                .verticalScroll(rememberScrollState())){
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())){
 
                 //Prendi gli elementi inseriti e conservati nel vm, passali al modulo ComposingListItem e costruisci le voci
                 items?.forEach { i ->
                     ComposingListItem(i, vm) { msg ->
                         scope.launch {
-                            snackbarHostState.showSnackbar(
+                            val result = snackbarHostState.showSnackbar(
                                 message = msg,
-                                duration = SnackbarDuration.Short
+                                duration = SnackbarDuration.Short,
+                                actionLabel = "Cancel"
                             )
+
+                            if(result == SnackbarResult.ActionPerformed){
+                                vm.addItem(lastDeleted.copy())
+                            }
                         }
                     }
                 }
@@ -133,7 +140,9 @@ fun ComposingListItem(item : PurchasableItem, vm : PurchaseViewModel, msg : (Str
                     painter = painterResource(R.drawable.baseline_circle_24),
                     tint = catColors[item.category]!!.bg,
                     contentDescription = "Localized description",
-                    modifier = Modifier.height(16.dp).width(16.dp)
+                    modifier = Modifier
+                        .height(16.dp)
+                        .width(16.dp)
                 )
             }
         },
@@ -142,7 +151,7 @@ fun ComposingListItem(item : PurchasableItem, vm : PurchaseViewModel, msg : (Str
                 Badge(
                     containerColor = catColors[item.category]!!.bg,
                     contentColor = catColors[item.category]!!.txt){
-                    Text("${item.category.toString().replace("_", " ")}",
+                    Text(item.category.toString().replace("_", " "),
                         modifier = Modifier.semantics {
                             contentDescription = "Category of item is ${item.category}"
                         }
@@ -151,10 +160,13 @@ fun ComposingListItem(item : PurchasableItem, vm : PurchaseViewModel, msg : (Str
             }
         },
         trailingContent = {
-            IconButton({
-                vm.deleteItem(item)
-                msg("Deleting item ${item.name} from category ${item.category}")
-            }){
+            IconButton(
+                onClick = {
+                    lastDeleted = item.copy()
+                    vm.deleteItem(item)
+                    msg("Deleting item ${item.name} from category ${item.category.toString().replace("_", " ")}")
+                }
+            ){
                 Icon(
                     Icons.Filled.Delete,
                     contentDescription = "Delete item",
@@ -162,19 +174,6 @@ fun ComposingListItem(item : PurchasableItem, vm : PurchaseViewModel, msg : (Str
             }
         }
     )
-}
-
-
-@Composable
-fun ShoppingModeButton(onClick : () -> Unit){
-    FloatingActionButton(
-        onClick = { onClick() },
-        shape = CircleShape,
-        modifier = Modifier
-            .padding(16.dp)
-    ) {
-        Icon(Icons.Filled.ShoppingCart, "Go to shopping mode")
-    }
 }
 
 /**
@@ -286,7 +285,7 @@ fun AddItemDialog(closeDialog: () -> Unit,
                         onClick = {
                             vm.addItem(PurchasableItem(itemDescription, ItemCategory.valueOf(categorySelected), false))
                             closeDialog()
-                            snackbarMsg("Added new item $itemDescription in category $categorySelected")
+                            snackbarMsg("Added new item $itemDescription in category ${categorySelected.replace("_", " ")}")
                                   },
                         modifier = Modifier.padding(8.dp),
                     ) {

@@ -204,56 +204,6 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
                         }
                     }
 
-                    // OLD VERSION
-                    /*
-                    Column(
-                        Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())){
-                        for (cat in catList) {
-                            CategorySection(cat)
-
-                            items
-                                ?.filter { item -> item.category == cat && !item.purchased}
-                                ?.forEach { item ->
-                                    ShoppingListItem(item, vm) {
-                                        progressScope.launch {
-                                            if(vm.getProgress()==1f){
-                                                completed = true
-                                            }else if(vm.getPurchasedNum() != vm.getTotalItems()){
-                                                completed = false
-                                            }
-
-                                            currentProgress.animateTo(vm.getProgress(), animationSpec = tween(ANIM_TIMING, easing = EaseInOut))
-                                        }
-                                    }
-                                }
-
-                            Divider()
-
-                            items
-                                ?.filter { item -> item.category == cat && item.purchased}
-                                ?.forEach { item ->
-                                    ShoppingListItem(item, vm) {
-                                        progressScope.launch {
-
-                                            if(vm.getProgress()==1f){
-                                                completed = true
-                                            }else if(vm.getPurchasedNum() != vm.getTotalItems()){
-                                                completed = false
-                                            }
-
-                                            currentProgress.animateTo(vm.getProgress(), animationSpec = tween(ANIM_TIMING, easing = EaseInOut))
-                                        }
-                                    }
-                                }
-
-                            Divider()
-                        }
-
-                    }
-                    */
-
                     if (openFilterDialog) {
                         FilterDialog(
                             closeDialog = { setOpen(false) },
@@ -283,20 +233,6 @@ private fun CategoryHeader(label: String, modifier: Modifier = Modifier){
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primaryContainer)
             .padding(16.dp)
-    )
-}
-
-@Composable
-fun CategorySection(cat: ItemCategory){
-    //TODO Prendi la lista salvata in vm, filtrala per stampare le categorie e per ogni categoria stampa le voci
-    Text(text = cat.toString().replace("_", " "),
-        fontSize = 20.sp,
-        fontWeight = FontWeight.Bold,
-        color = catColors[cat]!!.txt,
-        modifier = Modifier
-            .background(catColors[cat]!!.bg)
-            .fillMaxWidth()
-            .padding(10.dp)
     )
 }
 
@@ -337,19 +273,6 @@ fun ShoppingListItem(item: PurchasableItem, vm : PurchaseViewModel, modifier : M
         )
     }
 
-    /*
-    if(state.currentValue == DragAnchors.End){
-        //state.updateAnchors(newAnchors = draggableAnchors, newTarget = DragAnchors.Start)
-        LaunchedEffect(state){
-            state.snapTo(DragAnchors.Start)
-            vm.setPurchase(item, !item.purchased)
-            updateProgress()
-        }
-
-        Log.d("ShoScr", "ShoppingListItem > Updated item is $item\n(also: ${vm.getItems()})")
-    }
-     */
-
     when(state.currentValue){
         DragAnchors.Start -> {
             //TODO
@@ -357,8 +280,7 @@ fun ShoppingListItem(item: PurchasableItem, vm : PurchaseViewModel, modifier : M
 
         DragAnchors.Action -> {
             LaunchedEffect(state){
-
-                state.snapTo(DragAnchors.Start)
+                //state.snapTo(DragAnchors.Start)
             }
         }
 
@@ -423,26 +345,13 @@ fun ShoppingListItem(item: PurchasableItem, vm : PurchaseViewModel, modifier : M
 
         ListItem(
             headlineText = {
-                Text(text = item.name+" [${state.isAnimationRunning}]",
+                Text(text = item.name,
                     //textDecoration = (if(targetItem?.find{it.name==item.name}?.purchased == true) TextDecoration.LineThrough else null ),
                     //fontStyle = (if(targetItem?.find{it.name==item.name}?.purchased == true) FontStyle.Italic else null )
                     textDecoration = (if(item.purchased) TextDecoration.LineThrough else null ),
                     fontStyle = (if(item.purchased) FontStyle.Italic else null )
                 ) },
-            /*
-            leadingContent = {
-                Checkbox(
-                    //checked = targetItem?.find{it.name==item.name}?.purchased ?: false,
-                    checked = item.purchased,
-                    onCheckedChange = { it ->
-                        vm.setPurchase(item, it)
-                        updateProgress()
 
-                        Log.d("ShoScr", "ShoppingListItem > Updated item is $item\n(also: ${vm.getItems()})")
-                    }
-                )
-            },
-             */
             modifier = Modifier
                 .height(45.dp)
                 .offset {
@@ -460,34 +369,6 @@ fun ShoppingListItem(item: PurchasableItem, vm : PurchaseViewModel, modifier : M
                 )
         )
     }
-
-    //OLD
-/*
-    ListItem(
-        headlineText = {
-            Text(text = item.name,
-                //textDecoration = (if(targetItem?.find{it.name==item.name}?.purchased == true) TextDecoration.LineThrough else null ),
-                //fontStyle = (if(targetItem?.find{it.name==item.name}?.purchased == true) FontStyle.Italic else null )
-                textDecoration = (if(item.purchased) TextDecoration.LineThrough else null ),
-                fontStyle = (if(item.purchased) FontStyle.Italic else null )
-            ) },
-        leadingContent = {
-            Checkbox(
-                //checked = targetItem?.find{it.name==item.name}?.purchased ?: false,
-                checked = item.purchased,
-                onCheckedChange = { it ->
-                    vm.setPurchase(item, it)
-                    updateProgress()
-
-                    Log.d("ShoScr", "ShoppingListItem > Updated item is $item\n(also: ${vm.getItems()})")
-                },
-                enabled = true
-            )
-        },
-        modifier = modifier.height(45.dp)
-    )
-
- */
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
