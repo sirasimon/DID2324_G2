@@ -7,17 +7,25 @@ import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.AnchoredDraggableState
+import androidx.compose.foundation.gestures.DraggableAnchors
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.anchoredDraggable
+import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -26,7 +34,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilterChip
@@ -45,6 +52,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -53,21 +61,28 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 const val ANIM_TIMING = 500
+val ADD_COLOR = Color(0xFF01B95A)
+val DEL_COLOR = Color(0xFFDD0021)
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -285,27 +300,194 @@ fun CategorySection(cat: ItemCategory){
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+enum class DragAnchors {
+    Start,
+    Action,
+    End,
+}
+
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class
+)
 @Composable
 fun ShoppingListItem(item: PurchasableItem, vm : PurchaseViewModel, modifier : Modifier = Modifier, updateProgress: () -> Unit){
 
-    val targetItem by vm.itemsLiveData.observeAsState()
+    //val targetItem by vm.itemsLiveData.observeAsState()
+    val coroutineScope = rememberCoroutineScope()
+    val density = LocalDensity.current
 
+    val defaultActionSize = 80.dp
+    val actionSizePx = with(density) { defaultActionSize.toPx() }
+    val endActionSizePx = with(density) { (defaultActionSize * 2).toPx() }
+
+    val draggableAnchors = DraggableAnchors {
+        DragAnchors.Start at 0f
+        DragAnchors.Action at actionSizePx
+        DragAnchors.End at endActionSizePx
+    }
+
+    val state = remember {
+        AnchoredDraggableState(
+            initialValue = DragAnchors.Start,
+            anchors = draggableAnchors,
+            positionalThreshold = { distance: Float -> distance * 0.5f },
+            velocityThreshold = { with(density) { 100.dp.toPx() } },
+            animationSpec = tween()
+        )
+    }
+
+    /*
+    if(state.currentValue == DragAnchors.End){
+        //state.updateAnchors(newAnchors = draggableAnchors, newTarget = DragAnchors.Start)
+        LaunchedEffect(state){
+            state.snapTo(DragAnchors.Start)
+            vm.setPurchase(item, !item.purchased)
+            updateProgress()
+        }
+
+        Log.d("ShoScr", "ShoppingListItem > Updated item is $item\n(also: ${vm.getItems()})")
+    }
+     */
+
+    when(state.currentValue){
+        DragAnchors.Start -> {
+            //TODO
+        }
+
+        DragAnchors.Action -> {
+            LaunchedEffect(state){
+
+                state.snapTo(DragAnchors.Start)
+            }
+        }
+
+        DragAnchors.End -> {
+            LaunchedEffect(state){
+                state.snapTo(DragAnchors.Start)
+                vm.setPurchase(item, !item.purchased)
+                updateProgress()
+            }
+
+            Log.d("ShoScr", "ShoppingListItem > Updated item is $item\n(also: ${vm.getItems()})")
+        }
+    }
+
+    Box(                            //Contenitore che contiene il draggabile
+        modifier = modifier
+            .fillMaxWidth()
+            .height(45.dp)
+            .clip(RectangleShape)
+            .background(
+                if (item.purchased)
+                    DEL_COLOR
+                else
+                    ADD_COLOR
+            )
+    ){
+        //TODO
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .align(Alignment.CenterStart),
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(defaultActionSize)
+                    .fillMaxSize()
+                    .offset {
+                        IntOffset(((state.requireOffset() - actionSizePx)).roundToInt(), 0)
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        modifier = Modifier
+                            .padding(top = 10.dp, bottom = 4.dp)
+                            .padding(horizontal = 20.dp)
+                            .size(24.dp),
+                        painter =
+                        if(item.purchased)
+                            painterResource(R.drawable.baseline_remove_shopping_cart_24)
+                        else
+                            painterResource(R.drawable.baseline_shopping_cart_24),
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
+            }
+        }
+
+        ListItem(
+            headlineText = {
+                Text(text = item.name+" [${state.isAnimationRunning}]",
+                    //textDecoration = (if(targetItem?.find{it.name==item.name}?.purchased == true) TextDecoration.LineThrough else null ),
+                    //fontStyle = (if(targetItem?.find{it.name==item.name}?.purchased == true) FontStyle.Italic else null )
+                    textDecoration = (if(item.purchased) TextDecoration.LineThrough else null ),
+                    fontStyle = (if(item.purchased) FontStyle.Italic else null )
+                ) },
+            /*
+            leadingContent = {
+                Checkbox(
+                    //checked = targetItem?.find{it.name==item.name}?.purchased ?: false,
+                    checked = item.purchased,
+                    onCheckedChange = { it ->
+                        vm.setPurchase(item, it)
+                        updateProgress()
+
+                        Log.d("ShoScr", "ShoppingListItem > Updated item is $item\n(also: ${vm.getItems()})")
+                    }
+                )
+            },
+             */
+            modifier = Modifier
+                .height(45.dp)
+                .offset {
+                    IntOffset(
+                        x = state
+                            .requireOffset()
+                            .roundToInt(),
+                        y = 0,
+                    )
+                }
+                .anchoredDraggable(
+                    state = state,
+                    orientation = Orientation.Horizontal,
+                    reverseDirection = false
+                )
+        )
+    }
+
+    //OLD
+/*
     ListItem(
         headlineText = {
             Text(text = item.name,
-                textDecoration = (if(targetItem?.find{it.name==item.name}?.purchased == true) TextDecoration.LineThrough else null ),
-                fontStyle = (if(targetItem?.find{it.name==item.name}?.purchased == true) FontStyle.Italic else null )
+                //textDecoration = (if(targetItem?.find{it.name==item.name}?.purchased == true) TextDecoration.LineThrough else null ),
+                //fontStyle = (if(targetItem?.find{it.name==item.name}?.purchased == true) FontStyle.Italic else null )
+                textDecoration = (if(item.purchased) TextDecoration.LineThrough else null ),
+                fontStyle = (if(item.purchased) FontStyle.Italic else null )
             ) },
         leadingContent = {
-            Checkbox(checked = targetItem?.find{it.name==item.name}?.purchased ?: false, onCheckedChange = { it ->
-                vm.setPurchase(item, it)
-                updateProgress()
+            Checkbox(
+                //checked = targetItem?.find{it.name==item.name}?.purchased ?: false,
+                checked = item.purchased,
+                onCheckedChange = { it ->
+                    vm.setPurchase(item, it)
+                    updateProgress()
 
-                Log.d("ShoScr", "ShoppingListItem > Updated item is $item\n(also: ${vm.getItems()})")})
+                    Log.d("ShoScr", "ShoppingListItem > Updated item is $item\n(also: ${vm.getItems()})")
+                },
+                enabled = true
+            )
         },
         modifier = modifier.height(45.dp)
     )
+
+ */
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
