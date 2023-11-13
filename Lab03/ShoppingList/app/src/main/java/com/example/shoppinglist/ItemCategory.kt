@@ -20,3 +20,15 @@ val catColors = mapOf(
     ItemCategory.ORTOFRUTTA to ItemUI(Color(0xFFACFC8D), Color(0xFF009616)),
     ItemCategory.SURGELATI to ItemUI(Color(0xFFB3EBFE), Color(0xFF0065A9)),
 )
+
+val catIcons = mapOf(
+    ItemCategory.NONE to R.drawable.resource_null,
+    ItemCategory.BEVANDE to R.drawable.bevande,
+    ItemCategory.CURA_PERSONA to R.drawable.cura_persona,
+    ItemCategory.CURA_CASA to R.drawable.cura_casa,
+    ItemCategory.FORNO to R.drawable.forno,
+    //ItemCategory.FRESCHI to ItemUI(Color.Blue, Color.Black),
+    ItemCategory.GASTRONOMIA to R.drawable.gastronomia,
+    ItemCategory.ORTOFRUTTA to R.drawable.ortofrutta,
+    ItemCategory.SURGELATI to R.drawable.surgelati,
+)

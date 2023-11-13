@@ -6,6 +6,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
@@ -181,7 +182,7 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
 
                     LazyColumn(){
                         catList.forEach {
-                            stickyHeader { CategoryHeader(label = it.name.replace("_"," ")) }
+                            stickyHeader { CategoryHeader(category = it) }
 
                             items( items = items!!.toList().filter{ item -> item.category == it}
                                 .sortedWith(compareBy<PurchasableItem> { it.purchased }
@@ -224,16 +225,28 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
 }
 
 @Composable
-private fun CategoryHeader(label: String, modifier: Modifier = Modifier){
-    Text(
-        text = label,
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Bold,
+private fun CategoryHeader(category: ItemCategory, modifier: Modifier = Modifier){
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primaryContainer)
-            .padding(16.dp)
-    )
+            .padding(8.dp)
+            .height(24.dp)
+    ){
+        Image(
+            painter = painterResource(catIcons[category] ?: R.drawable.baseline_circle_24),
+            contentDescription = "Localized description",
+
+        )
+        Text(
+            text = category.toString().replace("_"," "),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+    }
+
 }
 
 enum class DragAnchors {
