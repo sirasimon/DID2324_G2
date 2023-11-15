@@ -126,7 +126,7 @@ fun ComposingListItem(item : PurchasableItem, vm : PurchaseViewModel, msg : (Str
         headlineText = { Text(item.name) },
         leadingContent = {
             Image(
-                painter = painterResource(catIcons[item.category] ?: R.drawable.baseline_circle_24),
+                painter = painterResource(catImgs[item.category] ?: R.drawable.baseline_circle_24),
                 contentDescription = "Localized description"
             )
         },

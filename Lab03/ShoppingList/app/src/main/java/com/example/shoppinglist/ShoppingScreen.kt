@@ -6,7 +6,6 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
@@ -101,13 +100,14 @@ fun ShoppingScreen(navController : NavController, vm : PurchaseViewModel){
 
     var completed by remember{mutableStateOf(false)}
 
-    val defaultColor = Color(95,95,95)
-    val endColor = Color.Green
+    val defaultColor = Color(0xFFB18400)
+    val endColor = Color(0xFF45B400)
     val progressColor by animateColorAsState(
         if(completed) endColor else defaultColor,
         animationSpec = tween(ANIM_TIMING, easing = EaseInOut),
         label = "ColorChange"
     )
+
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     Scaffold (
@@ -230,23 +230,24 @@ private fun CategoryHeader(category: ItemCategory, modifier: Modifier = Modifier
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .padding(8.dp)
-            .height(24.dp)
+            .background(Color(0xFFFFECB3))
+            .padding(horizontal = 16.dp)
+            .height(48.dp)
     ){
-        Image(
+        Icon(
             painter = painterResource(catIcons[category] ?: R.drawable.baseline_circle_24),
             contentDescription = "Localized description",
-
+            modifier = Modifier.height(24.dp),
+            tint = Color(0xFFB18400)
         )
         Text(
             text = category.toString().replace("_"," "),
-            fontSize = 16.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 8.dp)
+            modifier = Modifier.padding(horizontal = 16.dp),
+            color = Color(0xFFB18400)
         )
     }
-
 }
 
 enum class DragAnchors {
@@ -320,7 +321,6 @@ fun ShoppingListItem(item: PurchasableItem, vm : PurchaseViewModel, modifier : M
                     ADD_COLOR
             )
     ){
-        //TODO
         Box(
             modifier = Modifier
                 .fillMaxHeight()
