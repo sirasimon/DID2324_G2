@@ -66,6 +66,26 @@ class MainViewModel : ViewModel() {
         })
          */
 
+        usrsDBRef.child(UID).addValueEventListener(object: ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                Log.i("DB CON", "$snapshot")
+
+                //val userData = snapshot.getValue<User>()
+
+                //nickname.value = userData?.nickname
+                //email.value = userData?.email
+                email.value = snapshot.child("email").getValue<String>()
+                nickname.value = snapshot.child("nickname").getValue<String>()
+                Log.i("DB CON", "\tNickname is ${nickname.value}")
+                Log.i("DB CON", "\tEmail is ${email.value}")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+        })
+        /*
         usrsDBRef.child(UID).child("email").addValueEventListener(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 Log.i("DB CON", "$snapshot")
@@ -102,6 +122,8 @@ class MainViewModel : ViewModel() {
         }.addOnFailureListener{
             Log.e("DB CON", "Error getting data", it)
         }
+
+         */
     }
 
 
