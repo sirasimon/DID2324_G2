@@ -84,12 +84,12 @@ fun ContenitoreDatiTest(vm : MainViewModel){
             text= "Nickname: ",
             fontWeight = FontWeight.Bold
         )
-        Text(vm.nickname.value?:"N/A")
+        Text(vm.nickname.value?:"null")
         Text(
             text= "Email: ",
             fontWeight = FontWeight.Bold
         )
-        Text(vm.email.value?:"N/A")
+        Text(vm.email.value?:"null")
     }
 }
 
