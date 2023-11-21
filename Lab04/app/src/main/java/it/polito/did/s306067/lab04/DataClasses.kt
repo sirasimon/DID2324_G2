@@ -34,22 +34,52 @@ data class Order(
     val creationTime : Timestamp,
     val lastUpdateTime : Timestamp,
     val senderID : String,
-    val receiverID : String,
+    val adresseeID : String,
     val lockerID : String,
-    val insertionCode : String,
-    val gatheringCode : String
+    val insertionCode : Int?,
+    val gatheringCode : Int?
 )
 
-data class Compartment(
+class Compartment(
     val ID : Int,
-    val insertionCode : String,
-    val gatheringCode : String,
-    val isOpen : Boolean,
-    val isEmpty : Boolean,
-    val isWorking : Boolean,
-    val orderID : String?
-)
+    var insertionCode : Int?,
+    var gatheringCode : Int?,
+    var isOpen : Boolean,
+    var isEmpty : Boolean,
+    var isWorking : Boolean,
+    var orderID : String?
+){
+    fun setOutOfOrder(){
+        isWorking = false
+    }
 
+    fun flagAsCollected(){
+        isEmpty = true
+        orderID = null
+        insertionCode = null
+        gatheringCode = null
+    }
+
+    fun generateCodes(insertionCode: Int?, gatheringCode: Int?){
+        if(insertionCode!=null){
+            this.insertionCode = insertionCode
+        }else{
+            //TODO: generare i codici randomicamente
+        }
+
+        if(gatheringCode!=null){
+            this.gatheringCode = gatheringCode
+        }else{
+            //TODO: generare i codici randomicamente
+        }
+    }
+}
+
+/**
+ * Classe relativa al Locker caratterizzata da:
+ * @param ID la stringa univoca relativa del locker che coincide con l'indirizzo MAC del dispositivo
+ * @param compartments la lista di scompartimenti di cui dispone il locker
+ */
 data class Locker(
     val ID : String,
     val compartments : List<Compartment>

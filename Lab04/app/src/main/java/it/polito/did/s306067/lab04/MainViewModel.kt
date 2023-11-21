@@ -54,7 +54,7 @@ class MainViewModel : ViewModel() {
                 Log.i("DB CON", "\tEmail is ${email.value}")
 
                 var pending = snapshot.child("pending").value
-                Log.i("DB CON", "\tPending is ${pending}")
+                Log.i("DB CON", "\tPending is $pending")
 
 
 
@@ -66,7 +66,6 @@ class MainViewModel : ViewModel() {
             override fun onCancelled(error: DatabaseError) {
                 TODO("Not yet implemented")
             }
-
         })
         /*
         usrsDBRef.child(UID).child("email").addValueEventListener(object: ValueEventListener{
