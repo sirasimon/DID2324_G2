@@ -9,6 +9,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import com.google.firebase.database.getValue
+import it.polito.did.s306067.lab04.classes.User
 
 val UID = "0x11F"
 
@@ -39,6 +40,8 @@ class MainViewModel : ViewModel() {
             Log.e("DB CON", "Error getting data", it)
         }
 
+        Log.i("DB CON", "Now reading UID child")
+
         users.child(UID).addValueEventListener(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
 
@@ -56,10 +59,6 @@ class MainViewModel : ViewModel() {
                 var pending = snapshot.child("pending").value
                 Log.i("DB CON", "\tPending is $pending")
 
-
-
-
-
                 //user = User(UID, nick, em, pending)
             }
 
@@ -67,6 +66,29 @@ class MainViewModel : ViewModel() {
                 TODO("Not yet implemented")
             }
         })
+
+        val key = dbRef.child("users").push().key
+
+        if(key == null)
+            Log.i("DB CON", "Chiave NON creata")
+        else
+            Log.i("DB CON", "Chiave creata ($key)")
+
+        if(key!=null){
+            val newUser = User(key,"sirasimo", "sira.simon@icloud.com", null)
+
+            val usrRef = dbRef.child("users").child(key)
+
+            usrRef.child("nickname").setValue(newUser.nickname).addOnSuccessListener {
+                Log.i("DB CON", "Ce l'ho fatta?")
+            }.addOnFailureListener {
+                Log.i("DB CON", "MA KOTLIN MALEDETTO")
+            }
+        }
+
+
+        //nickname.value = users.child(UID).child("nickname").key
+
         /*
         usrsDBRef.child(UID).child("email").addValueEventListener(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {

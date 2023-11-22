@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.polito.did.s306067.lab04.ui.theme.Lab04Theme
 
-val IS_DEBUG = false
+val IS_DEBUG = true
 
 class MainActivity : ComponentActivity() {
 
@@ -77,21 +77,13 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContenitoreDatiTest(vm : MainViewModel){
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     val test by vm.testText.observeAsState()
-    val nick = vm.nickname.value
+    val nick by vm.testText.observeAsState()
     val email = vm.email.value
 
     if(IS_DEBUG){
@@ -131,6 +123,7 @@ fun ContenitoreDatiTest(vm : MainViewModel){
             floatingActionButtonPosition = FabPosition.End
         ) {
                 paddingValues ->
+
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
@@ -199,13 +192,5 @@ fun CurrentShipments(){
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Lab04Theme {
-        Greeting("Android")
     }
 }
