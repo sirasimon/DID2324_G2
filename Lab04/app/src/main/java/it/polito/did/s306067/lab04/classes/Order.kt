@@ -10,6 +10,6 @@ data class Order(
     val senderID : String? = null,
     val addresseeID : String? = null,
     val lockerID : String? = null,
-    val insertionCode : Int? = null,
-    val gatheringCode : Int? = null
+    val insertionCode : String? = null,
+    val gatheringCode : String? = null
 )

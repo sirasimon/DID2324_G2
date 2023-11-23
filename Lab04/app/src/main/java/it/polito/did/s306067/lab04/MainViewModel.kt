@@ -27,9 +27,8 @@ class MainViewModel : ViewModel() {
     private val _email : MutableLiveData<String> = MutableLiveData("[email here]")
     val email : LiveData<String> = _email
 
-    private val _ordersList : MutableLiveData<MutableList<Order>>? = null
-    val ordersList : LiveData<MutableList<Order>>? = _ordersList
-
+    private val _ordersList : MutableLiveData<MutableList<Order>?> = MutableLiveData(null)
+    //val ordersList : LiveData<MutableList<Order>>? = _ordersList
 
     //DB REFERENCES
     //val dbRef = Firebase.database.reference
@@ -75,31 +74,42 @@ class MainViewModel : ViewModel() {
         }
     )
 
-    private val orders = Firebase.database.reference.addValueEventListener(
+    private val orders = Firebase.database.reference.child("orders").addValueEventListener(
         object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 Log.i("ORDERS CON", "Listening to value in orders")
                 //Looking for orders for UID
 
+                var prova : Order? = null
+
+                val buffer = mutableListOf<Order>()
+
                 for(snap in snapshot.children){
+                    Log.i("ORDERS CON", "ENTRATO nel FOR")
                     if(snap.child("addresseeID").getValue<String>()==UID){
-                        _ordersList?.value?.add(
-                            Order(
-                                orderID = snap.key,
-                                states = null,
-                                creationTime = null,
-                                lastUpdateTime = null,
-                                senderID = null,
-                                addresseeID = UID,
-                                lockerID = null,
-                                insertionCode = snap.child("insertionCode").getValue<Int>(),
-                                gatheringCode = snap.child("gatheringCode").getValue<Int>()
-                            )
+                        Log.i("ORDERS CON", "ENTRATO nell'IF")
+                        Log.i("ORDERS CON", "\t${snap.key}, ${snap.child("insertionCode").getValue<String>()}, ${snap.child("gatheringCode").getValue<String>()}")
+
+                        prova = Order(
+                            orderID = snap.key,
+                            states = null,
+                            creationTime = null,
+                            lastUpdateTime = null,
+                            senderID = null,
+                            addresseeID = UID,
+                            lockerID = null,
+                            insertionCode = snap.child("insertionCode").getValue<String>(),
+                            gatheringCode = snap.child("gatheringCode").getValue<String>()
                         )
+
+                        buffer.add(prova)
                     }
                 }
 
-                Log.i("ORDERS CON", "\t${_ordersList?.value ?: "null"}")
+                _ordersList.value = buffer
+
+                Log.i("ORDERS CON", "\t${_ordersList.value}")
+                //println("")
             }
 
             override fun onCancelled(error: DatabaseError) {
