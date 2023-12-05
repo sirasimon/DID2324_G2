@@ -1,7 +1,9 @@
 //------------------------------------------------------------------------------------------------IMPORTS
 #include <Servo.h>
-#include <arduino-timer.h>
-#include <LockerStates.h>
+#include <CustomTimer.h>
+
+
+
 
 //------------------------------------------------------------------------------------------------GLOBAL VALUES
 //Constants
@@ -9,13 +11,13 @@ const int pinHall = A0;
 const int magneticCalibrationReadings = 100;
 const int magneticReadings = 10;
 const long magneticSensitivity = 50;
-const long onOpenCloseDelay = 2000; 
+const long onOpenCloseDelay = 2000;
 const char openComChar = '1';
 //Variables
 Servo myservo;
 auto timer = timer_create_default();
 bool isFullyOpen;
-int pos = 0;    
+int pos = 0;
 long magneticCalibrationValue = 0;
 LockerState lockerState = Invalid;
 
@@ -26,9 +28,9 @@ void setup() {
   //Pins initialization
   pinMode(pinHall, INPUT);
   //Servo initialization
-  myservo.attach(9); 
+  myservo.attach(9);
   myservo.write(180);
-  //Magnetic sensor calibration - Value reading   
+  //Magnetic sensor calibration - Value reading
   long measure = 0;
   for (int i = 0; i < magneticCalibrationReadings; i++) {
     measure += analogRead(pinHall);
@@ -53,7 +55,7 @@ void loop() {
 }
 
 //------------------------------------------------------------------------------------------------OPEN STATE
-void open_Enter() { 
+void open_Enter() {
   Serial.println("State has changed to Open");
   timer.in(onOpenCloseDelay, []() -> void {
     isFullyOpen = true;
@@ -74,8 +76,8 @@ void open_Exit() {
 
 //------------------------------------------------------------------------------------------------CLOSED STATE
 void closed_Enter() {
-    Serial.println("State has changed to Closed");
-    myservo.write(0);
+  Serial.println("State has changed to Closed");
+  myservo.write(0);
 }
 void closed_Loop() {
   if (Serial.available() > 0) {
@@ -91,15 +93,13 @@ void closed_Exit() {
 void changeState(LockerState nextState) {
   if (lockerState == Open) {
     open_Exit();
-  }
-  else if (lockerState == Closed) {
+  } else if (lockerState == Closed) {
     closed_Exit();
   }
   lockerState = nextState;
   if (lockerState == Open) {
     open_Enter();
-  }
-  else if (lockerState == Closed) {
+  } else if (lockerState == Closed) {
     closed_Exit();
   }
 }
