@@ -6,6 +6,10 @@ CustomTimer::CustomTimer(unsigned long duration) {
   _timestamp = millis() + _duration;
 }
 
+CustomTimer::CustomTimer() {
+  CustomTimer(1000);
+}
+
 bool CustomTimer::checkAndUpdate() {
   if (millis() >= _timestamp) {
     _timestamp = millis() + _duration;

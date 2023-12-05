@@ -1,19 +1,21 @@
 #ifndef MagneticSensor_h
 #define MagneticSensor_h
 #include "Arduino.h"
+
 class MagneticSensor {
   public:
     static const int calibrationReadings = 100;
     static const int readings = 10;
     long calibrationValue;
     MagneticSensor(int pin, int sensitivity);
-    init();
-    read();
-    check();
+    void init();
+    long read();
+    bool check();
     
   private:
-    int pin;
-    int sensitivity;
-    read(int readings);
-}
+    int _pin;
+    int _sensitivity;
+    long _read(int readings);
+};
+
 #endif

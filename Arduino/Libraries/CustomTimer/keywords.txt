@@ -1,2 +1,0 @@
-CustomTimer	KEYWORD1
-checkAndUpdate	KEYWORD2

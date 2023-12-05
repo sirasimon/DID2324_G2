@@ -1,31 +1,31 @@
 #include "Arduino.h"
-#include "CustomTimer.h"
+#include "MagneticSensor.h"
 
 MagneticSensor::MagneticSensor(int pin, int sensitivity) {
-  this.pin = pin;
-  this.sensitivity = sensitivity;
+  _pin = pin;
+  _sensitivity = sensitivity;
 }
 
-MagneticSensor::init() {
-  calibrationValue = read(calibrationReadings);
+void MagneticSensor::init() {
+  calibrationValue = _read(calibrationReadings);
 }
 
-MagneticSensor::check() {
+bool MagneticSensor::check() {
   long deltaSensor = abs(read() - calibrationValue);
-  if (deltaSensor > sensitivity) {
+  if (deltaSensor > _sensitivity) {
     return true;
   }
   return false;
 }
 
-MagneticSensor::read() {
-  return read(readings);
+long MagneticSensor::read() {
+  return _read(readings);
 }
 
-MagneticSensor::read(int readings) {
+long MagneticSensor::_read(int readings) {
   long measure = 0;
   for (int i = 0; i < readings; i++) {
-    measure += analogRead(pin);
+    measure += analogRead(_pin);
   }
   measure /= readings;
   return measure;

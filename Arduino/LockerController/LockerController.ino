@@ -1,6 +1,10 @@
+
+
 //------------------------------------------------------------------------------------------------IMPORTS
 #include <Servo.h>
+#include <MagneticSensor.h>
 #include <CustomTimer.h>
+#include <CustomServo.h>
 
 CustomTimer myTimer(6000);
 int i = 0;
@@ -11,7 +15,7 @@ void setup() {
 
 void loop() {
   if (myTimer.checkAndUpdate()) {
-    Serial.println("Ding! " + String(i) + " " + String(myTimer._duration));
+    Serial.println("Ding! " + String(i));
     i++;
   }
 }
