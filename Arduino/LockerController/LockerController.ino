@@ -2,15 +2,28 @@
 #include <Servo.h>
 #include <CustomTimer.h>
 
+CustomTimer myTimer(6000);
+int i = 0;
+void setup() {
+  Serial.begin(9600);
+  Serial.println("START");
+}
 
-
-
+void loop() {
+  if (myTimer.checkAndUpdate()) {
+    Serial.println("Ding! " + String(i) + " " + String(myTimer._duration));
+    i++;
+  }
+}
+/*
 //------------------------------------------------------------------------------------------------GLOBAL VALUES
 //Constants
+
 const int pinHall = A0;
 const int magneticCalibrationReadings = 100;
 const int magneticReadings = 10;
 const long magneticSensitivity = 50;
+
 const long onOpenCloseDelay = 2000;
 const char openComChar = '1';
 //Variables
@@ -112,3 +125,4 @@ long readMagnetic() {
   measure /= magneticReadings;
   return measure;
 }
+*/

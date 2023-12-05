@@ -1,15 +1,15 @@
 #include "Arduino.h"
 #include "CustomTimer.h"
 
-CustomTimer::CustomTimer(float duration) {
-  this.duration = duration;
-  timestamp = millis();
+CustomTimer::CustomTimer(unsigned long duration) {
+  _duration = duration;
+  _timestamp = millis() + _duration;
 }
 
-CustomTimer::checkAndUpdate() {
-  if (millis >= timestamp) {
-    timestamp = millis();
-    return true;
+bool CustomTimer::checkAndUpdate() {
+  if (millis() >= _timestamp) {
+    _timestamp = millis() + _duration;
+    return true;  
   }
   return false;
 }

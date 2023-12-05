@@ -3,11 +3,11 @@
 #include "Arduino.h"
 class CustomTimer {
   public:
-    CustomTimer(float duration);
+    CustomTimer(unsigned long duration);
     bool checkAndUpdate();
+    unsigned long _duration;
+    unsigned long _timestamp; 
   private:
-    float duration;
-    float timestamp; 
-}
+};
 #endif
   
