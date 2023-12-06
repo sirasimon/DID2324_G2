@@ -16,11 +16,11 @@ class Locker {
       open,
       closed
     };
+    char _id;
   private:
     CustomServo _servo;
     MagneticSensor _sensor;
     state _currentState;
-    char _id;
     char _com;
     bool _input_sent;
     void _open_enter();
