@@ -9,7 +9,7 @@ Servo servo1;
 Servo servo2;
 MagneticSensor sensor1(A0, 100);
 MagneticSensor sensor2(A1, 100);
-CustomServo customServo1(servo1, 9, 10000, 1);
+CustomServo customServo1(servo1, 9, 100, 1);
 CustomServo customServo2(servo2, 10, 5000, 1);
 Locker locker1(customServo1, sensor1, 'A');
 Locker locker2(customServo2, sensor2, 'B');
@@ -26,9 +26,12 @@ void setup() {
   customServo2.init();
   locker1.init();
   locker2.init();
+
+  customServo1.sweep(180);
 }
 
 void loop() {
+  customServo1.update();
   input_manager();
   locker1.update();
   locker2.update();

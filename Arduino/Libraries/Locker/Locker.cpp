@@ -5,9 +5,7 @@
 #include "CustomTimer.h"
 #include "Locker.h"
 
-Locker::Locker(CustomServo servo, MagneticSensor sensor, char id) {
-  servo = _servo;
-  sensor = _sensor;
+Locker::Locker(CustomServo& servo, MagneticSensor& sensor, char id): _servo(servo), _sensor(sensor) {
   _id = id;
 } 
 #pragma region Open State
@@ -40,6 +38,7 @@ void Locker::_closed_exit() {
 }
 #pragma endregion
 #pragma region Other
+
 void Locker::init() {
   _change_state(open);
 }

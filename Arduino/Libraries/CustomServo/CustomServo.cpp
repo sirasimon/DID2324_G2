@@ -4,8 +4,7 @@
 #include "CustomTimer.h"
 #include "CustomServo.h"
 
-CustomServo::CustomServo(Servo& servo, int pin, int sweepSpeed, int sweepResolution) {
-  _servo = servo;
+CustomServo::CustomServo(Servo& servo, int pin, int sweepSpeed, int sweepResolution): _servo(servo) {
   _pin = pin;
   _sweepSpeed = sweepSpeed;
   _sweepResolution = sweepResolution;

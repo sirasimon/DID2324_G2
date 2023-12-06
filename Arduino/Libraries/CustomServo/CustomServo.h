@@ -13,7 +13,7 @@ class CustomServo {
     void update();
 
   private:
-    Servo _servo;
+    Servo& _servo;
     CustomTimer _sweepTimer;
     int _pin;
     int _sweepSpeed;
