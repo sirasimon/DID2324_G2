@@ -3,38 +3,80 @@
 #include "CustomServo.h"
 #include "MagneticSensor.h"
 #include "CustomTimer.h"
+#include "Locker.h"
 
 Locker::Locker(CustomServo servo, MagneticSensor sensor, char id) {
-  servo.init();
-  sensor.init();
+  servo = _servo;
+  sensor = _sensor;
   _id = id;
+} 
+#pragma region Open State
+void Locker::_open_enter() {
+  Serial.println("Locker " + String(_id) + " state has changed to OPEN");
+  _servo.sweep(180);
 }
-
-void input(char com) {
-  _com = com;
-}
-
-void open_enter() {
-  servo.sweep(180);
-}
-
-void open_update() {
-  if (MagneticSensor.check()) {
-    changeState(closed);
+void Locker::_open_update() {
+  if (_sensor.check()) {
+    _change_state(closed);
   }
 }
-
-void open_exit() {
+void Locker::_open_exit() {
 
 }
+#pragma endregion 
+#pragma region Closed State
 
-void closed_enter() {
-  myservo.write(0);
+void Locker::_closed_enter() {
+  Serial.println("Locker " + String(_id) + " state has changed to OPEN");
+  _servo.sweep(0);
 }
+void Locker::_closed_update() {
 
-void close_loop
-enum states {
-  invalid,
-  open,
-  closed
 }
+void Locker::_closed_exit() {
+
+}
+#pragma endregion
+#pragma region Other
+void Locker::init() {
+  _change_state(Open);
+}
+void Locker::send_input(char com) {
+   _com = com;
+   _input_sent = true;
+}
+void Locker::update() {
+  _servo.update();
+  switch (_currentState) {
+    case open:
+      _open_update();
+      break;
+    case closed:
+      _closed_update();  
+      break; 
+  }
+  _input_sent = false;
+}
+void Locker::_change_state(state nextState) {
+  switch (_currentState)
+  {
+    case open: 
+      _open_exit();
+      break;
+    case closed:
+      _closed_exit();
+      break;
+    default:
+      Serial.println("Locker " + String(_id) + " has enterd an INVALID state!");
+  }
+  _currentState = nextState;
+  switch (_currentState){
+    case open: 
+      _open_enter(); 
+      break;
+    case closed:
+      _closed_enter();
+      break;
+  }
+}
+#pragma endregion

@@ -4,13 +4,15 @@
 #include "CustomTimer.h"
 #include "CustomServo.h"
 
-CustomServo::CustomServo(Servo servo, int pin, int sweepSpeed, int sweepResolution) {
+CustomServo::CustomServo(Servo& servo, int pin, int sweepSpeed, int sweepResolution) {
   _servo = servo;
   _pin = pin;
   _sweepSpeed = sweepSpeed;
   _sweepResolution = sweepResolution;
 }
 
+CustomServo::CustomServo() {
+}
 void CustomServo::init() {
   _servo.attach(_pin);
   _servo.write(0);
@@ -19,8 +21,8 @@ void CustomServo::init() {
 
 void CustomServo::sweep(int angle) {
   _sweeping = true;
-  int deltaAngle = _currentAngle - angle;
-  _sweepTimer = CustomTimer((abs(deltaAngle) / _sweepSpeed) * _sweepResolution);
+  int deltaAngle = angle - _currentAngle;
+  _sweepTimer = CustomTimer(_sweepSpeed / (abs(deltaAngle)) * _sweepResolution);
   _sweepDir = deltaAngle > 0? 1 : -1;
   _targetAngle = angle;
 }
@@ -32,5 +34,6 @@ void CustomServo::update() {
       _currentAngle = _targetAngle;
       _sweeping = false;
     }
+    _servo.write(_currentAngle);
   }
 }

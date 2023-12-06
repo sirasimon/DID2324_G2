@@ -6,6 +6,11 @@ MagneticSensor::MagneticSensor(int pin, int sensitivity) {
   _sensitivity = sensitivity;
 }
 
+MagneticSensor::MagneticSensor() {
+  _pin = A0;
+  _sensitivity = 100;
+}
+
 void MagneticSensor::init() {
   calibrationValue = _read(calibrationReadings);
 }

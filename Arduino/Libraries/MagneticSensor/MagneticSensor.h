@@ -8,6 +8,7 @@ class MagneticSensor {
     static const int readings = 10;
     long calibrationValue;
     MagneticSensor(int pin, int sensitivity);
+    MagneticSensor();
     void init();
     long read();
     bool check();

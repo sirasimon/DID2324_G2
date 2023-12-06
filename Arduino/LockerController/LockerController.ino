@@ -1,23 +1,31 @@
-
-
 //------------------------------------------------------------------------------------------------IMPORTS
 #include <Servo.h>
 #include <MagneticSensor.h>
 #include <CustomTimer.h>
 #include <CustomServo.h>
+#include <Locker.h>
 
-CustomTimer myTimer(6000);
-int i = 0;
+Servo servo1;
+Servo servo2;
+MagneticSensor sensor1(A0, 100);
+MagneticSensor sensor2(A1, 100);
+CustomServo customServo1(servo1, 9, 10000, 1);
+CustomServo customServo2(servo2, 10, 5000, 1);
+Locker locker1(customServo1, sensor1, 'A');
+Locker locker2(customServo2, sensor2, 'B');
+
 void setup() {
   Serial.begin(9600);
   Serial.println("START");
+  sensor1.init();
+  sensor2.init();
+  customServo1.init();
+  customServo2.init();
 }
 
 void loop() {
-  if (myTimer.checkAndUpdate()) {
-    Serial.println("Ding! " + String(i));
-    i++;
-  }
+  locker1.update();
+  locker2.update();
 }
 /*
 //------------------------------------------------------------------------------------------------GLOBAL VALUES

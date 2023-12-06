@@ -6,7 +6,8 @@
 #include "CustomTimer.h"
 class CustomServo {
   public:
-    CustomServo(Servo servo, int pin, int sweepSpeed, int sweepResolution);
+    CustomServo(Servo& servo, int pin, int sweepSpeed, int sweepResolution);
+    CustomServo();
     void init();
     void sweep(int angle);
     void update();
