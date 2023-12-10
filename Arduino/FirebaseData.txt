@@ -1,0 +1,2 @@
+https://console.firebase.google.com/project/lab-7-did/database/lab-7-did-default-rtdb/data/~2F
+AIzaSyCvyI8yNymIx_B2GwBnZmGu2q8YB8t0qik
