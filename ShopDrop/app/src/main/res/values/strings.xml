@@ -1,4 +1,28 @@
 <resources>
-    <string name="app_name">ShopDrop</string>
+    <string name="app_name" translatable="false">ShopDrop</string>
     <string name="title_activity_home_screen">HomeScreen</string>
+    <string name="tab_home">home</string>
+    <string name="tab_cart">cart</string>
+    <string name="tab_profile">profile</string>
+    <string name="title_pending">pending order</string>
+    <string name="title_buy_again">buy again</string>
+    <string name="btn_see_more">see more</string>
+    <string name="title_pendings">pending orders</string>
+    <string name="btn_edit">edit</string>
+    <string name="title_my_orders">my orders</string>
+    <string name="title_address">Address</string>
+    <string name="title_help">help</string>
+    <string name="title_credits">credits</string>
+    <string name="btn_sign_out" translatable="false">sign out</string>
+    <string name="btn_log_out">log out</string>
+    <string name="btn_log_in">log in</string>
+    <string name="title_promo">promo</string>
+    <string name="placeholder_search_main">search on</string>
+    <string name="title_payment_methods">payment methods\n</string>
+    <string name="title_support">support</string>
+    <string name="price_subtotal">subtotal</string>
+    <string name="price_shipment">shipment</string>
+    <string name="price_service">service</string>
+    <string name="price_total">total</string>
+    <string name="title_order_summary">order summary</string>
 </resources>

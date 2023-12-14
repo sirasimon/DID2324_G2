@@ -14,22 +14,7 @@ import androidx.compose.ui.text.style.TextOverflow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(currentTab: TabScreen, scrollBehavior: TopAppBarScrollBehavior){
-
-    var screenTitle = when(currentTab){
-        TabScreen.PROFILE -> {
-            "PROFILO"
-        }
-
-        TabScreen.HOME -> {
-            "HOME"
-        }
-
-        TabScreen.CART -> {
-            "CART"
-        }
-    }
-
+fun TopBar(currentTab : TabScreen, title: String, scrollBehavior: TopAppBarScrollBehavior){
 
     CenterAlignedTopAppBar(
         /*
@@ -40,7 +25,7 @@ fun TopBar(currentTab: TabScreen, scrollBehavior: TopAppBarScrollBehavior){
         */
         title = {
             Text(
-                text = screenTitle,
+                text = title,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )

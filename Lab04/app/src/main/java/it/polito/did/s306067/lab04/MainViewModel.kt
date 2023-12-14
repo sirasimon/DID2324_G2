@@ -27,6 +27,9 @@ class MainViewModel : ViewModel() {
     private val _email : MutableLiveData<String> = MutableLiveData("[email here]")
     val email : LiveData<String> = _email
 
+    private val _open : MutableLiveData<Boolean> = MutableLiveData(false)
+    val open : LiveData<Boolean> = _open
+
     private val _ordersList : MutableLiveData<MutableList<Order>?> = MutableLiveData(null)
     //val ordersList : LiveData<MutableList<Order>>? = _ordersList
 
@@ -36,14 +39,19 @@ class MainViewModel : ViewModel() {
     //val orders = Firebase.database.reference.child("orders")
     val lockers = Firebase.database.reference.child("lockers")
 
+    private val dbRef = Firebase.database.reference
 
-    private val dbRef = Firebase.database.reference.addValueEventListener(
+    val evListener = dbRef.addValueEventListener(
         object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 Log.i("DB CON", "Listening to value in dbRef")
                 _testText.value = snapshot.child("Test").getValue<String>()
                 Log.i("DB CON", "\t_testText.value is ${_testText.value}")
                 Log.i("DB CON", "\ttestText.value is ${testText.value}")
+
+                _open.value = snapshot.child("open").getValue<Boolean>()
+                Log.i("DB CON", "\t_open value is ${_open.value}")
+                Log.i("DB CON", "\topen value is ${open.value}")
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -229,5 +237,13 @@ class MainViewModel : ViewModel() {
 
     fun getUID() : String{
         return UID
+    }
+
+    //TODO: funzione solo di debug
+    fun changeState(){
+        if(_open.value!=null){
+            dbRef.child("open").setValue(!_open.value!!)
+        }
+
     }
 }

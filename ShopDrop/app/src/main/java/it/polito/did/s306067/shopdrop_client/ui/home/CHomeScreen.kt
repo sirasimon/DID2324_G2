@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
@@ -24,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -35,10 +38,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -46,7 +54,6 @@ import it.polito.did.s306067.shopdrop_client.R
 import it.polito.did.s306067.shopdrop_client.ui.common.BottomBar
 import it.polito.did.s306067.shopdrop_client.ui.common.ItemCard
 import it.polito.did.s306067.shopdrop_client.ui.common.TabScreen
-import it.polito.did.s306067.shopdrop_client.ui.common.TopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,6 +62,9 @@ fun CHomeScreen(navController : NavController){
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
+    var query by rememberSaveable { mutableStateOf("") }
+    var searchBoxActive by rememberSaveable { mutableStateOf(false) }
+
     //Bottom sheet
     val bottomSheetState = rememberModalBottomSheetState()
     val bottomSheetScope = rememberCoroutineScope()
@@ -62,7 +72,7 @@ fun CHomeScreen(navController : NavController){
 
 
     Scaffold(
-        topBar = { TopBar(currentTab, scrollBehavior = scrollBehavior) },
+        //topBar = { TopBar(currentTab, scrollBehavior = scrollBehavior) },
         bottomBar = { BottomBar(currentTab, navController) },
         //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         //floatingActionButton = { AddButton(onClick = {/*TODO*/}) },
@@ -70,44 +80,121 @@ fun CHomeScreen(navController : NavController){
     ) { paddingValues ->
         Surface(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(paddingValues),
             color = MaterialTheme.colorScheme.background
         ) {
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-            ) {
-                Text(text = "CLIENT HOME")
+            Box(Modifier.fillMaxSize().semantics { isTraversalGroup = true }){
+                SearchBar(  //https://www.youtube.com/watch?v=90gokceSYdM
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                        .semantics { traversalIndex = -1f },
+                    query = query,
+                    onQueryChange = { query = it },
+                    onSearch = {
+                        searchBoxActive = false
+                        Log.d("SEARCH","Search for $query")
+                        //TODO
+                    },
+                    active = searchBoxActive,
+                    onActiveChange = {
+                        searchBoxActive = it
+                    },
+                    placeholder = {
+                        Row(){
+                            Text(stringResource(R.string.placeholder_search_main).capitalize())
+                            Text("[APP LOGO]")
+                        } },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search icon") },
+                    trailingIcon = {
+                        if(searchBoxActive){
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Close icon",
+                                Modifier.clickable {
+                                    if(query.isNotEmpty())
+                                        query = ""
+                                    else
+                                        searchBoxActive = false
+                                }
+                            )
+                        }
 
-                //TODO Searchbar
-                //TODO Pending orders
-                //TODO controllare il vm che ci siano ordini pendenti ed eventualmente mostrarli
-                if(true)    //Condizione dei pending order
-                    PendingOrdersCard(navController, { showBottomSheet = true })
-                //TODO demo oggetti acquistabili
-
-                HomeSection(SectionName.ALREADY_BOUGHT, navController = navController, onClick = { showBottomSheet = true })
-                HomeSection(SectionName.PROMO, navController = navController, onClick = { showBottomSheet = true })
-
-                Box(){
-                    Text("Varie categorie")
+                    }
+                ){
+                    //HINTS -> TODO: mettere ultime 3 ricerche e poi i risultati
+                    repeat(4) { idx ->
+                        val resultText = "Suggestion $idx"
+                        ListItem(
+                            headlineContent = { Text(resultText) },
+                            supportingContent = { Text("Additional info") },
+                            leadingContent = { Icon(Icons.Filled.Star, contentDescription = null) },
+                            modifier = Modifier
+                                .clickable {
+                                    query = resultText
+                                    searchBoxActive = false
+                                }
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 4.dp)
+                        )
+                    }
                 }
 
-                Box(){
-                    Text("Quando schiacci un bottone appare overlay per acquisto quantità e conferma")
-                }
+                if(!searchBoxActive){
+                    Column(modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                    ) {
 
-                Box(){
-                    Text("Quando schiacci un bottone appare overlay per acquisto quantità e conferma")
-                }
-                Box(){
-                    Text("Quando schiacci un bottone appare overlay per acquisto quantità e conferma")
-                }
-                Box(){
-                    Text("Quando schiacci un bottone appare overlay per acquisto quantità e conferma")
+                        /*
+                        BasicTextField(
+                            value = TextFieldValue(query),
+                            onValueChange = {it -> query=it},
+                            //label = {Text("Cerca su ShopDrop")},
+                            singleLine = true,
+                            //leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+                            shape = RoundedCornerShape(48.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                                .padding(horizontal = 16.dp)
+                        )
+                         */
+
+
+
+
+                        //TODO Pending orders
+                        //TODO controllare il vm che ci siano ordini pendenti ed eventualmente mostrarli
+                        if(true)    //Condizione dei pending order
+                            PendingOrdersCard(navController, { showBottomSheet = true })
+                        //TODO demo oggetti acquistabili
+
+                        HomeSection(SectionName.BUY_AGAIN, navController = navController, onClick = { showBottomSheet = true })
+                        HomeSection(SectionName.PROMO, navController = navController, onClick = { showBottomSheet = true })
+
+                        Box(){
+                            Text("Varie categorie")
+                        }
+
+                        Box(){
+                            Text("Quando schiacci un bottone appare overlay per acquisto quantità e conferma")
+                        }
+
+                        Box(){
+                            Text("Quando schiacci un bottone appare overlay per acquisto quantità e conferma")
+                        }
+                        Box(){
+                            Text("Quando schiacci un bottone appare overlay per acquisto quantità e conferma")
+                        }
+                        Box(){
+                            Text("Quando schiacci un bottone appare overlay per acquisto quantità e conferma")
+                        }
+
+                    }
                 }
             }
+
         }
 
         if(showBottomSheet){
@@ -160,12 +247,14 @@ fun PendingOrdersCard(navController: NavController, onClick: () -> Unit){
 
 @Composable
 fun HomeSection(sectionType: SectionName, navController: NavController, onClick : () -> Unit){
-    val sectionName = when(sectionType){
-        SectionName.ALREADY_BOUGHT -> {
-            "Acquista di nuovo"
+    var sectionName = "[Section title]"
+
+    when(sectionType){
+        SectionName.BUY_AGAIN -> {
+            sectionName = stringResource(R.string.title_buy_again).capitalize()
         }
         SectionName.PROMO -> {
-            "In offerta"
+            sectionName = stringResource(R.string.title_promo).capitalize()
         }
     }
 
@@ -180,7 +269,7 @@ fun HomeSection(sectionType: SectionName, navController: NavController, onClick 
                 onClick = { navController.navigate("CategorySection") },
                 contentPadding = PaddingValues(0.dp)
             ) {
-                Text(text = "Vedi altro",
+                Text(text = stringResource(R.string.btn_see_more).capitalize(),
                     fontSize = 18.sp,
                     modifier = Modifier.padding(16.dp)
                 )

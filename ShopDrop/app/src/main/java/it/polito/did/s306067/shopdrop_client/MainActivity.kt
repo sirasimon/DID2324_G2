@@ -12,6 +12,7 @@ import it.polito.did.s306067.shopdrop_client.ui.cart.CCartScreen
 import it.polito.did.s306067.shopdrop_client.ui.home.CHomeScreen
 import it.polito.did.s306067.shopdrop_client.ui.home.CategorySection
 import it.polito.did.s306067.shopdrop_client.ui.orders.COrderDetailScreen
+import it.polito.did.s306067.shopdrop_client.ui.orders.COrderListScreen
 import it.polito.did.s306067.shopdrop_client.ui.profile.CProfileScreen
 import it.polito.did.s306067.shopdrop_client.ui.theme.ShopDropTheme
 
@@ -48,6 +49,10 @@ fun Navigation(){
 
         composable("COrderDetailScreen"){
             COrderDetailScreen(navController = navController)
+        }
+
+        composable("COrderListScreen"){
+            COrderListScreen(navController = navController)
         }
     }
 }

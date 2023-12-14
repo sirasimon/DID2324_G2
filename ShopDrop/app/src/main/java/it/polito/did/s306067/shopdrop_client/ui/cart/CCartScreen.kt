@@ -31,10 +31,12 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import it.polito.did.s306067.shopdrop_client.R
 import it.polito.did.s306067.shopdrop_client.ui.common.BottomBar
 import it.polito.did.s306067.shopdrop_client.ui.common.TabScreen
 import it.polito.did.s306067.shopdrop_client.ui.common.TopBar
@@ -43,11 +45,10 @@ import it.polito.did.s306067.shopdrop_client.ui.common.TopBar
 @Composable
 fun CCartScreen(navController: NavController){
     var currentTab = TabScreen.CART
-
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
-        topBar = { TopBar(currentTab, scrollBehavior) },
+        topBar = { TopBar(currentTab = TabScreen.CART, title = stringResource(R.string.title_order_summary).capitalize(), scrollBehavior = scrollBehavior )},
         bottomBar = { BottomBar(currentTab, navController) },
         //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         floatingActionButton = { CheckoutButton() },
@@ -367,10 +368,10 @@ fun CCartScreen(navController: NavController){
                             .fillMaxWidth()
                             .height(24.dp)){}
 
-                    PriceItemList("Subtotale", "19,90 €")
-                    PriceItemList("Spedizione", "1,50 €")
-                    PriceItemList("Servizio", "2,00 €")
-                    PriceListTotal("TOTALE", "23,40 €")
+                    PriceItemList(stringResource(R.string.price_subtotal).capitalize(), "19,90 €")
+                    PriceItemList(stringResource(R.string.price_shipment).capitalize(), "1,50 €")
+                    PriceItemList(stringResource(R.string.price_service).capitalize(), "2,00 €")
+                    PriceListTotal(stringResource(R.string.price_total).uppercase(), "23,40 €")
 
                     Row(
                         Modifier

@@ -12,7 +12,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTopAppBarState
@@ -29,7 +28,6 @@ import androidx.navigation.NavController
 import it.polito.did.s306067.shopdrop_client.ui.common.BottomBar
 import it.polito.did.s306067.shopdrop_client.ui.common.ItemCard
 import it.polito.did.s306067.shopdrop_client.ui.common.TabScreen
-import it.polito.did.s306067.shopdrop_client.ui.common.TopBar
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,7 +45,7 @@ fun CategorySection(navController : NavController){
     val testList : List<Int> = listOf(1,2,3,4,5,6,7)
 
     Scaffold(
-        topBar = { TopBar(currentTab, scrollBehavior = scrollBehavior) },
+        //topBar = { TopBar(currentTab, "" scrollBehavior = scrollBehavior) },
         bottomBar = { BottomBar(currentTab, navController) },
         //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         //floatingActionButton = { AddButton(onClick = {/*TODO*/}) },
