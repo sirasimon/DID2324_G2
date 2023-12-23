@@ -6,12 +6,21 @@
 
 #include <ESP8266Firebase.h>
 #include <ESP8266WiFi.h>
+#include <Wire.h>
+#include <arduino.h>
+
+#define SLAVE_ADDRESS 8
+const int sclPin = 5;
+const int sdaPin = 4;
 
 #define _SSID "HUAWEI Mate 20"          // Your WiFi SSID
 #define _PASSWORD "sicurezza"      // Your WiFi Password
-#define REFERENCE_URL "https://lab-7-did-default-rtdb.europe-west1.firebasedatabase.app/"  // Your Firebase project reference url
+#define REFERENCE_URL "https://did23-shopdrop-default-rtdb.firebaseio.com/"  // Your Firebase project reference url
 
 Firebase firebase(REFERENCE_URL);
+
+
+String read = "null";
 
 void setup() {
   Serial.begin(115200);
@@ -46,6 +55,8 @@ void setup() {
 //================================================================//
 //================================================================//
 
+
+/*
   // Examples of setting String, integer and float values.
   firebase.setString("Example/setString", "It's Working");
   firebase.setInt("Example/setInt", 123);
@@ -73,8 +84,24 @@ void setup() {
 
   // Example of data deletion.
   firebase.deleteData("Example");
+  */
+  Wire.begin(sdaPin, sclPin);
+}
+
+size_t recvFrom(int address, char* buffer, size_t size) {
+  Wire.requestFrom(address, size);
+  return Wire.readBytes(buffer, size);
+}
+
+size_t sendTo(int address, const char* buffer, size_t size) {
+  Wire.beginTransmission(address);
+  return Wire.write(buffer, size);
 }
 
 void loop() {
   // Nothing
+  String opened = firebase.getString("debug/apri");
+  Serial.println("string: " + opened);
+  Serial.println("executing");
+  read = opened;
 }

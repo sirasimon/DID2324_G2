@@ -11,14 +11,13 @@ class CustomServo {
     void init();
     void sweep(int angle);
     void update();
-
+    int _currentAngle;
   private:
     Servo& _servo;
     CustomTimer _sweepTimer;
     int _pin;
     int _sweepSpeed;
     int _sweepResolution;
-    int _currentAngle;
     int _sweepDir;
     int _targetAngle;
     bool _sweeping;
