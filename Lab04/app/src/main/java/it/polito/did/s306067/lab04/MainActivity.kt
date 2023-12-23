@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
@@ -31,6 +32,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -74,6 +76,7 @@ fun ContenitoreDatiTest(vm : MainViewModel){
     val test by vm.testText.observeAsState()
     val nickname by vm.nickname.observeAsState()
     val email by vm.email.observeAsState()
+    val open by vm.open.observeAsState()
 
     if(IS_DEBUG){
         DebugScreen(vm)
@@ -111,6 +114,17 @@ fun ContenitoreDatiTest(vm : MainViewModel){
 
                     Row(){
                         CurrentShipments()
+                    }
+
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                        Text(text = "Open value is $open")
+
+                        Button(
+                            onClick={vm.changeState()},
+                            enabled = open!=null
+                        ){
+                            Text("Change to ${!open!!}")
+                        }
                     }
                 }
             }

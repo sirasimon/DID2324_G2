@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_home_screen">HomeScreen</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_cart">carrello</string>
+    <string name="tab_profile">profilo</string>
+    <string name="title_pending">ordine in corso</string>
+    <string name="title_buy_again">acquista ancora</string>
+    <string name="btn_see_more">vedi altro</string>
+    <string name="title_pendings">ordini in corso</string>
+    <string name="btn_edit">modifica</string>
+    <string name="title_my_orders">i miei ordini</string>
+    <string name="title_address">Indirizzo</string>
+    <string name="title_help">Aiuto</string>
+    <string name="title_credits">Crediti</string>
+    <string name="btn_log_out">esci</string>
+    <string name="btn_log_in">accedi</string>
+    <string name="title_promo">in offerta</string>
+    <string name="placeholder_search_main">cerca su</string>
+    <string name="title_payment_methods">metodi di pagamento</string>
+    <string name="title_support">supporto</string>
+    <string name="price_subtotal">subtotale</string>
+    <string name="price_shipment">spedizione</string>
+    <string name="price_service">servizio</string>
+    <string name="price_total">totale</string>
+</resources>
