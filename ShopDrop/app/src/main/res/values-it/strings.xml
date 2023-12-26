@@ -23,4 +23,8 @@
     <string name="price_shipment">spedizione</string>
     <string name="price_service">servizio</string>
     <string name="price_total">totale</string>
+    <string name="forgot_pwd">Password dimenticata?</string>
+    <string name="title_order_summary">sommario ordine</string>
+    <string name="alternative_login">Oppure accedi con...</string>
+    <string name="title_login">accedi</string>
 </resources>

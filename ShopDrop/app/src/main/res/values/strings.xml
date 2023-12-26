@@ -25,4 +25,8 @@
     <string name="price_service">service</string>
     <string name="price_total">total</string>
     <string name="title_order_summary">order summary</string>
+    <string name="forgot_pwd">Forgotten password?</string>
+    <string name="alternative_login">Or, log in with...</string>
+    <string name="title_login">login</string>
+    <string name="msg_developing">Feature not available yet</string>
 </resources>
