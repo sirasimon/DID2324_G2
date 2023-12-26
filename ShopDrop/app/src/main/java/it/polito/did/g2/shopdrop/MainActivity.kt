@@ -11,6 +11,8 @@ import androidx.navigation.compose.rememberNavController
 import it.polito.did.g2.shopdrop.ui.cart.CCartScreen
 import it.polito.did.g2.shopdrop.ui.home.CHomeScreen
 import it.polito.did.g2.shopdrop.ui.home.CategorySection
+import it.polito.did.g2.shopdrop.ui.home.DHomeScreen
+import it.polito.did.g2.shopdrop.ui.login.LoginScreen
 import it.polito.did.g2.shopdrop.ui.orders.COrderDetailScreen
 import it.polito.did.g2.shopdrop.ui.orders.COrderListScreen
 import it.polito.did.g2.shopdrop.ui.profile.CProfileScreen
@@ -42,9 +44,15 @@ class MainActivity : ComponentActivity() {
 fun Navigation(viewModel: MainViewModel){
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "ClientHome"){
+    NavHost(navController = navController, startDestination = "Login"){
+        composable("Login") {
+            LoginScreen(navController = navController)
+        }
         composable("ClientHome") {
             CHomeScreen(navController = navController)
+        }
+        composable("DeliveryHome") {
+            DHomeScreen(navController = navController)
         }
         composable("ClientCart"){
             CCartScreen(navController = navController)
@@ -52,15 +60,12 @@ fun Navigation(viewModel: MainViewModel){
         composable("ClientProfile"){
             CProfileScreen(navController = navController)
         }
-
         composable("CategorySection"){
             CategorySection(navController = navController)
         }
-
         composable("COrderDetailScreen"){
             COrderDetailScreen(navController = navController, vm = viewModel)
         }
-
         composable("COrderListScreen"){
             COrderListScreen(navController = navController)
         }

@@ -97,7 +97,7 @@ fun CProfileScreen(navController: NavController){
                 ProfileItemList(label = stringResource(R.string.title_help).capitalize(), onClick = {/*TODO*/})
                 ProfileItemList(label = stringResource(R.string.title_support).capitalize(), onClick = {/*TODO*/})
 
-                TextButton(onClick = { /*TODO*/ }) {
+                TextButton(onClick = { navController.navigate("Login") }) {
                     Text(stringResource(R.string.btn_sign_out).capitalize())
                 }
             }
