@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.ui.common.BottomBar
 import it.polito.did.g2.shopdrop.ui.common.ScanButton
 import it.polito.did.g2.shopdrop.ui.common.TabScreen
@@ -35,7 +36,7 @@ data class UpdateInfo(val stateName : String, val time : String, val state : Boo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun COrderDetailScreen(navController : NavController){
+fun COrderDetailScreen(navController : NavController, vm : MainViewModel){
     var currentTab = TabScreen.HOME
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
@@ -50,7 +51,7 @@ fun COrderDetailScreen(navController : NavController){
     Scaffold(
         topBar = { TopBar(currentTab, "Detail", scrollBehavior = scrollBehavior) },
         bottomBar = { BottomBar(currentTab, navController) },
-        floatingActionButton = { ScanButton(true) },            //TODO: inviare valore true o false in base a disponibilità al ritiro
+        floatingActionButton = { ScanButton(true, vm) },            //TODO: inviare valore true o false in base a disponibilità al ritiro
         floatingActionButtonPosition = FabPosition.End
     ) { paddingValues ->
         Surface(
