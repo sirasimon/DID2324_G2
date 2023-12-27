@@ -36,10 +36,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import it.polito.did.g2.shopdrop.ui.common.BottomBar
-import it.polito.did.g2.shopdrop.ui.common.TabScreen
-import it.polito.did.g2.shopdrop.ui.common.TopBar
 import it.polito.did.g2.shopdrop.R
+import it.polito.did.g2.shopdrop.data.TabScreen
+import it.polito.did.g2.shopdrop.ui.common.BottomBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,7 +47,7 @@ fun CCartScreen(navController: NavController){
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
-        topBar = { TopBar(currentTab = TabScreen.CART, title = stringResource(R.string.title_order_summary).capitalize(), scrollBehavior = scrollBehavior )},
+        //topBar = { TopBar(currentTab = TabScreen.CART, title = stringResource(R.string.title_order_summary).capitalize(), scrollBehavior = scrollBehavior )},
         bottomBar = { BottomBar(currentTab, navController) },
         //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         floatingActionButton = { CheckoutButton() },

@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.ui.common.BottomBar
 import it.polito.did.g2.shopdrop.ui.common.ItemCard
-import it.polito.did.g2.shopdrop.ui.common.TabScreen
+import it.polito.did.g2.shopdrop.data.TabScreen
 
 
 @OptIn(ExperimentalMaterial3Api::class)

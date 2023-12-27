@@ -27,4 +27,15 @@
     <string name="title_order_summary">sommario ordine</string>
     <string name="alternative_login">Oppure accedi con...</string>
     <string name="title_login">accedi</string>
+    <string name="msg_developing">Caratteristica non ancora disponibile</string>
+    <string name="order_dated">ordine del</string>
+    <string name="title_camera_on">Scansiona il codice QR</string>
+    <string name="btn_back">indietro</string>
+    <string name="btn_flashlight">accendi la torcia</string>
+    <string name="order_state_created">ordine inviato</string>
+    <string name="order_state_received">ordine ricevuto</string>
+    <string name="order_state_carried">ordine in transito</string>
+    <string name="order_state_available">ordine disponibile al ritiro</string>
+    <string name="order_state_collected">ordine ritirato</string>
+    <string name="title_collection_point">punto di ritiro</string>
 </resources>

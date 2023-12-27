@@ -7,6 +7,6 @@ import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DHomeScreen(navController : NavController){
+fun CarrierHomeScreen(navController : NavController){
     Text("Delivery Home Screen")
 }

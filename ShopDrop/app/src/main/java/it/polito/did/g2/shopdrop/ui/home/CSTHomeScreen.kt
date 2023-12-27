@@ -1,6 +1,10 @@
 package it.polito.did.g2.shopdrop.ui.home
 
+import android.content.Context
+import android.os.Build
+import android.os.LocaleList
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -14,13 +18,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DirectionsBusFilled
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -42,7 +53,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
@@ -50,14 +60,21 @@ import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
+import it.polito.did.g2.shopdrop.data.Order
+import it.polito.did.g2.shopdrop.data.OrderStateName
+import it.polito.did.g2.shopdrop.data.SectionName
+import it.polito.did.g2.shopdrop.data.TabScreen
 import it.polito.did.g2.shopdrop.ui.common.BottomBar
 import it.polito.did.g2.shopdrop.ui.common.ItemCard
-import it.polito.did.g2.shopdrop.ui.common.TabScreen
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CHomeScreen(navController : NavController){
+fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
     var currentTab = TabScreen.HOME
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
@@ -83,11 +100,14 @@ fun CHomeScreen(navController : NavController){
                 .padding(paddingValues),
             color = MaterialTheme.colorScheme.background
         ) {
-            Box(Modifier.fillMaxSize().semantics { isTraversalGroup = true }){
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .semantics { isTraversalGroup = true }){
                 SearchBar(  //https://www.youtube.com/watch?v=90gokceSYdM
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
+                        .padding(8.dp)
                         .semantics { traversalIndex = -1f },
                     query = query,
                     onQueryChange = { query = it },
@@ -166,8 +186,8 @@ fun CHomeScreen(navController : NavController){
 
                         //TODO Pending orders
                         //TODO controllare il vm che ci siano ordini pendenti ed eventualmente mostrarli
-                        if(true)    //Condizione dei pending order
-                            PendingOrdersCard(navController, { showBottomSheet = true })
+                        if(viewModel.hasPending.value!!)    //Condizione dei pending order
+                            PendingOrdersCard(navController, viewModel)
                         //TODO demo oggetti acquistabili
 
                         HomeSection(SectionName.BUY_AGAIN, navController = navController, onClick = { showBottomSheet = true })
@@ -204,9 +224,10 @@ fun CHomeScreen(navController : NavController){
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PendingOrdersCard(navController: NavController, onClick: () -> Unit){
+fun PendingOrdersCard(navController: NavController, viewModel: MainViewModel){
 
     Column(modifier = Modifier.padding(vertical = 16.dp)){
         /*
@@ -215,25 +236,46 @@ fun PendingOrdersCard(navController: NavController, onClick: () -> Unit){
             modifier = Modifier.padding(16.dp)
         )
          */
+
+        ElevatedCard(
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+            modifier = Modifier.padding(16.dp).fillMaxWidth()
+        ){
+            viewModel.pendingOrdersList.value?.forEachIndexed{i, it ->
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()){
+                    OrderListItem(order = it, navController, viewModel)
+
+                    if (i < viewModel.pendingOrdersList.value!!.size)
+                        HorizontalDivider()
+                }
+            }
+        }
+
+        /*
         Box(Modifier){
             ElevatedCard(
                 elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
+                    .background(Color.Red)
             ){
-                Column(){
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Cyan)){
                     ListItem(
                         headlineContent = { Text("Pacco Halloween") },
                         trailingContent = {
-                            IconButton(onClick = {/*TODO*/ })
+                            IconButton(onClick = { /*TODO*/ })
                             {
-                                Icon(painter = painterResource(R.drawable.baseline_qr_code_scanner_24), contentDescription = null)
+                                Icon(Icons.Filled.QrCodeScanner, contentDescription = null)
                             }
                         },    //aggiungere if per farlo apparire solo se è disponibile
-                        modifier = Modifier.clickable { navController.navigate("COrderDetailScreen") }
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { navController.navigate("COrderDetailScreen") }
                     )
-                    Divider()
+                    HorizontalDivider()
                     ListItem(
                         headlineContent = {Text("Regalo Matti")},
                         modifier = Modifier.clickable { /*TODO*/ }
@@ -241,8 +283,42 @@ fun PendingOrdersCard(navController: NavController, onClick: () -> Unit){
                 }
             }
         }
+         */
 
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun OrderListItem(order: Order, navController: NavController, viewModel: MainViewModel){
+    val creationTime = order.stateList?.find { it.state==OrderStateName.CREATED }?.timestamp?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+    val icon = when(order.stateList?.last()?.state){
+        OrderStateName.CREATED -> Icons.Filled.Add
+        OrderStateName.RECEIVED -> Icons.Filled.Business
+        OrderStateName.CARRIED -> Icons.Filled.DirectionsBusFilled
+        OrderStateName.AVAILABLE -> Icons.Filled.Done
+        OrderStateName.COLLECTED -> Icons.Filled.DoneAll
+        else -> Icons.Filled.QuestionMark
+    }
+
+    val scannable = order.stateList?.last()?.state == OrderStateName.AVAILABLE
+
+    ListItem(
+        headlineContent = { Text(stringResource(id = R.string.order_dated).capitalize() + " " + creationTime) },
+        leadingContent = { Icon(icon, contentDescription = null) },
+        trailingContent = {
+            if (scannable)
+                IconButton(onClick = { navController.navigate("CameraScreen") }) {
+                    Icon(Icons.Filled.QrCodeScanner, contentDescription = null)
+                }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                viewModel.targetOrderID=order.id
+                navController.navigate("COrderDetailScreen")
+            }
+    )
 }
 
 @Composable
@@ -261,7 +337,7 @@ fun HomeSection(sectionType: SectionName, navController: NavController, onClick 
     Column(modifier = Modifier.padding(vertical = 16.dp)){
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom){
             Text(text = sectionName,
-                fontSize = 18.sp,
+                style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.padding(16.dp)
             )
 
@@ -284,5 +360,15 @@ fun HomeSection(sectionType: SectionName, navController: NavController, onClick 
             ItemCard(onClick)
         }
 
+    }
+}
+
+fun getSystemLanguage(context: Context): Locale {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        val localeList = LocaleList.getDefault()
+        localeList[0]
+    } else {
+        @Suppress("DEPRECATION")
+        Locale.getDefault()
     }
 }

@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.R
+import it.polito.did.g2.shopdrop.data.TabScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -1,6 +1,7 @@
 package it.polito.did.g2.shopdrop.ui.login
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,8 +21,8 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -51,6 +52,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -58,12 +60,14 @@ import kotlinx.coroutines.launch
 data class User(val email : String, val password : String)
 
 @Composable
-fun LoginScreen(navController : NavController){
+fun LoginScreen(navController : NavController, viewModel: MainViewModel){
     var email by rememberSaveable { mutableStateOf("") }
     var emailActive by remember { mutableStateOf(false) }   //TODO: set label to null if active
+    var emailError by remember { mutableStateOf(false) }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordActive by remember { mutableStateOf(false) }    //TODO: set label to null if active
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
+    var passwordError by remember { mutableStateOf(false) }
 
     val baseMod = Modifier
         .padding(vertical = 16.dp)
@@ -73,15 +77,36 @@ fun LoginScreen(navController : NavController){
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
+    fun checkForm(navController: NavController, userData : User, viewModel: MainViewModel){
+
+        if(userData.email.contains("@shopdrop.com")){
+            Log.i("FORM_CHECK", "email contains company domain")
+            /*
+            if(viewModel.login(UserQuery(userData.email, userData.password, UserRole.DLV))) {
+                Log.i("FORM_CHECK", "data is correct, redirecting to Delivery Home")
+                navController.navigate("DeliveryHome")
+            }
+            */
+            navController.navigate("DeliveryHome")
+            /*
+            else {
+                Log.i("FORM_CHECK", "data is incorrect ($userData)")
+                emailError = false
+                passwordError = false
+            }
+             */
+        }else{
+            navController.navigate("CustomerHome")
+        }
+    }
+
     Scaffold(
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState,
                 snackbar = { snackbarData: SnackbarData ->
-                    Card(
-                        elevation = CardDefaults.cardElevation(
-                            defaultElevation = 4.dp
-                        ),
+                    ElevatedCard(
+                        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
                         shape = RoundedCornerShape(8.dp),
                         modifier = Modifier
                             .padding(16.dp)
@@ -135,9 +160,10 @@ fun LoginScreen(navController : NavController){
                         imeAction = if (email != "" && password != "") ImeAction.Done else ImeAction.Next
                     ),
                     keyboardActions = KeyboardActions(
-                        onDone = { checkForm(navController, User(email, password)) }
+                        onDone = { checkForm(navController, User(email, password), viewModel) }
                     ),
                     maxLines = 1,
+                    isError = emailError,
                     modifier = baseMod
                 )
 
@@ -175,9 +201,10 @@ fun LoginScreen(navController : NavController){
                         imeAction = if (email != "" && password != "") ImeAction.Done else ImeAction.Previous
                     ),
                     keyboardActions = KeyboardActions(
-                        onDone = { checkForm(navController, User(email, password)) }
+                        onDone = { checkForm(navController, User(email, password), viewModel) }
                     ),
                     maxLines = 1,
+                    isError = passwordError
                 )
 
                 // FORGOTTEN PASSWORD
@@ -188,7 +215,7 @@ fun LoginScreen(navController : NavController){
                 }
 
                 Button(
-                    onClick = { checkForm(navController, User(email, password)) },
+                    onClick = { checkForm(navController, User(email, password), viewModel) },
                     modifier = baseMod
                 ) {
                     Text(text = stringResource(R.string.btn_log_in).capitalize())
@@ -219,14 +246,5 @@ fun performDevMsg(scope: CoroutineScope, snackbarHostState: SnackbarHostState, c
         snackbarHostState.showSnackbar(
             message = "",
             duration = SnackbarDuration.Short)
-    }
-}
-
-
-fun checkForm(navController: NavController, userData : User){
-    if(userData.email.contains("@shopdrop.com")){
-        navController.navigate("DeliveryHome")
-    }else{
-        navController.navigate("ClientHome")
     }
 }

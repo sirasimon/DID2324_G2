@@ -29,4 +29,14 @@
     <string name="alternative_login">Or, log in with...</string>
     <string name="title_login">login</string>
     <string name="msg_developing">Feature not available yet</string>
+    <string name="order_dated">order dated</string>
+    <string name="title_camera_on">Scan the QR code</string>
+    <string name="btn_back">back</string>
+    <string name="btn_flashlight">switch on flashlight</string>
+    <string name="order_state_created">order sent</string>
+    <string name="order_state_received">order received</string>
+    <string name="order_state_carried">order in transit</string>
+    <string name="order_state_available">order available for collection</string>
+    <string name="order_state_collected">order collected</string>
+    <string name="title_collection_point">collection point</string>
 </resources>
