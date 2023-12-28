@@ -22,47 +22,79 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
+import it.polito.did.g2.shopdrop.data.StoreItem
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfirmSheet(
+    item : StoreItem?,
+    viewModel: MainViewModel,
     onDismiss: () -> Unit,
     bottomSheetState: SheetState,
     bottomSheetScope: CoroutineScope
 ) {
-    var count = mutableIntStateOf(0)
-    var price = 11.35f
+    var quantity = mutableIntStateOf(viewModel.cart.value?.get(item?.name) ?: 0)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = bottomSheetState,
         dragHandle = { Text("Aggiungi", Modifier.padding(vertical = 8.dp)) }
     ) {
-        // Sheet content
+        // SHEET CONTENT
 
-        Text("[Nome prodotto]", Modifier.padding(horizontal = 16.dp))
-        Text("$price", Modifier.padding(horizontal = 16.dp))
+        // Product name
+        Text(
+            text = item?.name?.capitalize()?:"[NULL]",
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            lineHeight = 24.sp,
+            maxLines = 1,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        )
+
+        // Product price
+        Text(
+            text = item?.price.toString()+" €",
+            fontWeight = FontWeight.Black,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        )
 
         Card(shape = CircleShape, modifier = Modifier
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
             .height(48.dp)){
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxSize()){
-                Text(text = "Quantità", modifier = Modifier
-                    .background(Color.Cyan)
-                    .padding(horizontal = 16.dp))
-                Row(verticalAlignment = Alignment.CenterVertically,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxSize()
+            ){
+                Text(
+                    text = stringResource(id = R.string.txt_quantity).capitalize(),
+                    modifier = Modifier
+                        .background(Color.Cyan)
+                        .padding(horizontal = 16.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .background(Color.Red)
                         .padding(horizontal = 16.dp)){
-                    IconButton(onClick = { if(count.value>0) count.value-- }) {
+                    IconButton(onClick = { if(quantity.value>0) quantity.value-- }) {
                         Icon(painter = painterResource(R.drawable.outline_do_disturb_on_24), contentDescription = null)
                     }
-                    Text("${count.value}")
-                    IconButton(onClick = { count.value++ }) {
+                    Text("${quantity.value}")
+                    IconButton(onClick = { quantity.value++ }) {
                         Icon(painter = painterResource(R.drawable.round_add_circle_outline_24), contentDescription = null)
                     }
                 }
@@ -71,10 +103,20 @@ fun ConfirmSheet(
 
         Text("[Breve descrizione]", Modifier.padding(horizontal = 16.dp))
 
-        Button(onClick = {/*TODO*/}, modifier = Modifier
-            .padding(vertical = 24.dp, horizontal = 64.dp)
-            .fillMaxWidth()){
-            Text(String.format("Aggiungi per %.2f €", price*count.value))
+        Button(
+            onClick = {
+                viewModel.modifyCart(item, quantity.value)
+                bottomSheetScope.launch { bottomSheetState.hide() }
+                    .invokeOnCompletion {
+                        if(!bottomSheetState.isVisible){
+                            onDismiss()
+                        }
+                    }
+                      },
+            modifier = Modifier.padding(vertical = 24.dp, horizontal = 64.dp)
+                .fillMaxWidth()
+        ){
+                Text( String.format("Aggiungi per %.2f €", (quantity.value.toFloat())*(item?.price ?: 0f)) )
         }
 
         /*

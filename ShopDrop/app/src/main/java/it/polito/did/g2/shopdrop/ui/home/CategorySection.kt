@@ -25,9 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import it.polito.did.g2.shopdrop.data.TabScreen
 import it.polito.did.g2.shopdrop.ui.common.BottomBar
 import it.polito.did.g2.shopdrop.ui.common.ItemCard
-import it.polito.did.g2.shopdrop.data.TabScreen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,6 +78,6 @@ fun CategorySection(navController : NavController){
 
     if(showBottomSheet){
         Log.d("MODAL", "Dovrebbe aprirsi qui")
-        ConfirmSheet({showBottomSheet=false}, bottomSheetState, bottomSheetScope)
+        //ConfirmSheet({showBottomSheet=false}, bottomSheetState, bottomSheetScope)
     }
 }

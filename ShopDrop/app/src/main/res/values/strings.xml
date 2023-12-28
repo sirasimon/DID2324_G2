@@ -16,7 +16,6 @@
     <string name="btn_sign_out" translatable="false">sign out</string>
     <string name="btn_log_out">log out</string>
     <string name="btn_log_in">log in</string>
-    <string name="title_promo">promo</string>
     <string name="placeholder_search_main">search on</string>
     <string name="title_payment_methods">payment methods\n</string>
     <string name="title_support">support</string>
@@ -39,4 +38,10 @@
     <string name="order_state_available">order available for collection</string>
     <string name="order_state_collected">order collected</string>
     <string name="title_collection_point">collection point</string>
+    <string name="store_it_cat_bakery">bakery</string>
+    <string name="store_it_cat_promo">promo</string>
+    <string name="store_it_cat_new">new</string>
+    <string name="store_it_cat_fruitveg">fruit and vegetables</string>
+    <string name="txt_quantity">quantity</string>
+    <string name="desc_item_pic_of">item picture of</string>
 </resources>

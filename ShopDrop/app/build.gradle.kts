@@ -87,4 +87,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
 
     implementation("com.google.firebase:firebase-storage")
+
+    //https://www.sinasamaki.com/loading-images-using-coil-in-jetpack-compose/
+    implementation("io.coil-kt:coil-compose:2.2.2")
 }

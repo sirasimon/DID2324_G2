@@ -15,7 +15,6 @@
     <string name="title_credits">Crediti</string>
     <string name="btn_log_out">esci</string>
     <string name="btn_log_in">accedi</string>
-    <string name="title_promo">in offerta</string>
     <string name="placeholder_search_main">cerca su</string>
     <string name="title_payment_methods">metodi di pagamento</string>
     <string name="title_support">supporto</string>
@@ -38,4 +37,9 @@
     <string name="order_state_available">ordine disponibile al ritiro</string>
     <string name="order_state_collected">ordine ritirato</string>
     <string name="title_collection_point">punto di ritiro</string>
+    <string name="store_it_cat_bakery">forno</string>
+    <string name="store_it_cat_promo">in promozione</string>
+    <string name="store_it_cat_new">novità</string>
+    <string name="store_it_cat_fruitveg">ortofrutta</string>
+    <string name="txt_quantity">quantità</string>
 </resources>

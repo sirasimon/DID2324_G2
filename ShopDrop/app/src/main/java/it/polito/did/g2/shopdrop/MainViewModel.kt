@@ -16,12 +16,27 @@ import it.polito.did.g2.shopdrop.data.Locker
 import it.polito.did.g2.shopdrop.data.Order
 import it.polito.did.g2.shopdrop.data.OrderState
 import it.polito.did.g2.shopdrop.data.OrderStateName
+import it.polito.did.g2.shopdrop.data.StoreItem
+import it.polito.did.g2.shopdrop.data.StoreItemCategory
 import it.polito.did.g2.shopdrop.data.UserQuery
 import it.polito.did.g2.shopdrop.data.UserRole
 import java.time.LocalDateTime
 
-class MainViewModel : ViewModel(){
+class MainViewModel() : ViewModel(){
     //TODO
+    val shipmentFee = 2.5
+    val serviceFee = 0.0
+
+
+    //CART DATA
+    private val _cart : MutableLiveData<MutableMap<String, Int>> = MutableLiveData(mutableMapOf())
+    val cart : LiveData<MutableMap<String, Int>> = _cart
+
+    private val _subtot : MutableLiveData<Float> = MutableLiveData(.0f )
+    val subtot : LiveData<Float> = _subtot
+
+    //SHARED PREFs
+    //private val sharedPreferences = application.getSharedPreferences("shopdrop_pref", Context.MODE_PRIVATE)
 
     //DB REFs
     private val dbRef = Firebase.database.reference
@@ -34,6 +49,7 @@ class MainViewModel : ViewModel(){
 
     //USER INFO
     private val _userID : MutableLiveData<String?> = MutableLiveData(null)
+    val userID : LiveData<String?> = _userID
 
     //ORDERS
     private val _hasPending : MutableLiveData<Boolean> = MutableLiveData(true)
@@ -74,6 +90,10 @@ class MainViewModel : ViewModel(){
 
     @RequiresApi(Build.VERSION_CODES.O)
     val pendingOrdersList : LiveData<MutableList<Order>> = _pendingOrdersList
+
+    //PRODUCTS
+    private val _storeItems = MutableLiveData<MutableList<StoreItem>>(mutableListOf())
+    val storeItems :LiveData<MutableList<StoreItem>> = _storeItems
 
 
     //DEBUG
@@ -160,7 +180,25 @@ class MainViewModel : ViewModel(){
                 )
         }
 
+        /*
+        if(result){
+            viewModelScope.launch {
+                //sharedPreferences.edit().putString("userID", _userID.value).apply()
+            }
+        }
+         */
+
         return result
+    }
+
+    fun loadUserInfo() : String?{
+        /*
+        viewModelScope.launch {
+            //sharedPreferences.getString("userID", _userID.value)
+        }
+         */
+
+        return _userID.value
     }
 
     //DEBUG FUNS
@@ -176,5 +214,73 @@ class MainViewModel : ViewModel(){
 
     fun debugSetDefault(){
         dbRef.child("debug").child("apri").setValue("null")
+    }
+
+    init{
+        productsRef.addListenerForSingleValueEvent(
+            object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    Log.i("PROD_INIT", "INITIALIZING Products list")
+                    for(snap in snapshot.children){
+                        Log.i("PROD_INIT", "\tTrying to add to list the product ${snap.key}")
+                        Log.i("PROD_INIT", "\tThe new item should contain:\n\tname: ${snap.key}\n" +
+                                "\tprice: ${snap.child("price").getValue<Float>()}\n" +
+                                "\tcategory: ${StoreItemCategory.valueOf(snap.child("category").getValue<String>()?.uppercase()?:"<null>").toString()}\n" +
+                                "\tthumbnail: ${snap.child("thumbnail").getValue<String>()}")
+
+                        val newItem = StoreItem(
+                            snap.key?:"<null>",
+                            snap.child("price").getValue<Float>()?:.0f,
+                            StoreItemCategory.valueOf(snap.child("category").getValue<String>()?.uppercase()?:"<null>"),
+                            snap.child("thumbnail").getValue<String>()?:"<null>"
+                        )
+
+                        Log.i("PROD_INIT", "\tNew object of StoreItem is: ${newItem}\n\tPutting it inside the list")
+
+                        _storeItems.value?.add(newItem)
+                        //_storeItems.value = _storeItems.value
+
+                        Log.i("PROD_INIT", "\tList is now ${_storeItems.value?.size} items long and the last product added is ${_storeItems.value?.last()}")
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            }
+        )
+    }
+
+    fun modifyCart(item: StoreItem?, quantity: Int){
+        Log.i("MODIFY_CART", "Trying to modify the cart")
+
+        if(item!=null){
+            if(_cart.value!!.contains(item.name)){
+                Log.i("MODIFY_CART", "\t\"${item.name}\" already in the cart with quantity ${_cart.value!![item.name]}, but willing to change into $quantity")
+                _cart.value!![item.name] = quantity
+            }else{
+                Log.i("MODIFY_CART", "\t\"${item.name}\" is not in the cart yet")
+                _cart.value!![item.name] = quantity
+            }
+            Log.i("MODIFY_CART", "\tUpdated quantity of \"${item.name}\" in map is ${_cart.value!![item.name]} (desired change was $quantity)")
+
+            updateSubtot()
+        }else{
+            Log.w("MODIFY_CART", "\tITEM IS NULL")
+        }
+    }
+
+    fun updateSubtot(){
+        Log.i("UPD_SUBTOT", "UPDATING SUBTOTAL")
+
+        var subtot = 0f
+
+        _cart.value?.forEach {
+            subtot += (it.value.toFloat()*(_storeItems.value?.find{storeItem ->  storeItem.name==it.key}?.price?:.0f))
+        }
+
+        _subtot.value = subtot
+
+        Log.i("UPD_SUBTOT", "\tNew subtotal is ${_subtot.value}")
     }
 }

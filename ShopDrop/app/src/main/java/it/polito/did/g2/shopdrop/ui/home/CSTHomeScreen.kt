@@ -8,7 +8,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -65,9 +64,12 @@ import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.data.Order
 import it.polito.did.g2.shopdrop.data.OrderStateName
 import it.polito.did.g2.shopdrop.data.SectionName
+import it.polito.did.g2.shopdrop.data.StoreItem
+import it.polito.did.g2.shopdrop.data.StoreItemCategory
 import it.polito.did.g2.shopdrop.data.TabScreen
 import it.polito.did.g2.shopdrop.ui.common.BottomBar
 import it.polito.did.g2.shopdrop.ui.common.ItemCard
+import it.polito.did.g2.shopdrop.ui.common.StoreItemCard
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -87,6 +89,7 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
     val bottomSheetScope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
 
+    var targetItem by remember{ mutableStateOf<StoreItem?>(null) }
 
     Scaffold(
         //topBar = { TopBar(currentTab, scrollBehavior = scrollBehavior) },
@@ -190,27 +193,21 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
                             PendingOrdersCard(navController, viewModel)
                         //TODO demo oggetti acquistabili
 
+                        /*
                         HomeSection(SectionName.BUY_AGAIN, navController = navController, onClick = { showBottomSheet = true })
                         HomeSection(SectionName.PROMO, navController = navController, onClick = { showBottomSheet = true })
+                        */
 
-                        Box(){
-                            Text("Varie categorie")
-                        }
+                        //SEZIONI CATEGORIE MERCEOLOGICHE
+                        enumValues<StoreItemCategory>().forEach {
+                            val itList = viewModel.storeItems.value?.filter{storeItem -> storeItem.category==it }
 
-                        Box(){
-                            Text("Quando schiacci un bottone appare overlay per acquisto quantità e conferma")
+                            if(!itList.isNullOrEmpty())
+                                HomeCatSection(it, itList, navController = navController){ item ->
+                                    targetItem = item
+                                    showBottomSheet = true
+                                }
                         }
-
-                        Box(){
-                            Text("Quando schiacci un bottone appare overlay per acquisto quantità e conferma")
-                        }
-                        Box(){
-                            Text("Quando schiacci un bottone appare overlay per acquisto quantità e conferma")
-                        }
-                        Box(){
-                            Text("Quando schiacci un bottone appare overlay per acquisto quantità e conferma")
-                        }
-
                     }
                 }
             }
@@ -219,11 +216,10 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
 
         if(showBottomSheet){
             Log.d("MODAL", "Dovrebbe aprirsi qui")
-            ConfirmSheet({showBottomSheet=false}, bottomSheetState, bottomSheetScope)
+            ConfirmSheet(targetItem, viewModel, {showBottomSheet=false}, bottomSheetState, bottomSheetScope)
         }
     }
 }
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -239,7 +235,9 @@ fun PendingOrdersCard(navController: NavController, viewModel: MainViewModel){
 
         ElevatedCard(
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-            modifier = Modifier.padding(16.dp).fillMaxWidth()
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
         ){
             viewModel.pendingOrdersList.value?.forEachIndexed{i, it ->
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()){
@@ -315,10 +313,67 @@ fun OrderListItem(order: Order, navController: NavController, viewModel: MainVie
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                viewModel.targetOrderID=order.id
+                viewModel.targetOrderID = order.id
                 navController.navigate("COrderDetailScreen")
             }
     )
+}
+
+@Composable
+fun HomeCatSection(category: StoreItemCategory, itemList: List<StoreItem>, navController: NavController, onClick : (it: StoreItem) -> Unit){
+
+    Column {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom){
+            Text(text = stringResource(id = category.getStringRef()).capitalize(),
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(16.dp)
+            )
+
+            TextButton(
+                onClick = { navController.navigate("CategorySection") },
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                Text(text = stringResource(R.string.btn_see_more).capitalize(),
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        }
+
+        Row(modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .horizontalScroll(rememberScrollState())){
+
+            //Text("TEST")
+
+            val upperLimit = if(itemList.size<5) itemList.size else 5
+            //Text("upper limit is $upperLimit")
+
+            for (i in 0 until upperLimit){
+                StoreItemCard(itemList[i]) {
+                    onClick(it)
+                }
+            }
+
+
+/*
+            for(i in 0 until upperLimit){
+                //ItemCard(itemList[i], onClick)
+                Card(modifier = Modifier
+                    .size(width = 160.dp, height = 200.dp)
+                    .padding(8.dp)
+                    .clickable(onClick = onClick)) {
+                    Column {
+                        Spacer(Modifier.height(160.dp))
+                        Text(text = itemList[i].name)
+                        Text(text = itemList[i].price.toString())
+                    }
+                }
+            }
+
+             */
+        }
+    }
 }
 
 @Composable
@@ -330,7 +385,7 @@ fun HomeSection(sectionType: SectionName, navController: NavController, onClick 
             sectionName = stringResource(R.string.title_buy_again).capitalize()
         }
         SectionName.PROMO -> {
-            sectionName = stringResource(R.string.title_promo).capitalize()
+            //sectionName = stringResource(R.string.title_promo).capitalize()
         }
     }
 

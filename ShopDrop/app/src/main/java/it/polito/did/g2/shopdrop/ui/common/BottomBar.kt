@@ -28,7 +28,7 @@ fun BottomBar(currentTab : TabScreen, navController: NavController/*, vm : ViewM
     NavigationBar() {
         NavigationBarItem(
             selected = currentTab== TabScreen.HOME,
-            onClick = { if(currentTab!= TabScreen.HOME) navController.navigate("ClientHome") },
+            onClick = { if(currentTab!= TabScreen.HOME) navController.navigate("CustomerHome") },
             icon = { if(currentTab== TabScreen.HOME) Icon(Icons.Filled.Home, stringResource(R.string.tab_home).capitalize()) else Icon(
                 Icons.Outlined.Home, stringResource(R.string.tab_home).capitalize()) },
             label = { Text(text = stringResource(R.string.tab_home).capitalize()) }

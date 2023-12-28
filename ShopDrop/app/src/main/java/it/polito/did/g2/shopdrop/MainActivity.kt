@@ -1,5 +1,6 @@
 package it.polito.did.g2.shopdrop
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import it.polito.did.g2.shopdrop.ui.cart.CCartScreen
+import it.polito.did.g2.shopdrop.ui.cart.CartScreen
 import it.polito.did.g2.shopdrop.ui.home.CSTHomeScreen
 import it.polito.did.g2.shopdrop.ui.home.CarrierHomeScreen
 import it.polito.did.g2.shopdrop.ui.home.CategorySection
@@ -27,6 +28,8 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val sharedPreferences = application.getSharedPreferences("shopdrop_pref", Context.MODE_PRIVATE)
+
         vm.debugInit()
 
         setContent {
@@ -49,7 +52,17 @@ class MainActivity : ComponentActivity() {
 fun Navigation(viewModel: MainViewModel){
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "Login"){
+    NavHost(
+        navController = navController,
+        startDestination = "Login"
+        /*
+        if(viewModel.loadUserInfo()!=null){
+            "CSTHomeScreen"
+        }else{
+            "Login"
+        }
+        */
+    ){
         composable("Login") {
             LoginScreen(navController = navController, viewModel = viewModel)
         }
@@ -60,7 +73,7 @@ fun Navigation(viewModel: MainViewModel){
             CarrierHomeScreen(navController = navController)
         }
         composable("ClientCart"){
-            CCartScreen(navController = navController)
+            CartScreen(navController = navController, viewModel = viewModel)
         }
         composable("ClientProfile"){
             CProfileScreen(navController = navController)
