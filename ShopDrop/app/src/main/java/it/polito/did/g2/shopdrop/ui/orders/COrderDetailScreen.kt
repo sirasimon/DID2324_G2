@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberTopAppBarState
@@ -34,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
@@ -85,8 +87,8 @@ fun COrderDetailScreen(navController : NavController, vm : MainViewModel){
             )
         },
         bottomBar = { BottomBar(currentTab, navController) },
-        floatingActionButton = { ScanButton(true, navController) },
-        floatingActionButtonPosition = FabPosition.End
+        floatingActionButton = { if(order?.stateList?.size==4) ScanButton(true, navController) else if(order?.stateList?.size==1) CancelButton({/*TODO*/})},
+        floatingActionButtonPosition = if(order?.stateList?.size==1) FabPosition.Center else FabPosition.End
     ) { paddingValues ->
 
         Surface(
@@ -141,6 +143,13 @@ fun COrderDetailScreen(navController : NavController, vm : MainViewModel){
                 }
             }
         }
+    }
+}
+
+@Composable
+fun CancelButton(onClick: () -> Unit){
+    TextButton(onClick = onClick) {
+        Text(text = stringResource(id = R.string.btn_cancel_order), color = Color.Red, fontSize = 18.sp)
     }
 }
 

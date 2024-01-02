@@ -122,73 +122,100 @@ class MainViewModel() : ViewModel(){
     private val users = dbRef.child("users")
 
     //LOGIN
-    fun login(userQuery: UserQuery) : Boolean{
-        var result = false
+    suspend fun login(userQuery: UserQuery){
 
-        when(userQuery.role){
-            UserRole.CRR -> {
-                users.orderByChild("email")
-                    .equalTo(userQuery.email)
-                    .addListenerForSingleValueEvent(
-                        object : ValueEventListener {
-                            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                                if(dataSnapshot.children.count()==1){
-                                    Log.i("LOGIN", "FOUND 1 OCCURRENCE FOR EMAIL ${userQuery.email}")
-                                    for (snapshot in dataSnapshot.children) {
-                                        // Trovato un nodo con l'attributo desiderato e il valore noto
-                                        _userID.value = snapshot.key
+        users.orderByChild("email")
+            .equalTo(userQuery.email)
+            .addListenerForSingleValueEvent(
+                object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        if(dataSnapshot.children.count()==1){
+                            Log.i("LOGIN", "FOUND 1 OCCURRENCE FOR EMAIL ${userQuery.email}")
+                            for (snapshot in dataSnapshot.children) {
+                                // Trovato un nodo con l'attributo desiderato e il valore noto
+                                _userID.value = snapshot.key
 
-                                        Log.i("LOGIN", "FOUND ${_userID.value}")
-                                    }
-                                }else{
-                                    Log.e("LOGIN", "FOR EMAIL ${userQuery.email} COUNTED ${dataSnapshot.children.count()} OCCURRENCES")
+                                userQuery.role = enumValueOf<UserRole>(snapshot.child("role").getValue<String>()?:"")
+                                Log.i("LOGIN", "FOUND ${_userID.value}")
 
-                                    result = false
-                                }
+                                users.child(snapshot.key?:"").child("password")
+                                    .addValueEventListener(
+                                        object : ValueEventListener {
+                                            override fun onDataChange(dataSnapshot: DataSnapshot) {
+
+                                                Log.i("LOGIN", "Stored password is ${dataSnapshot.value}")
+
+                                                if(userQuery.password!=dataSnapshot.value){
+                                                    userQuery.errType = UserQuery.LOGIN_ERROR_TYPE.PASSWORD
+
+                                                    Log.e("LOGIN", "PASSWORD IS NOT VALID")
+                                                }else{
+                                                    userQuery.errType = null
+                                                    Log.i("LOGIN", "PASSWORD IS VALID")
+                                                }
+
+
+                                            }
+
+                                            override fun onCancelled(databaseError: DatabaseError) {
+                                                userQuery.role = null
+                                                userQuery.errType = UserQuery.LOGIN_ERROR_TYPE.UNKNOWN
+
+                                                Log.e("LOGIN", "UNKNOWN ERROR")
+                                            }
+                                        }
+                                    )
                             }
-
-                            override fun onCancelled(databaseError: DatabaseError) {
-                                // Gestisci eventuali errori
-                                println("Errore nella query: $databaseError")
+                        }else{
+                            if(userQuery.errType == null){
+                                Log.e("LOGIN", "FOR EMAIL ${userQuery.email} COUNTED ${dataSnapshot.children.count()} OCCURRENCES")
+                                userQuery.role = null
+                                userQuery.errType = UserQuery.LOGIN_ERROR_TYPE.NOT_FOUND
                             }
                         }
-                    )
-            }
-            else -> {
-                //TODO
-            }
-        }
+                    }
 
-        if(_userID.value!=null){
-            users.child(_userID.value!!)
+                    override fun onCancelled(databaseError: DatabaseError) {
+                        userQuery.role = null
+                        userQuery.errType = UserQuery.LOGIN_ERROR_TYPE.UNKNOWN
+
+                        Log.e("LOGIN", "UNKNOWN ERROR")
+                    }
+                }
+            )
+
+        /*
+        if(userID!=null){
+            users.child(userID)
                 .child("password")
                 .addValueEventListener(
                     object : ValueEventListener {
                         override fun onDataChange(dataSnapshot: DataSnapshot) {
 
-                            result = userQuery.password==dataSnapshot.value.toString()
+                            Log.e("LOGIN", "Stored password is ${dataSnapshot.getValue<String>()}")
 
-                            Log.i("LOGIN", "PASSWORD IS ${if(result) "CORRECT" else "INCORRECT"} ($result)")
+                            if(userQuery.password!=dataSnapshot.getValue<String>()){
+                                userQuery.errType = UserQuery.LOGIN_ERROR_TYPE.PASSWORD
+
+                                Log.e("LOGIN", "PASSWORD IS NOT VALID")
+                            }else{
+                                userQuery.errType = null
+                                Log.i("LOGIN", "PASSWORD IS VALID")
+                            }
+
+
                         }
 
                         override fun onCancelled(databaseError: DatabaseError) {
-                            // Gestisci eventuali errori
-                            result = false
-                            println("Errore nella query: $databaseError")
+                            userQuery.role = null
+                            userQuery.errType = UserQuery.LOGIN_ERROR_TYPE.UNKNOWN
+
+                            Log.e("LOGIN", "UNKNOWN ERROR")
                         }
                     }
                 )
         }
-
-        /*
-        if(result){
-            viewModelScope.launch {
-                //sharedPreferences.edit().putString("userID", _userID.value).apply()
-            }
-        }
          */
-
-        return result
     }
 
     fun loadUserInfo() : String?{

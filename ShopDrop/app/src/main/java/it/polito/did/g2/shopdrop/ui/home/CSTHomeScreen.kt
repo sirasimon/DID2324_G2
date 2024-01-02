@@ -77,6 +77,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
+
     var currentTab = TabScreen.HOME
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())

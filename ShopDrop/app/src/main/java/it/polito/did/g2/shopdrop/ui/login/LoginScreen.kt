@@ -6,9 +6,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,6 +25,7 @@ import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,6 +47,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -54,20 +59,24 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
+import it.polito.did.g2.shopdrop.data.UserQuery
+import it.polito.did.g2.shopdrop.data.UserRole
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 data class User(val email : String, val password : String)
 
 @Composable
 fun LoginScreen(navController : NavController, viewModel: MainViewModel){
-    var email by rememberSaveable { mutableStateOf("") }
-    var emailActive by remember { mutableStateOf(false) }   //TODO: set label to null if active
+    var email by remember { mutableStateOf("") }
     var emailError by remember { mutableStateOf(false) }
-    var password by rememberSaveable { mutableStateOf("") }
-    var passwordActive by remember { mutableStateOf(false) }    //TODO: set label to null if active
+    var password by remember { mutableStateOf("") }
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
     var passwordError by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+
+    val loginScope = rememberCoroutineScope()
 
     val baseMod = Modifier
         .padding(vertical = 16.dp)
@@ -164,7 +173,8 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                     ),
                     maxLines = 1,
                     isError = emailError,
-                    modifier = baseMod
+                    modifier = baseMod,
+                    supportingText = {if(emailError) Text(stringResource(id = R.string.err_email_not_found))}
                 )
 
                 // PASSWORD
@@ -204,7 +214,8 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                         onDone = { checkForm(navController, User(email, password), viewModel) }
                     ),
                     maxLines = 1,
-                    isError = passwordError
+                    isError = passwordError,
+                    supportingText = {if(passwordError) Text(stringResource(id = R.string.err_pwd_not_valid))}
                 )
 
                 // FORGOTTEN PASSWORD
@@ -214,12 +225,81 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                     Text(text = stringResource(R.string.forgot_pwd).capitalize())
                 }
 
-                Button(
-                    onClick = { checkForm(navController, User(email, password), viewModel) },
-                    modifier = baseMod
-                ) {
-                    Text(text = stringResource(R.string.btn_log_in).capitalize())
-                }
+                // LOGIN BUTTON or LOADING CIRCLE
+                    Button(
+                        onClick = {
+                            Log.i("BTN_LOGIN", "LOGIN PRESSED")
+                            Log.i("BTN_LOGIN", "\tisLoading = $isLoading, setting it to true")
+                            Log.i("BTN_LOGIN", "\temailError = $emailError, passwordError = $passwordError")
+                            isLoading = true
+
+                            loginScope.launch{
+                                Log.i("BTN_LOGIN", "\tLaunching suspend fun of view model")
+                                emailError = false
+                                passwordError = false
+
+
+                                var userQuery = UserQuery(email, password)
+                                Log.i("BTN_LOGIN", "\tCreating login query: $userQuery")
+
+                                viewModel.login(userQuery)
+                                delay(1500)
+                                Log.i("BTN_LOGIN", "\tQuery changed to: $userQuery")
+
+                                // Arresta l'animazione di caricamento
+                                isLoading = false
+                                Log.i("BTN_LOGIN", "\tisLoading = $isLoading, setting it to false")
+
+                                if (userQuery.role!=null && userQuery.errType==null) {
+                                    when(userQuery.role){
+                                        UserRole.ADM ->{
+                                            //TODO
+                                        }
+                                        UserRole.CST -> {
+                                            Log.i("BTN_LOGIN", "\tVALID CREDENTIALS: role is ${userQuery.role}, navigating to Customer Home")
+                                            navController.navigate("CustomerHome")
+                                        }
+                                        UserRole.CRR -> {
+                                            Log.i("BTN_LOGIN", "\tVALID CREDENTIALS: role is ${userQuery.role}, navigating to Carrier Home")
+                                            navController.navigate("CarrierHome")
+                                        }
+
+                                        else -> {/*TODO forse qui l'alternativa all'if*/}
+                                    }
+                                } else {
+                                    // Mostra un messaggio di errore all'utente
+
+                                    when(userQuery.errType){
+                                        UserQuery.LOGIN_ERROR_TYPE.UNKNOWN ->{
+                                            //TODO
+                                        }
+                                        UserQuery.LOGIN_ERROR_TYPE.NOT_FOUND ->{
+                                            Log.e("BTN_LOGIN", "\tEMAIL NOT FOUNT: error is ${userQuery.errType}")
+
+                                            emailError = true
+                                            passwordError = false
+                                        }
+                                        UserQuery.LOGIN_ERROR_TYPE.PASSWORD ->{
+                                            Log.e("BTN_LOGIN", "\tWRONG PASSWORD: error is ${userQuery.errType}")
+
+                                            emailError = false
+                                            passwordError = true
+                                        }
+
+                                        else -> {
+                                            emailError = true
+                                            passwordError = true
+                                        }
+                                    }
+                                }
+                            }
+                                  },
+                        enabled = !isLoading,
+                        modifier = baseMod
+                    ) {
+                        Text(text = stringResource(R.string.btn_log_in).capitalize())
+                    }
+
 
                 Text(stringResource(R.string.alternative_login).capitalize())
                 Row {
@@ -234,6 +314,15 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                     Button(onClick = { performDevMsg(scope, snackbarHostState, context) }) {
                         Text(text = "G")
                     }
+                }
+
+                if(isLoading){
+                    Spacer(modifier = Modifier.height(20.dp))
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(50.dp)
+                            .align(CenterHorizontally)
+                    )
                 }
             }
         }

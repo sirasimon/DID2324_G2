@@ -89,5 +89,13 @@ dependencies {
     implementation("com.google.firebase:firebase-storage")
 
     //https://www.sinasamaki.com/loading-images-using-coil-in-jetpack-compose/
-    implementation("io.coil-kt:coil-compose:2.2.2")
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
+    // CameraX
+    implementation("androidx.camera:camera-camera2:1.3.1")
+    implementation("androidx.camera:camera-lifecycle:1.3.1")
+    implementation("androidx.camera:camera-view:1.3.1")
+
+    // Zxing
+    implementation("com.google.zxing:core:3.3.3")
 }

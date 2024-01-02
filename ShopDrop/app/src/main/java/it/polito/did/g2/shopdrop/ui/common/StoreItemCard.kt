@@ -10,7 +10,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -34,8 +33,8 @@ fun StoreItemCard(item: StoreItem, onClick: (it: StoreItem) -> Unit){
             modifier = Modifier
                 .height(160.dp)
                 .wrapContentSize(),
-            placeholder = painterResource(id = R.drawable.baseline_qr_code_scanner_24),
-            error = painterResource(id = R.drawable.outline_do_disturb_on_24)
+            //placeholder = painterResource(id = R.drawable.baseline_qr_code_scanner_24),
+            //error = painterResource(id = R.drawable.outline_do_disturb_on_24)
         )
         Text(
             text = item.name.capitalize(),

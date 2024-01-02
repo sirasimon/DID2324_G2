@@ -1,6 +1,5 @@
 package it.polito.did.g2.shopdrop.ui.home
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,7 +46,7 @@ fun ConfirmSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = bottomSheetState,
-        dragHandle = { Text("Aggiungi", Modifier.padding(vertical = 8.dp)) }
+        dragHandle = { Text(text = "Aggiungi", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 8.dp)) }
     ) {
         // SHEET CONTENT
 
@@ -83,19 +83,20 @@ fun ConfirmSheet(
                 Text(
                     text = stringResource(id = R.string.txt_quantity).capitalize(),
                     modifier = Modifier
-                        .background(Color.Cyan)
                         .padding(horizontal = 16.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .background(Color.Red)
                         .padding(horizontal = 16.dp)){
-                    IconButton(onClick = { if(quantity.value>0) quantity.value-- }) {
-                        Icon(painter = painterResource(R.drawable.outline_do_disturb_on_24), contentDescription = null)
+                    IconButton(onClick = { if(quantity.value>0) quantity.value-- }, enabled = quantity.value>0) {
+                        if(quantity.value != 1)
+                            Icon(painter = painterResource(R.drawable.outline_do_disturb_on_24), contentDescription = "Decrease quantity")
+                        else
+                            Icon(Icons.Filled.Delete, contentDescription = "Delete item from list")
                     }
                     Text("${quantity.value}")
                     IconButton(onClick = { quantity.value++ }) {
-                        Icon(painter = painterResource(R.drawable.round_add_circle_outline_24), contentDescription = null)
+                        Icon(painter = painterResource(R.drawable.round_add_circle_outline_24), contentDescription = "increase quantity")
                     }
                 }
             }
@@ -113,7 +114,8 @@ fun ConfirmSheet(
                         }
                     }
                       },
-            modifier = Modifier.padding(vertical = 24.dp, horizontal = 64.dp)
+            modifier = Modifier
+                .padding(vertical = 24.dp, horizontal = 64.dp)
                 .fillMaxWidth()
         ){
                 Text( String.format("Aggiungi per %.2f €", (quantity.value.toFloat())*(item?.price ?: 0f)) )

@@ -44,4 +44,7 @@
     <string name="store_it_cat_fruitveg">fruit and vegetables</string>
     <string name="txt_quantity">quantity</string>
     <string name="desc_item_pic_of">item picture of</string>
+    <string name="err_email_not_found">Email not found</string>
+    <string name="err_pwd_not_valid">Password not valid</string>
+    <string name="btn_cancel_order">Cancel order</string>
 </resources>

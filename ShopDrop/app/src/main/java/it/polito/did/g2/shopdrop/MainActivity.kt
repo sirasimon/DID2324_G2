@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import it.polito.did.g2.shopdrop.ui.camera.CameraScreen
 import it.polito.did.g2.shopdrop.ui.cart.CartScreen
 import it.polito.did.g2.shopdrop.ui.home.CSTHomeScreen
 import it.polito.did.g2.shopdrop.ui.home.CarrierHomeScreen
@@ -20,7 +21,7 @@ import it.polito.did.g2.shopdrop.ui.orders.COrderDetailScreen
 import it.polito.did.g2.shopdrop.ui.orders.COrderListScreen
 import it.polito.did.g2.shopdrop.ui.profile.CProfileScreen
 import it.polito.did.g2.shopdrop.ui.theme.ShopDropTheme
-import it.polito.did.g2.shopdrop.ui.unlock.CameraScreen
+import it.polito.did.g2.shopdrop.ui.unlocker.UnlockScreen
 
 class MainActivity : ComponentActivity() {
     private val vm by viewModels<MainViewModel>()
@@ -54,7 +55,7 @@ fun Navigation(viewModel: MainViewModel){
 
     NavHost(
         navController = navController,
-        startDestination = "Login"
+        startDestination = "CustomerHome"
         /*
         if(viewModel.loadUserInfo()!=null){
             "CSTHomeScreen"
@@ -89,6 +90,10 @@ fun Navigation(viewModel: MainViewModel){
         }
         composable("CameraScreen"){
             CameraScreen(navController = navController, viewModel)
+        }
+
+        composable("UnlockScreen"){
+            UnlockScreen(navController = navController)
         }
     }
 }

@@ -42,4 +42,8 @@
     <string name="store_it_cat_new">novità</string>
     <string name="store_it_cat_fruitveg">ortofrutta</string>
     <string name="txt_quantity">quantità</string>
+    <string name="desc_item_pic_of">immagine di</string>
+    <string name="err_email_not_found">Email non trovata</string>
+    <string name="err_pwd_not_valid">Password non valida</string>
+    <string name="btn_cancel_order">Annulla ordine</string>
 </resources>
