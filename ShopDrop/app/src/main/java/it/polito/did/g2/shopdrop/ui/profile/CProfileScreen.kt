@@ -36,20 +36,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
-import it.polito.did.g2.shopdrop.ui.common.BottomBar
 import it.polito.did.g2.shopdrop.data.TabScreen
+import it.polito.did.g2.shopdrop.ui.common.BottomBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CProfileScreen(navController: NavController){
+fun CProfileScreen(navController: NavController, viewModel: MainViewModel){
     var currentTab = TabScreen.PROFILE
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
         //topBar = { TopBar(currentTab, scrollBehavior = scrollBehavior) },
-        bottomBar = { BottomBar(currentTab, navController) },
+        bottomBar = { BottomBar(currentTab, navController, viewModel) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         //floatingActionButton = { AddButton(onClick = {/*TODO*/}) },
         //floatingActionButtonPosition = FabPosition.End

@@ -94,7 +94,7 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
 
     Scaffold(
         //topBar = { TopBar(currentTab, scrollBehavior = scrollBehavior) },
-        bottomBar = { BottomBar(currentTab, navController) },
+        bottomBar = { BottomBar(currentTab, navController, viewModel) },
         //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         //floatingActionButton = { AddButton(onClick = {/*TODO*/}) },
         //floatingActionButtonPosition = FabPosition.End

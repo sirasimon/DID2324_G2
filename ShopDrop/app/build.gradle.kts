@@ -85,11 +85,14 @@ dependencies {
     // https://firebase.google.com/docs/android/setup#available-libraries
     implementation("com.google.firebase:firebase-database-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-auth")
 
     implementation("com.google.firebase:firebase-storage")
+    implementation("com.firebaseui:firebase-ui-storage:7.2.0")
 
     //https://www.sinasamaki.com/loading-images-using-coil-in-jetpack-compose/
     implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
 
     // CameraX
     implementation("androidx.camera:camera-camera2:1.3.1")

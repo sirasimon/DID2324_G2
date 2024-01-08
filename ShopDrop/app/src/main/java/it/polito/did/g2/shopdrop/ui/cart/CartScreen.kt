@@ -53,7 +53,7 @@ fun CartScreen(navController: NavController, viewModel: MainViewModel){
 
     Scaffold(
         //topBar = { TopBar(currentTab = TabScreen.CART, title = stringResource(R.string.title_order_summary).capitalize(), scrollBehavior = scrollBehavior )},
-        bottomBar = { BottomBar(currentTab, navController) },
+        bottomBar = { BottomBar(currentTab, navController, viewModel) },
         //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         floatingActionButton = { CheckoutButton() },
         floatingActionButtonPosition = FabPosition.Center

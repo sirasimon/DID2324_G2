@@ -39,12 +39,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.data.TabScreen
 import it.polito.did.g2.shopdrop.ui.common.BottomBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun COrderListScreen(navController : NavController){
+fun COrderListScreen(navController : NavController, viewModel : MainViewModel){
     val listNavController = rememberNavController()
 
     var state by remember { mutableStateOf(0) }
@@ -56,7 +57,7 @@ fun COrderListScreen(navController : NavController){
 
     Scaffold(
         //topBar = { TopBar(currentTab, "...", scrollBehavior = scrollBehavior) },
-        bottomBar = { BottomBar(currentTab, navController) },
+        bottomBar = { BottomBar(currentTab, navController, viewModel) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
     ) { paddingValues ->
         Surface(

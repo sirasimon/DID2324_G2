@@ -77,16 +77,16 @@ fun Navigation(viewModel: MainViewModel){
             CartScreen(navController = navController, viewModel = viewModel)
         }
         composable("ClientProfile"){
-            CProfileScreen(navController = navController)
+            CProfileScreen(navController = navController, viewModel)
         }
         composable("CategorySection"){
-            CategorySection(navController = navController)
+            CategorySection(navController = navController, viewModel = viewModel)
         }
         composable("COrderDetailScreen"){
             COrderDetailScreen(navController = navController, vm = viewModel)
         }
         composable("COrderListScreen"){
-            COrderListScreen(navController = navController)
+            COrderListScreen(navController = navController, viewModel)
         }
         composable("CameraScreen"){
             CameraScreen(navController = navController, viewModel)

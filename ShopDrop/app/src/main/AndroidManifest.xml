@@ -19,12 +19,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ShopDrop"
-        tools:targetApi="31">
-        <activity
+        tools:targetApi="31"
+        android:requestLegacyExternalStorage="true">    <!-- aggiunto per caricamento foto-->
+        <!--<activity
             android:name=".ui.home.CSTHomeScreen"
             android:exported="false"
             android:label="@string/title_activity_home_screen"
-            android:theme="@style/Theme.ShopDrop" />
+            android:theme="@style/Theme.ShopDrop" />-->
         <activity
             android:name=".MainActivity"
             android:exported="true"

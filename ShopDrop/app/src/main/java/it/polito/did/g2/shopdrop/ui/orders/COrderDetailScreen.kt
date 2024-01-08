@@ -86,7 +86,7 @@ fun COrderDetailScreen(navController : NavController, vm : MainViewModel){
                 scrollBehavior = scrollBehavior,
             )
         },
-        bottomBar = { BottomBar(currentTab, navController) },
+        bottomBar = { BottomBar(currentTab, navController, vm) },
         floatingActionButton = { if(order?.stateList?.size==4) ScanButton(true, navController) else if(order?.stateList?.size==1) CancelButton({/*TODO*/})},
         floatingActionButtonPosition = if(order?.stateList?.size==1) FabPosition.Center else FabPosition.End
     ) { paddingValues ->

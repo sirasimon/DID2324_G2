@@ -1,5 +1,6 @@
 package it.polito.did.g2.shopdrop
 
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -12,6 +13,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import com.google.firebase.database.getValue
+import com.google.firebase.storage.storage
 import it.polito.did.g2.shopdrop.data.Locker
 import it.polito.did.g2.shopdrop.data.Order
 import it.polito.did.g2.shopdrop.data.OrderState
@@ -46,6 +48,8 @@ class MainViewModel() : ViewModel(){
     private val ordersRef = dbRef.child("orders")
     private val productsRef = dbRef.child("products")
     private val storesRef = dbRef.child("stores")
+
+    private val storageRef = Firebase.storage.reference
 
     //USER INFO
     private val _userID : MutableLiveData<String?> = MutableLiveData(null)
@@ -244,6 +248,7 @@ class MainViewModel() : ViewModel(){
     }
 
     init{
+
         productsRef.addListenerForSingleValueEvent(
             object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -255,11 +260,23 @@ class MainViewModel() : ViewModel(){
                                 "\tcategory: ${StoreItemCategory.valueOf(snap.child("category").getValue<String>()?.uppercase()?:"<null>").toString()}\n" +
                                 "\tthumbnail: ${snap.child("thumbnail").getValue<String>()}")
 
+                        Log.w("PROD_INIT", "\tThe URL needs to be converted from internal to public!")
+
+                        var publicURL : Uri? = null
+                        val urlTask = storageRef.child(
+                            snap.child("thumbnail").getValue<String>()?.replace("gs://did23-shopdrop.appspot.com/", "")?:""
+                        ).downloadUrl.addOnSuccessListener {
+                            publicURL=it
+                            Log.i("PROD_INIT", "\tNew URL is ${it.toString()}")
+                        }.addOnFailureListener{
+                            Log.e("PROD_INIT", "\tFAILURE")
+                        }
+
                         val newItem = StoreItem(
                             snap.key?:"<null>",
                             snap.child("price").getValue<Float>()?:.0f,
                             StoreItemCategory.valueOf(snap.child("category").getValue<String>()?.uppercase()?:"<null>"),
-                            snap.child("thumbnail").getValue<String>()?:"<null>"
+                            publicURL.toString()
                         )
 
                         Log.i("PROD_INIT", "\tNew object of StoreItem is: ${newItem}\n\tPutting it inside the list")

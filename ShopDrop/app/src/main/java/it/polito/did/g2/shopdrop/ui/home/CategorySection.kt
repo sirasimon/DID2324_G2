@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.data.TabScreen
 import it.polito.did.g2.shopdrop.ui.common.BottomBar
 import it.polito.did.g2.shopdrop.ui.common.ItemCard
@@ -32,7 +33,7 @@ import it.polito.did.g2.shopdrop.ui.common.ItemCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategorySection(navController : NavController){
+fun CategorySection(navController : NavController, viewModel : MainViewModel){
     var currentTab = TabScreen.HOME
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
@@ -46,7 +47,7 @@ fun CategorySection(navController : NavController){
 
     Scaffold(
         //topBar = { TopBar(currentTab, "" scrollBehavior = scrollBehavior) },
-        bottomBar = { BottomBar(currentTab, navController) },
+        bottomBar = { BottomBar(currentTab, navController, viewModel) },
         //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         //floatingActionButton = { AddButton(onClick = {/*TODO*/}) },
         //floatingActionButtonPosition = FabPosition.End
