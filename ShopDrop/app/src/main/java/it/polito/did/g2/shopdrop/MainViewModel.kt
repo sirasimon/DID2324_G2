@@ -1,6 +1,5 @@
 package it.polito.did.g2.shopdrop
 
-import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -14,6 +13,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import com.google.firebase.database.getValue
 import com.google.firebase.storage.storage
+import it.polito.did.g2.shopdrop.data.CollectionStep
 import it.polito.did.g2.shopdrop.data.Locker
 import it.polito.did.g2.shopdrop.data.Order
 import it.polito.did.g2.shopdrop.data.OrderState
@@ -36,6 +36,12 @@ class MainViewModel() : ViewModel(){
 
     private val _subtot : MutableLiveData<Float> = MutableLiveData(.0f )
     val subtot : LiveData<Float> = _subtot
+    private val _itemsInCart : MutableLiveData<Int> = MutableLiveData(0)
+    val itemsInCart : LiveData<Int> = _itemsInCart
+
+    //OPENING PROCEDURE
+    private val _collectionStep : MutableLiveData<CollectionStep> = MutableLiveData(CollectionStep.NONE)
+    val collectionStep : LiveData<CollectionStep> = _collectionStep
 
     //SHARED PREFs
     //private val sharedPreferences = application.getSharedPreferences("shopdrop_pref", Context.MODE_PRIVATE)
@@ -262,6 +268,7 @@ class MainViewModel() : ViewModel(){
 
                         Log.w("PROD_INIT", "\tThe URL needs to be converted from internal to public!")
 
+                        /*
                         var publicURL : Uri? = null
                         val urlTask = storageRef.child(
                             snap.child("thumbnail").getValue<String>()?.replace("gs://did23-shopdrop.appspot.com/", "")?:""
@@ -271,12 +278,27 @@ class MainViewModel() : ViewModel(){
                         }.addOnFailureListener{
                             Log.e("PROD_INIT", "\tFAILURE")
                         }
+                        */
+
+                        /*
+                        var image : Bitmap? = null
+
+                        storageRef.child("images/${snap.child("thumbnail").getValue<String>()}")
+                            .getBytes(Long.MAX_VALUE)
+                            .addOnSuccessListener { bytes ->
+                                image = BitmapFactory.decodeByteArray(bytes,0, bytes.size)
+                            }.addOnFailureListener {
+                                Log.e("PROD_INIT", "\tFAILED TO LOAD BITMAP")
+                            }
+
+                         */
 
                         val newItem = StoreItem(
                             snap.key?:"<null>",
                             snap.child("price").getValue<Float>()?:.0f,
                             StoreItemCategory.valueOf(snap.child("category").getValue<String>()?.uppercase()?:"<null>"),
-                            publicURL.toString()
+                            snap.child("thumbnail").getValue<String>()?:""
+                            //publicURL.toString()
                         )
 
                         Log.i("PROD_INIT", "\tNew object of StoreItem is: ${newItem}\n\tPutting it inside the list")
@@ -309,12 +331,13 @@ class MainViewModel() : ViewModel(){
             Log.i("MODIFY_CART", "\tUpdated quantity of \"${item.name}\" in map is ${_cart.value!![item.name]} (desired change was $quantity)")
 
             updateSubtot()
+            updateItemsInCart()
         }else{
             Log.w("MODIFY_CART", "\tITEM IS NULL")
         }
     }
 
-    fun updateSubtot(){
+    private fun updateSubtot(){
         Log.i("UPD_SUBTOT", "UPDATING SUBTOTAL")
 
         var subtot = 0f
@@ -326,5 +349,28 @@ class MainViewModel() : ViewModel(){
         _subtot.value = subtot
 
         Log.i("UPD_SUBTOT", "\tNew subtotal is ${_subtot.value}")
+    }
+
+    private fun updateItemsInCart(){
+        Log.i("UPD_ItInCrt", "UPDATING ITEMS IN CART NUMBER")
+
+        _itemsInCart.value = cart.value?.values?.sum()?:0
+
+        Log.i("UPD_ItInCrt", "\tNow cart has ${_itemsInCart.value} items")
+    }
+
+    private fun updateCollectionStep(isDone : Boolean? = null){
+        if(isDone==null){
+            when(_collectionStep.value){
+                CollectionStep.NONE         -> _collectionStep.value = CollectionStep.READY
+                CollectionStep.READY        -> _collectionStep.value = CollectionStep.OPEN_OK
+                CollectionStep.OPEN_OK      -> _collectionStep.value = CollectionStep.OPEN_MID
+                CollectionStep.OPEN_MID     -> _collectionStep.value = CollectionStep.OPEN_LAST
+                CollectionStep.OPEN_LAST    -> _collectionStep.value = CollectionStep.TIMEOUT
+                CollectionStep.TIMEOUT      -> _collectionStep.value = CollectionStep.DONE
+                CollectionStep.DONE         -> _collectionStep.value = CollectionStep.NONE
+                else -> _collectionStep.value = CollectionStep.NONE
+            }
+        }
     }
 }

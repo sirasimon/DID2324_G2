@@ -63,12 +63,10 @@ import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.data.Order
 import it.polito.did.g2.shopdrop.data.OrderStateName
-import it.polito.did.g2.shopdrop.data.SectionName
 import it.polito.did.g2.shopdrop.data.StoreItem
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
 import it.polito.did.g2.shopdrop.data.TabScreen
 import it.polito.did.g2.shopdrop.ui.common.BottomBar
-import it.polito.did.g2.shopdrop.ui.common.ItemCard
 import it.polito.did.g2.shopdrop.ui.common.StoreItemCard
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -331,7 +329,7 @@ fun HomeCatSection(category: StoreItemCategory, itemList: List<StoreItem>, navCo
             )
 
             TextButton(
-                onClick = { navController.navigate("CategorySection") },
+                onClick = { navController.navigate("CategorySection/$category") },
                 contentPadding = PaddingValues(0.dp)
             ) {
                 Text(text = stringResource(R.string.btn_see_more).capitalize(),
@@ -377,6 +375,7 @@ fun HomeCatSection(category: StoreItemCategory, itemList: List<StoreItem>, navCo
     }
 }
 
+/*
 @Composable
 fun HomeSection(sectionType: SectionName, navController: NavController, onClick : () -> Unit){
     var sectionName = "[Section title]"
@@ -398,7 +397,7 @@ fun HomeSection(sectionType: SectionName, navController: NavController, onClick 
             )
 
             TextButton(
-                onClick = { navController.navigate("CategorySection") },
+                onClick = { navController.navigate("CategorySection/$sectionName") },
                 contentPadding = PaddingValues(0.dp)
             ) {
                 Text(text = stringResource(R.string.btn_see_more).capitalize(),
@@ -418,6 +417,7 @@ fun HomeSection(sectionType: SectionName, navController: NavController, onClick 
 
     }
 }
+*/
 
 fun getSystemLanguage(context: Context): Locale {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

@@ -6,7 +6,7 @@
     <string name="tab_profile">profile</string>
     <string name="title_pending">pending order</string>
     <string name="title_buy_again">buy again</string>
-    <string name="btn_see_more">see more</string>
+    <string name="btn_see_more">see all</string>
     <string name="title_pendings">pending orders</string>
     <string name="btn_edit">edit</string>
     <string name="title_my_orders">my orders</string>
@@ -47,4 +47,17 @@
     <string name="err_email_not_found">Email not found</string>
     <string name="err_pwd_not_valid">Password not valid</string>
     <string name="btn_cancel_order">Cancel order</string>
+    <string name="store_it_cat_gastronomy">Gastronomy</string>
+    <string name="store_it_cat_canned">Canned Goods</string>
+    <string name="btn_order_now">order now</string>
+    <string name="txt_empty_cart">Your cart is empty.\nWhen you add an item in your cart,\nyou will be able to see it in this screen.</string>
+    <string name="btn_my_orders">my orders</string>
+    <string name="txt_order_done">Check your emails for the receipt</string>
+    <string name="title_order_done">order placed!</string>
+    <string name="title_order_ready">your order is ready</string>
+    <string name="txt_open_locker">Open the locker</string>
+    <string name="txt_collect_order">Collect your order</string>
+    <string name="txt_close_locker">Close the locker</string>
+    <string name="btn_open">open</string>
+    <string name="btn_cancel">cancel</string>
 </resources>

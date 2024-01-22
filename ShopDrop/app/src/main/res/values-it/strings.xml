@@ -6,7 +6,7 @@
     <string name="tab_profile">profilo</string>
     <string name="title_pending">ordine in corso</string>
     <string name="title_buy_again">acquista ancora</string>
-    <string name="btn_see_more">vedi altro</string>
+    <string name="btn_see_more">vedi tutti</string>
     <string name="title_pendings">ordini in corso</string>
     <string name="btn_edit">modifica</string>
     <string name="title_my_orders">i miei ordini</string>
@@ -23,7 +23,7 @@
     <string name="price_service">servizio</string>
     <string name="price_total">totale</string>
     <string name="forgot_pwd">Password dimenticata?</string>
-    <string name="title_order_summary">sommario ordine</string>
+    <string name="title_order_summary">riepilogo ordine</string>
     <string name="alternative_login">Oppure accedi con...</string>
     <string name="title_login">accedi</string>
     <string name="msg_developing">Caratteristica non ancora disponibile</string>
@@ -46,4 +46,17 @@
     <string name="err_email_not_found">Email non trovata</string>
     <string name="err_pwd_not_valid">Password non valida</string>
     <string name="btn_cancel_order">Annulla ordine</string>
+    <string name="store_it_cat_gastronomy">Gastronomia</string>
+    <string name="store_it_cat_canned">Scatolame</string>
+    <string name="btn_order_now">ordina adesso</string>
+    <string name="txt_empty_cart">Il tuo carrello è vuoto.\nQuando aggiungi un prodotto alla tua spesa,\nlo vedrai apparire in questa schermata qui.</string>
+    <string name="btn_my_orders">i miei ordini</string>
+    <string name="txt_order_done">Controlla le tue email per la ricevuta</string>
+    <string name="title_order_done">ordine effettuato!</string>
+    <string name="title_order_ready">il tuo ordine è pronto</string>
+    <string name="txt_open_locker">Apri il locker</string>
+    <string name="txt_collect_order">Ritira il tuo ordine</string>
+    <string name="txt_close_locker">Chiudi il locker</string>
+    <string name="btn_open">apri</string>
+    <string name="btn_cancel">annulla</string>
 </resources>

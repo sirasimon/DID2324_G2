@@ -2,6 +2,7 @@ package it.polito.did.g2.shopdrop.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,6 +32,7 @@ import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.data.StoreItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -120,6 +122,10 @@ fun ConfirmSheet(
         ){
                 Text( String.format("Aggiungi per %.2f €", (quantity.value.toFloat())*(item?.price ?: 0f)) )
         }
+
+
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         /*
         Button(modifier = Modifier.padding(horizontal = 16.dp),

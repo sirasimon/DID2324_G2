@@ -16,8 +16,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
@@ -27,8 +26,8 @@ import it.polito.did.g2.shopdrop.data.TabScreen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomBar(currentTab : TabScreen, navController: NavController, vm : MainViewModel){
-    val hasBadge by remember{ mutableStateOf(vm.cart.value?.count() != 0) }
-    val badgeNumber by remember { mutableStateOf(vm.cart.value?.values?.sum()?:0)}
+    //val hasBadge by remember{ mutableStateOf(vm.cart.value?.count() != 0) }
+    val badgeNumber by vm.itemsInCart.observeAsState()
 
     NavigationBar() {
         NavigationBarItem(
@@ -44,9 +43,9 @@ fun BottomBar(currentTab : TabScreen, navController: NavController, vm : MainVie
             {
                 BadgedBox(
                     badge = {
-                        if(hasBadge){
+                        if(badgeNumber!=0){
                             Badge{
-                                Text(badgeNumber.toString())
+                                Text("${badgeNumber}")
                             }
                         }
                     }

@@ -156,7 +156,7 @@ fun CancelButton(onClick: () -> Unit){
 @Composable
 fun PathLine(done : Boolean){
     VerticalDivider(color = if(done) Color.Green else Color.Gray, modifier = Modifier
-        .height(18.dp)
+        .height(36.dp)
         .padding(horizontal = 10.dp))
 }
 

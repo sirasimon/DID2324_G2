@@ -3,6 +3,7 @@ package it.polito.did.g2.shopdrop.ui.cart
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -49,13 +51,14 @@ fun CartScreen(navController: NavController, viewModel: MainViewModel){
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     var subtotal = mutableStateOf(viewModel.subtot.value)
 
+    var hasItems = viewModel.itemsInCart.value != 0
+
 
 
     Scaffold(
-        //topBar = { TopBar(currentTab = TabScreen.CART, title = stringResource(R.string.title_order_summary).capitalize(), scrollBehavior = scrollBehavior )},
         bottomBar = { BottomBar(currentTab, navController, viewModel) },
-        //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        floatingActionButton = { CheckoutButton() },
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        floatingActionButton = { if(hasItems) CheckoutButton(navController) },
         floatingActionButtonPosition = FabPosition.Center
     ) { paddingValues ->
         Surface(
@@ -71,30 +74,27 @@ fun CartScreen(navController: NavController, viewModel: MainViewModel){
                     viewModel.cart.value!!.forEach {
                         ProductListItem(viewModel.storeItems.value?.find { item -> item.name==it.key }, it.value)
                     }
-                }
 
+                    // TOTAL PRICE AREA
 
-
-                // TOTAL PRICE AREA
-
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)){
-                    Row(
+                    Column(
                         Modifier
                             .fillMaxWidth()
-                            .height(24.dp)){}
+                            .padding(8.dp)){
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(24.dp)){}
 
-                    PriceItemList(stringResource(R.string.price_subtotal).capitalize(), String.format("%.2f €", subtotal.value))  //TODO
-                    PriceItemList(stringResource(R.string.price_shipment).capitalize(), String.format("%.2f €", viewModel.shipmentFee))
-                    PriceItemList(stringResource(R.string.price_service).capitalize(), String.format("%.2f €", viewModel.serviceFee))
-                    PriceListTotal(stringResource(R.string.price_total).uppercase(), String.format("%.2f €", (subtotal.value?:0f)+viewModel.shipmentFee+viewModel.serviceFee))
+                        PriceItemList(stringResource(R.string.price_subtotal).capitalize(), String.format("%.2f €", subtotal.value))  //TODO
+                        PriceItemList(stringResource(R.string.price_shipment).capitalize(), String.format("%.2f €", viewModel.shipmentFee))
+                        PriceItemList(stringResource(R.string.price_service).capitalize(), String.format("%.2f €", viewModel.serviceFee))
+                        PriceListTotal(stringResource(R.string.price_total).uppercase(), String.format("%.2f €", (subtotal.value?:0f)+viewModel.shipmentFee+viewModel.serviceFee))
 
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(80.dp)){}
+                        Spacer(Modifier.height(80.dp))
+                    }
+                }else{
+                    Text(stringResource(id = R.string.txt_empty_cart))
                 }
             }
         }
@@ -187,8 +187,8 @@ fun PriceListTotal(voice : String, sum : String){
 }
 
 @Composable
-fun CheckoutButton(){
-    ExtendedFloatingActionButton(onClick = { /*TODO*/ }, modifier = Modifier
+fun CheckoutButton(navController: NavController){
+    ExtendedFloatingActionButton(onClick = { navController.navigate("CartSummary") }, modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 32.dp)) {
         Text("CHECKOUT")
