@@ -6,7 +6,7 @@
     <string name="tab_profile">profile</string>
     <string name="title_pending">pending order</string>
     <string name="title_buy_again">buy again</string>
-    <string name="btn_see_more">see more</string>
+    <string name="btn_see_more">see all</string>
     <string name="title_pendings">pending orders</string>
     <string name="btn_edit">edit</string>
     <string name="title_my_orders">my orders</string>
@@ -16,7 +16,6 @@
     <string name="btn_sign_out" translatable="false">sign out</string>
     <string name="btn_log_out">log out</string>
     <string name="btn_log_in">log in</string>
-    <string name="title_promo">promo</string>
     <string name="placeholder_search_main">search on</string>
     <string name="title_payment_methods">payment methods\n</string>
     <string name="title_support">support</string>
@@ -25,4 +24,40 @@
     <string name="price_service">service</string>
     <string name="price_total">total</string>
     <string name="title_order_summary">order summary</string>
+    <string name="forgot_pwd">Forgotten password?</string>
+    <string name="alternative_login">Or, log in with...</string>
+    <string name="title_login">login</string>
+    <string name="msg_developing">Feature not available yet</string>
+    <string name="order_dated">order dated</string>
+    <string name="title_camera_on">Scan the QR code</string>
+    <string name="btn_back">back</string>
+    <string name="btn_flashlight">switch on flashlight</string>
+    <string name="order_state_created">order sent</string>
+    <string name="order_state_received">order received</string>
+    <string name="order_state_carried">order in transit</string>
+    <string name="order_state_available">order available for collection</string>
+    <string name="order_state_collected">order collected</string>
+    <string name="title_collection_point">collection point</string>
+    <string name="store_it_cat_bakery">bakery</string>
+    <string name="store_it_cat_promo">promo</string>
+    <string name="store_it_cat_new">new</string>
+    <string name="store_it_cat_fruitveg">fruit and vegetables</string>
+    <string name="txt_quantity">quantity</string>
+    <string name="desc_item_pic_of">item picture of</string>
+    <string name="err_email_not_found">Email not found</string>
+    <string name="err_pwd_not_valid">Password not valid</string>
+    <string name="btn_cancel_order">Cancel order</string>
+    <string name="store_it_cat_gastronomy">Gastronomy</string>
+    <string name="store_it_cat_canned">Canned Goods</string>
+    <string name="btn_order_now">order now</string>
+    <string name="txt_empty_cart">Your cart is empty.\nWhen you add an item in your cart,\nyou will be able to see it in this screen.</string>
+    <string name="btn_my_orders">my orders</string>
+    <string name="txt_order_done">Check your emails for the receipt</string>
+    <string name="title_order_done">order placed!</string>
+    <string name="title_order_ready">your order is ready</string>
+    <string name="txt_open_locker">Open the locker</string>
+    <string name="txt_collect_order">Collect your order</string>
+    <string name="txt_close_locker">Close the locker</string>
+    <string name="btn_open">open</string>
+    <string name="btn_cancel">cancel</string>
 </resources>
