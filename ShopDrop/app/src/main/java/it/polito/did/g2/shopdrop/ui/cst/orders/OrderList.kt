@@ -1,4 +1,4 @@
-package it.polito.did.g2.shopdrop.ui.orders
+package it.polito.did.g2.shopdrop.ui.cst.orders
 
 import android.util.Log
 import androidx.compose.foundation.clickable
@@ -38,7 +38,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.data.TabScreen
-import it.polito.did.g2.shopdrop.ui.common.BottomBar
+import it.polito.did.g2.shopdrop.ui.cst.common.BottomBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

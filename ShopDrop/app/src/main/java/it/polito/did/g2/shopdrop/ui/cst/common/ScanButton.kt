@@ -1,4 +1,4 @@
-package it.polito.did.g2.shopdrop.ui.common
+package it.polito.did.g2.shopdrop.ui.cst.common
 
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon

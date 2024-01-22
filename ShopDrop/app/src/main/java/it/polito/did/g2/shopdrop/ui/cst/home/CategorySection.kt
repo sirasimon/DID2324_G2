@@ -1,4 +1,4 @@
-package it.polito.did.g2.shopdrop.ui.home
+package it.polito.did.g2.shopdrop.ui.cst.home
 
 import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
@@ -37,8 +37,8 @@ import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.data.StoreItem
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
 import it.polito.did.g2.shopdrop.data.TabScreen
-import it.polito.did.g2.shopdrop.ui.common.BottomBar
-import it.polito.did.g2.shopdrop.ui.common.StoreItemCard
+import it.polito.did.g2.shopdrop.ui.cst.common.BottomBar
+import it.polito.did.g2.shopdrop.ui.cst.common.StoreItemCard
 
 
 @OptIn(ExperimentalMaterial3Api::class)

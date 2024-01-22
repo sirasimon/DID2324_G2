@@ -1,4 +1,4 @@
-package it.polito.did.g2.shopdrop.ui.common
+package it.polito.did.g2.shopdrop.ui.cst.common
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding

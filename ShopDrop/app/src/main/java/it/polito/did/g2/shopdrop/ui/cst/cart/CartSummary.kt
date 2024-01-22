@@ -1,4 +1,4 @@
-package it.polito.did.g2.shopdrop.ui.cart
+package it.polito.did.g2.shopdrop.ui.cst.cart
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,7 +41,7 @@ fun CartSummary(navController: NavController, viewModel: MainViewModel) {
     Scaffold(
         topBar = { CS_TopBar(navController, viewModel, scrollBehavior) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        floatingActionButton = { CS_Button(navController, viewModel)},
+        floatingActionButton = { CS_Button(navController, viewModel) },
         floatingActionButtonPosition = FabPosition.Center
     ) { paddingValues ->
         Surface(

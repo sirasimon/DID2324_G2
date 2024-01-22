@@ -1,4 +1,4 @@
-package it.polito.did.g2.shopdrop.ui.common
+package it.polito.did.g2.shopdrop.ui.cst.common
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home

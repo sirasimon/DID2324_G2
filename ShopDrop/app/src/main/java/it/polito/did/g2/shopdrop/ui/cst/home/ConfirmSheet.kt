@@ -1,4 +1,4 @@
-package it.polito.did.g2.shopdrop.ui.home
+package it.polito.did.g2.shopdrop.ui.cst.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

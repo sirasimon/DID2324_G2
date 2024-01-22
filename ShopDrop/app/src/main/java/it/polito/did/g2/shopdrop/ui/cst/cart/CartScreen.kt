@@ -1,4 +1,4 @@
-package it.polito.did.g2.shopdrop.ui.cart
+package it.polito.did.g2.shopdrop.ui.cst.cart
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,7 +42,7 @@ import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.data.StoreItem
 import it.polito.did.g2.shopdrop.data.TabScreen
-import it.polito.did.g2.shopdrop.ui.common.BottomBar
+import it.polito.did.g2.shopdrop.ui.cst.common.BottomBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

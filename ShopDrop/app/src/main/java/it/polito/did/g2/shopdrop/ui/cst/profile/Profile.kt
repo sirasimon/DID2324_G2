@@ -1,4 +1,4 @@
-package it.polito.did.g2.shopdrop.ui.profile
+package it.polito.did.g2.shopdrop.ui.cst.profile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -39,7 +39,7 @@ import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.data.TabScreen
-import it.polito.did.g2.shopdrop.ui.common.BottomBar
+import it.polito.did.g2.shopdrop.ui.cst.common.BottomBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

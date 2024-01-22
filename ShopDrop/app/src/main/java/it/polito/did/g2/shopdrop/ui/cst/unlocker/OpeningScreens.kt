@@ -1,4 +1,4 @@
-package it.polito.did.g2.shopdrop.ui.unlocker
+package it.polito.did.g2.shopdrop.ui.cst.unlocker
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

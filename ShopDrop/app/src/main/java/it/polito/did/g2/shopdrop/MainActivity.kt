@@ -14,35 +14,37 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
+import it.polito.did.g2.shopdrop.navigation.Nav
 import it.polito.did.g2.shopdrop.ui.camera.CameraScreen
-import it.polito.did.g2.shopdrop.ui.cart.CartScreen
-import it.polito.did.g2.shopdrop.ui.cart.CartSummary
-import it.polito.did.g2.shopdrop.ui.cart.OrderConfirmed
-import it.polito.did.g2.shopdrop.ui.home.CSTHomeScreen
-import it.polito.did.g2.shopdrop.ui.home.CarrierHomeScreen
-import it.polito.did.g2.shopdrop.ui.home.CategorySection
+import it.polito.did.g2.shopdrop.ui.cst.cart.CartScreen
+import it.polito.did.g2.shopdrop.ui.cst.cart.CartSummary
+import it.polito.did.g2.shopdrop.ui.cst.cart.OrderConfirmed
+import it.polito.did.g2.shopdrop.ui.cst.home.CSTHomeScreen
+import it.polito.did.g2.shopdrop.ui.crr.home.CarrierHomeScreen
+import it.polito.did.g2.shopdrop.ui.cst.home.CategorySection
+import it.polito.did.g2.shopdrop.ui.cst.orders.COrderDetailScreen
+import it.polito.did.g2.shopdrop.ui.cst.orders.COrderListScreen
+import it.polito.did.g2.shopdrop.ui.cst.profile.CProfileScreen
+import it.polito.did.g2.shopdrop.ui.cst.unlocker.OpeningScreens
+import it.polito.did.g2.shopdrop.ui.cst.unlocker.UnlockScreen
 import it.polito.did.g2.shopdrop.ui.login.LoginScreen
-import it.polito.did.g2.shopdrop.ui.orders.COrderDetailScreen
-import it.polito.did.g2.shopdrop.ui.orders.COrderListScreen
-import it.polito.did.g2.shopdrop.ui.profile.CProfileScreen
 import it.polito.did.g2.shopdrop.ui.theme.ShopDropTheme
-import it.polito.did.g2.shopdrop.ui.unlocker.OpeningScreens
-import it.polito.did.g2.shopdrop.ui.unlocker.UnlockScreen
 
 class MainActivity : ComponentActivity() {
-    private val vm by viewModels<MainViewModel>()
+    private val viewModel by viewModels<MainViewModel>()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val sharedPreferences = application.getSharedPreferences("shopdrop_pref", Context.MODE_PRIVATE)
 
-        vm.debugInit()
+        viewModel.debugInit()
 
         setContent {
             ShopDropTheme {
                 // A surface container using the 'background' color from the theme
-                Navigation(vm)
+                //Navigation(vm)
+                Nav(viewModel)
             }
         }
     }
@@ -50,7 +52,7 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
 
-        vm.debugSetDefault()
+        viewModel.debugSetDefault()
     }
 }
 

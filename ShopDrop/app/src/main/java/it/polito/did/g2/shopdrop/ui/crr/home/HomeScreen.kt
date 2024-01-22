@@ -1,4 +1,4 @@
-package it.polito.did.g2.shopdrop.ui.home
+package it.polito.did.g2.shopdrop.ui.crr.home
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text

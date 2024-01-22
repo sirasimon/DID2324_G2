@@ -1,4 +1,4 @@
-package it.polito.did.g2.shopdrop.ui.orders
+package it.polito.did.g2.shopdrop.ui.cst.orders
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -41,8 +41,8 @@ import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.data.Order
 import it.polito.did.g2.shopdrop.data.TabScreen
-import it.polito.did.g2.shopdrop.ui.common.BottomBar
-import it.polito.did.g2.shopdrop.ui.common.ScanButton
+import it.polito.did.g2.shopdrop.ui.cst.common.BottomBar
+import it.polito.did.g2.shopdrop.ui.cst.common.ScanButton
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -87,7 +87,7 @@ fun COrderDetailScreen(navController : NavController, vm : MainViewModel){
             )
         },
         bottomBar = { BottomBar(currentTab, navController, vm) },
-        floatingActionButton = { if(order?.stateList?.size==4) ScanButton(true, navController) else if(order?.stateList?.size==1) CancelButton({/*TODO*/})},
+        floatingActionButton = { if(order?.stateList?.size==4) ScanButton(true, navController) else if(order?.stateList?.size==1) CancelButton({/*TODO*/}) },
         floatingActionButtonPosition = if(order?.stateList?.size==1) FabPosition.Center else FabPosition.End
     ) { paddingValues ->
 

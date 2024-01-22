@@ -1,4 +1,4 @@
-package it.polito.did.g2.shopdrop.ui.cart
+package it.polito.did.g2.shopdrop.ui.cst.cart
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
