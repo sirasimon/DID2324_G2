@@ -26,7 +26,7 @@
     <string name="title_order_summary">riepilogo ordine</string>
     <string name="alternative_login">Oppure accedi con...</string>
     <string name="title_login">accedi</string>
-    <string name="msg_developing">Caratteristica non ancora disponibile</string>
+    <string name="msg_developing">Funzione non ancora disponibile</string>
     <string name="order_dated">ordine del</string>
     <string name="title_camera_on">Scansiona il codice QR</string>
     <string name="btn_back">indietro</string>

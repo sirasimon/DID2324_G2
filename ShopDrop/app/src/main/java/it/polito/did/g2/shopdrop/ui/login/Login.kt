@@ -20,13 +20,14 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +40,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,7 +51,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -61,12 +65,15 @@ import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.data.UserQuery
 import it.polito.did.g2.shopdrop.data.UserRole
+import it.polito.did.g2.shopdrop.ui.theme.AlarmRed
+import it.polito.did.g2.shopdrop.ui.theme.Green100
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 data class User(val email : String, val password : String)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController : NavController, viewModel: MainViewModel){
     var email by remember { mutableStateOf("") }
@@ -79,7 +86,7 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
     val loginScope = rememberCoroutineScope()
 
     val baseMod = Modifier
-        .padding(vertical = 16.dp)
+        //.padding(vertical = 16.dp)
         .fillMaxWidth()
 
     val scope = rememberCoroutineScope()
@@ -127,9 +134,7 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                                 .padding(16.dp)
                                 .fillMaxWidth()
                         ) {
-                            Icon(imageVector = Icons.Default.Warning, contentDescription = "", modifier = Modifier.padding(horizontal = 8.dp))
                             Text(text = stringResource(id = R.string.msg_developing), modifier = Modifier.padding(horizontal = 8.dp))
-                            Icon(imageVector = Icons.Default.Warning, contentDescription = "", modifier = Modifier.padding(horizontal = 8.dp))
                         }
                     }
                 }
@@ -146,11 +151,19 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(32.dp)
             ) {
-                Text("[LOGO]")
+
+                //LOGO
+                Image(painterResource(id = R.drawable.shopdrop_logo), contentDescription = null, Modifier.height(128.dp))
+                Spacer(Modifier.height(16.dp))
+
+                //LOGIN TITLE
                 Text(
                     text = stringResource(R.string.title_login).capitalize(),
-                    style = MaterialTheme.typography.headlineLarge
+                    style = MaterialTheme.typography.headlineLarge,
+                    modifier = Modifier.align(Alignment.Start)
                 )
+
+                Spacer(Modifier.height(16.dp))
 
                 // EMAIL
                 OutlinedTextField(
@@ -158,9 +171,9 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                     value = email,
                     leadingIcon = {
                         if (email == "")
-                            Image(Icons.Outlined.Person, contentDescription = "User icon")
+                            Icon(Icons.Outlined.Person, contentDescription = "User icon", tint = Green100)
                         else
-                            Image(Icons.Filled.Person, contentDescription = "User icon")
+                            Icon(Icons.Filled.Person, contentDescription = "User icon", tint = Green100)
                     },
                     onValueChange = { email = it },
                     shape = RoundedCornerShape(16.dp),
@@ -174,8 +187,15 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                     maxLines = 1,
                     isError = emailError,
                     modifier = baseMod,
-                    supportingText = {if(emailError) Text(stringResource(id = R.string.err_email_not_found))}
+                    supportingText = {if(emailError) Text(stringResource(id = R.string.err_email_not_found))},
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = Green100,
+                        unfocusedBorderColor = Green100,
+                        errorPrefixColor = AlarmRed
+                    )
                 )
+
+                Spacer(Modifier.height(8.dp))
 
                 // PASSWORD
                 OutlinedTextField(
@@ -183,9 +203,9 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                     value = password,
                     leadingIcon = {
                         if (password == "")
-                            Image(Icons.Outlined.Lock, contentDescription = "Password icon")
+                            Icon(Icons.Outlined.Lock, contentDescription = "Password icon", tint = Green100)
                         else
-                            Image(Icons.Filled.Lock, contentDescription = "Password icon")
+                            Icon(Icons.Filled.Lock, contentDescription = "Password icon", tint = Green100)
                     },
                     trailingIcon = {
                         IconButton(onClick = { passwordHidden = !passwordHidden }) {
@@ -194,18 +214,17 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                             // Please provide localized description for accessibility services
                             val description =
                                 if (passwordHidden) "Show password" else "Hide password"
-                            Icon(imageVector = visibilityIcon, contentDescription = description)
+                            Icon(imageVector = visibilityIcon, contentDescription = description, tint = Green100)
                         }
                     },
                     onValueChange = { password = it },
                     shape = RoundedCornerShape(16.dp),
                     modifier = baseMod,
-
                     visualTransformation =
-                    if (passwordHidden)
-                        PasswordVisualTransformation()
-                    else
-                        VisualTransformation.None,
+                        if (passwordHidden)
+                            PasswordVisualTransformation()
+                        else
+                            VisualTransformation.None,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Password,
                         imeAction = if (email != "" && password != "") ImeAction.Done else ImeAction.Previous
@@ -215,15 +234,23 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                     ),
                     maxLines = 1,
                     isError = passwordError,
-                    supportingText = {if(passwordError) Text(stringResource(id = R.string.err_pwd_not_valid))}
+                    supportingText = {if(passwordError) Text(stringResource(id = R.string.err_pwd_not_valid))},
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = Green100,
+                        unfocusedBorderColor = Green100,
+                        errorPrefixColor = AlarmRed
+                    )
                 )
 
                 // FORGOTTEN PASSWORD
                 TextButton(
-                    onClick = { performDevMsg(scope, snackbarHostState, context) }, modifier = Modifier.align(Alignment.End)
+                    onClick = { performDevMsg(scope, snackbarHostState, context) },
+                    modifier = Modifier.align(Alignment.End)
                 ) {
-                    Text(text = stringResource(R.string.forgot_pwd).capitalize())
+                    Text(text = stringResource(R.string.forgot_pwd).capitalize(), color = Green100)
                 }
+
+                Spacer(Modifier.height(32.dp))
 
                 // LOGIN BUTTON or LOADING CIRCLE
                     Button(
@@ -300,19 +327,37 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                         Text(text = stringResource(R.string.btn_log_in).capitalize())
                     }
 
+                Spacer(Modifier.height(32.dp))
 
-                Text(stringResource(R.string.alternative_login).capitalize())
+                Text(stringResource(R.string.alternative_login).capitalize(), Modifier.padding(vertical=16.dp))
                 Row {
-                    Button(onClick = { performDevMsg(scope, snackbarHostState, context) }) {
-                        Text(text = "F")
+                    FloatingActionButton(
+                        onClick = { performDevMsg(scope, snackbarHostState, context) },
+                        containerColor = Color.White,
+                        modifier = Modifier.padding(4.dp)
+                    ) {
+                        Image(painterResource(id = R.drawable.google), contentDescription = null)
                     }
-
-                    Button(onClick = { performDevMsg(scope, snackbarHostState, context) }) {
-                        Text(text = "X")
+                    FloatingActionButton(
+                        onClick = { performDevMsg(scope, snackbarHostState, context) },
+                        containerColor = Color.White,
+                        modifier = Modifier.padding(4.dp)
+                    ) {
+                        Image(painterResource(id = R.drawable.facebook), contentDescription = null)
                     }
-
-                    Button(onClick = { performDevMsg(scope, snackbarHostState, context) }) {
-                        Text(text = "G")
+                    FloatingActionButton(
+                        onClick = { performDevMsg(scope, snackbarHostState, context) },
+                        containerColor = Color.White,
+                        modifier = Modifier.padding(4.dp)
+                    ) {
+                        Image(painterResource(id = R.drawable.twitter), contentDescription = null, modifier = Modifier.padding(8.dp))
+                    }
+                    FloatingActionButton(
+                        onClick = { performDevMsg(scope, snackbarHostState, context) },
+                        containerColor = Color.White,
+                        modifier = Modifier.padding(4.dp)
+                    ) {
+                        Image(painterResource(id = R.drawable.linkedin), contentDescription = null)
                     }
                 }
 
