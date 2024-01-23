@@ -18,13 +18,13 @@ fun Nav(viewModel: MainViewModel){
         }
 
         //CUSTOMER BRANCH (CST)
-        cstGraph(navController)
+        cstGraph(navController, viewModel)
 
         //CARRIER BRANCH (CRR)
-        crrGraph(navController)
+        crrGraph(navController, viewModel)
 
         //ADMIN BRANCH (ADM)
-        admGraph(navController)
+        admGraph(navController, viewModel)
 
     }
 }

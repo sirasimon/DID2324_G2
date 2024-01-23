@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -165,15 +166,17 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
 
                 Spacer(Modifier.height(16.dp))
 
+                var emlColor = if(emailError) AlarmRed else Green100
+
                 // EMAIL
                 OutlinedTextField(
                     placeholder = { Text("Email") },
                     value = email,
                     leadingIcon = {
                         if (email == "")
-                            Icon(Icons.Outlined.Person, contentDescription = "User icon", tint = Green100)
+                            Icon(Icons.Outlined.Person, contentDescription = "User icon", tint = emlColor)
                         else
-                            Icon(Icons.Filled.Person, contentDescription = "User icon", tint = Green100)
+                            Icon(Icons.Filled.Person, contentDescription = "User icon", tint = emlColor)
                     },
                     onValueChange = { email = it },
                     shape = RoundedCornerShape(16.dp),
@@ -197,24 +200,27 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
 
                 Spacer(Modifier.height(8.dp))
 
+                var pwdColor = if(passwordError) AlarmRed else Green100
+
                 // PASSWORD
                 OutlinedTextField(
                     placeholder = { Text("Password") },
                     value = password,
                     leadingIcon = {
                         if (password == "")
-                            Icon(Icons.Outlined.Lock, contentDescription = "Password icon", tint = Green100)
+                            Icon(Icons.Outlined.Lock, contentDescription = "Password icon", tint = pwdColor)
                         else
-                            Icon(Icons.Filled.Lock, contentDescription = "Password icon", tint = Green100)
+                            Icon(Icons.Filled.Lock, contentDescription = "Password icon", tint = pwdColor)
                     },
                     trailingIcon = {
                         IconButton(onClick = { passwordHidden = !passwordHidden }) {
                             val visibilityIcon =
-                                if (passwordHidden) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                            // Please provide localized description for accessibility services
+                                if (password == "") Icons.Outlined.Visibility
+                                else if (passwordHidden) Icons.Filled.Visibility
+                                else Icons.Filled.VisibilityOff
                             val description =
                                 if (passwordHidden) "Show password" else "Hide password"
-                            Icon(imageVector = visibilityIcon, contentDescription = description, tint = Green100)
+                            Icon(imageVector = visibilityIcon, contentDescription = description, tint = pwdColor)
                         }
                     },
                     onValueChange = { password = it },
