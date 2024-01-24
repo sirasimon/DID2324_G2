@@ -16,13 +16,10 @@ import com.google.firebase.storage.storage
 import it.polito.did.g2.shopdrop.data.CollectionStep
 import it.polito.did.g2.shopdrop.data.Locker
 import it.polito.did.g2.shopdrop.data.Order
-import it.polito.did.g2.shopdrop.data.OrderState
-import it.polito.did.g2.shopdrop.data.OrderStateName
 import it.polito.did.g2.shopdrop.data.StoreItem
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
 import it.polito.did.g2.shopdrop.data.UserQuery
 import it.polito.did.g2.shopdrop.data.UserRole
-import java.time.LocalDateTime
 
 class MainViewModel() : ViewModel(){
     //TODO
@@ -74,6 +71,7 @@ class MainViewModel() : ViewModel(){
     //TODO Adesso HARDCODED ma da fare su server
     @RequiresApi(Build.VERSION_CODES.O)
     private val _pendingOrdersList : MutableLiveData<MutableList<Order>> = MutableLiveData(
+        /*
         mutableListOf(
             Order("0x11", "STO_01", "0x13", "0x14", "LTO_01",
                 listOf(
@@ -96,6 +94,8 @@ class MainViewModel() : ViewModel(){
                 )
             )
         )
+        
+         */
     )
 
     @RequiresApi(Build.VERSION_CODES.O)

@@ -1,17 +1,20 @@
 package it.polito.did.g2.shopdrop.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.Text
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import it.polito.did.g2.shopdrop.MainViewModel
+import it.polito.did.g2.shopdrop.ui.cst.home.CSTHomeScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 fun NavGraphBuilder.cstGraph(navController: NavController, viewModel: MainViewModel){
     navigation(startDestination = Screens.CstHomeScreen.route, route = Screens.CstRoute.route){
         composable(route = Screens.CstHomeScreen.route){
-            //TODO
-            Text("CST HOME SCREEN")
+            CSTHomeScreen(navController = navController, viewModel = viewModel)
         }
 
         composable(route = Screens.CstCartScreen.route){

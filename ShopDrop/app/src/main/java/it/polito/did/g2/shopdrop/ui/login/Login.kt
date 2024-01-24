@@ -66,6 +66,7 @@ import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.data.UserQuery
 import it.polito.did.g2.shopdrop.data.UserRole
+import it.polito.did.g2.shopdrop.navigation.Screens
 import it.polito.did.g2.shopdrop.ui.theme.AlarmRed
 import it.polito.did.g2.shopdrop.ui.theme.Green100
 import kotlinx.coroutines.CoroutineScope
@@ -286,17 +287,17 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                                 if (userQuery.role!=null && userQuery.errType==null) {
                                     when(userQuery.role){
                                         UserRole.ADM ->{
-                                            //TODO
+                                            Log.i("BTN_LOGIN", "\tVALID CREDENTIALS: role is ${userQuery.role} (exp ADM), navigating to Carrier Home")
+                                            navController.navigate(Screens.AdmHomeScreen.route)
                                         }
                                         UserRole.CST -> {
-                                            Log.i("BTN_LOGIN", "\tVALID CREDENTIALS: role is ${userQuery.role}, navigating to Customer Home")
-                                            navController.navigate("CustomerHome")
+                                            Log.i("BTN_LOGIN", "\tVALID CREDENTIALS: role is ${userQuery.role} (exp CST), navigating to Customer Home")
+                                            navController.navigate(Screens.CstRoute.route)
                                         }
                                         UserRole.CRR -> {
-                                            Log.i("BTN_LOGIN", "\tVALID CREDENTIALS: role is ${userQuery.role}, navigating to Carrier Home")
-                                            navController.navigate("CarrierHome")
+                                            Log.i("BTN_LOGIN", "\tVALID CREDENTIALS: role is ${userQuery.role} (exp CRR), navigating to Carrier Home")
+                                            navController.navigate(Screens.CrrHomeScreen.route)
                                         }
-
                                         else -> {/*TODO forse qui l'alternativa all'if*/}
                                     }
                                 } else {
