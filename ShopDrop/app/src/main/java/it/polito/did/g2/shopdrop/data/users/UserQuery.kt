@@ -1,4 +1,4 @@
-package it.polito.did.g2.shopdrop.data
+package it.polito.did.g2.shopdrop.data.users
 
 /**
  * Classe per l'interrogazione del db per il login.

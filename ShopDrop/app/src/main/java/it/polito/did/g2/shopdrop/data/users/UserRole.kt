@@ -1,4 +1,4 @@
-package it.polito.did.g2.shopdrop.data
+package it.polito.did.g2.shopdrop.data.users
 
 /**
  * Ruoli che possono essere assunti dagli utenti

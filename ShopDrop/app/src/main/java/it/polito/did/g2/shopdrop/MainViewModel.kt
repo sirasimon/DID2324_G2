@@ -18,14 +18,19 @@ import it.polito.did.g2.shopdrop.data.Locker
 import it.polito.did.g2.shopdrop.data.Order
 import it.polito.did.g2.shopdrop.data.StoreItem
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
-import it.polito.did.g2.shopdrop.data.UserQuery
-import it.polito.did.g2.shopdrop.data.UserRole
+import it.polito.did.g2.shopdrop.data.users.UserQuery
+import it.polito.did.g2.shopdrop.data.users.UserRole
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class MainViewModel() : ViewModel(){
     //TODO
     val shipmentFee = 2.5
     val serviceFee = 0.0
 
+    //STARTING APP (SPLASH SCREEN)
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading = _isLoading.asStateFlow()
 
     //CART DATA
     private val _cart : MutableLiveData<MutableMap<String, Int>> = MutableLiveData(mutableMapOf())
@@ -315,6 +320,8 @@ class MainViewModel() : ViewModel(){
                 }
             }
         )
+
+        _isLoading.value = false
     }
 
     fun modifyCart(item: StoreItem?, quantity: Int){

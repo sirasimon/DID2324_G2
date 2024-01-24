@@ -101,4 +101,6 @@ dependencies {
 
     // Zxing
     implementation("com.google.zxing:core:3.3.3")
+
+    implementation("androidx.core:core-splashscreen:1.0.1")
 }

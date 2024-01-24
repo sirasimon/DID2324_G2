@@ -64,8 +64,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
-import it.polito.did.g2.shopdrop.data.UserQuery
-import it.polito.did.g2.shopdrop.data.UserRole
+import it.polito.did.g2.shopdrop.data.users.UserQuery
+import it.polito.did.g2.shopdrop.data.users.UserRole
 import it.polito.did.g2.shopdrop.navigation.Screens
 import it.polito.did.g2.shopdrop.ui.theme.AlarmRed
 import it.polito.did.g2.shopdrop.ui.theme.Green100

@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,11 +17,11 @@ import androidx.navigation.navArgument
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
 import it.polito.did.g2.shopdrop.navigation.Nav
 import it.polito.did.g2.shopdrop.ui.camera.CameraScreen
+import it.polito.did.g2.shopdrop.ui.crr.home.CarrierHomeScreen
 import it.polito.did.g2.shopdrop.ui.cst.cart.CartScreen
 import it.polito.did.g2.shopdrop.ui.cst.cart.CartSummary
 import it.polito.did.g2.shopdrop.ui.cst.cart.OrderConfirmed
 import it.polito.did.g2.shopdrop.ui.cst.home.CSTHomeScreen
-import it.polito.did.g2.shopdrop.ui.crr.home.CarrierHomeScreen
 import it.polito.did.g2.shopdrop.ui.cst.home.CategorySection
 import it.polito.did.g2.shopdrop.ui.cst.orders.COrderDetailScreen
 import it.polito.did.g2.shopdrop.ui.cst.orders.COrderListScreen
@@ -39,6 +40,12 @@ class MainActivity : ComponentActivity() {
         val sharedPreferences = application.getSharedPreferences("shopdrop_pref", Context.MODE_PRIVATE)
 
         viewModel.debugInit()
+
+        installSplashScreen().apply{//Prima di setContent per avviare splashscreen
+            this.setKeepOnScreenCondition{
+                viewModel.isLoading.value
+            }
+        }
 
         setContent {
             ShopDropTheme {
