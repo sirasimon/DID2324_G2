@@ -14,20 +14,24 @@ import it.polito.did.g2.shopdrop.ui.login.LoginScreen
 fun Nav(viewModel: MainViewModel){
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Screens.ScreenLoginRoute.route){
+    NavHost(
+        navController = navController,
+        startDestination = Screens.ScreenLoginRoute.route,
+        route = ROOT_ROUTE
+        ){
         //AUTH BRANCH
         composable(route = Screens.ScreenLoginRoute.route){
             LoginScreen(navController, viewModel)
         }
 
         //CUSTOMER BRANCH (CST)
-        cstGraph(navController, viewModel)
+        cstNavGraph(navController, viewModel)
 
         //CARRIER BRANCH (CRR)
-        crrGraph(navController, viewModel)
+        crrNavGraph(navController, viewModel)
 
         //ADMIN BRANCH (ADM)
-        admGraph(navController, viewModel)
+        admNavGraph(navController, viewModel)
 
     }
 }

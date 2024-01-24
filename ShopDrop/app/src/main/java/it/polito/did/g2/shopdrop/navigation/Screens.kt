@@ -1,12 +1,12 @@
 package it.polito.did.g2.shopdrop.navigation
 
-sealed class Screens(val route: String) {
-    // BASE ROUTES
-    object AuthRoute : Screens("Auth")
-    object CstRoute : Screens("Customer")
-    object CrrRoute : Screens("Carrier")
-    object AdmRoute : Screens( "Admin")
+const val ROOT_ROUTE = "root"
+const val ADM_ROUTE = "adm"
+const val CST_ROUTE = "cst"
+const val CRR_ROUTE = "crr"
 
+sealed class Screens(val route: String) {
+    // LOGIN SCREEN
     object ScreenLoginRoute : Screens("Login")
 
     // CUSTOMER SCREENS
