@@ -13,7 +13,7 @@ import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
 import it.polito.did.g2.shopdrop.ui.cst.home.CSTHomeScreen
 import it.polito.did.g2.shopdrop.ui.cst.home.CategoryScreen
-import it.polito.did.g2.shopdrop.ui.cst.orders.CstOrdersOverview
+import it.polito.did.g2.shopdrop.ui.cst.orders.CstOrdersHistory
 import it.polito.did.g2.shopdrop.ui.cst.profile.CSTProfileScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -68,7 +68,7 @@ fun NavGraphBuilder.cstNavGraph(
         }
 
         composable(route= Screens.CstOrdersOverview.route){
-            CstOrdersOverview(navController, viewModel)
+            CstOrdersHistory(navController, viewModel)
         }
 
         /*

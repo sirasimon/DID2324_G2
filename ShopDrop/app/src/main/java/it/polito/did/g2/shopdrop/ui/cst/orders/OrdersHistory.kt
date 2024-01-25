@@ -46,15 +46,18 @@ enum class FilterTab{PEND, ARCH, CANC}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CstOrdersOverview(navController : NavController, viewModel : MainViewModel){
+fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
     val listNavController = rememberNavController()
-
-    var state by remember { mutableStateOf(0) }
-    val options = listOf("Pending", "Archived", "Cancelled")
 
     val currentTab = TabScreen.PROFILE
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+
+    val chipLabels = mapOf(
+        FilterTab.PEND to R.string.chip_pending,
+        FilterTab.ARCH to R.string.chip_collected,
+        FilterTab.CANC to R.string.chip_cancelled
+    )
 
     Scaffold(
         topBar = { TopBar(navController, stringResource(id = R.string.title_history), scrollBehavior) },
@@ -70,26 +73,15 @@ fun CstOrdersOverview(navController : NavController, viewModel : MainViewModel){
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 var activeTab by remember { mutableStateOf(FilterTab.PEND) }
                 Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()){
-                    FilterChip(
-                        onClick = {activeTab = FilterTab.PEND; listNavController.navigate(FilterTab.PEND.toString())},
-                        label = { Text(stringResource(id = R.string.chip_pending).capitalize())},
-                        selected = activeTab==FilterTab.PEND,
-                        shape = RoundedCornerShape(16.dp)
-                    )
 
-                    FilterChip(
-                        onClick = {activeTab = FilterTab.ARCH; listNavController.navigate(FilterTab.ARCH.toString())},
-                        label = { Text(stringResource(id = R.string.chip_collected).capitalize())},
-                        selected = activeTab==FilterTab.ARCH,
-                        shape = RoundedCornerShape(16.dp)
-                    )
-
-                    FilterChip(
-                        onClick = {activeTab = FilterTab.CANC; listNavController.navigate(FilterTab.CANC.toString())},
-                        label = { Text(stringResource(id = R.string.chip_cancelled).capitalize())},
-                        selected = activeTab==FilterTab.CANC,
-                        shape = RoundedCornerShape(16.dp)
-                    )
+                    enumValues<FilterTab>().forEach {
+                        FilterChip(
+                            onClick = {activeTab = it; listNavController.navigate(it.toString())},
+                            label = { Text(stringResource(id = chipLabels[it]!!).capitalize())},
+                            selected = activeTab==it,
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                    }
                 }
 
                 Column {
