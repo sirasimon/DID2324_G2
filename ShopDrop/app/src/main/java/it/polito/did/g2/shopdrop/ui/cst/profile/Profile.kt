@@ -21,17 +21,21 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -39,21 +43,29 @@ import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.data.TabScreen
+import it.polito.did.g2.shopdrop.navigation.Screens
 import it.polito.did.g2.shopdrop.ui.cst.common.BottomBar
+import it.polito.did.g2.shopdrop.ui.cst.common.TopBar
+import it.polito.did.g2.shopdrop.ui.cst.common.WIPMessage
+import it.polito.did.g2.shopdrop.ui.cst.common.performDevMsg
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CSTProfileScreen(navController: NavController, viewModel: MainViewModel){
-    var currentTab = TabScreen.PROFILE
+    val currentTab = TabScreen.PROFILE
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
+    // SNACKBAR
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+
     Scaffold(
-        //topBar = { TopBar(currentTab, scrollBehavior = scrollBehavior) },
+        topBar = { TopBar(navController, stringResource(id = R.string.title_profile), scrollBehavior) },
         bottomBar = { BottomBar(currentTab, navController, viewModel) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        //floatingActionButton = { AddButton(onClick = {/*TODO*/}) },
-        //floatingActionButtonPosition = FabPosition.End
+        snackbarHost = { WIPMessage(snackbarHostState) }
     ) { paddingValues ->
         Surface(
             modifier = Modifier
@@ -61,7 +73,10 @@ fun CSTProfileScreen(navController: NavController, viewModel: MainViewModel){
                 .padding(paddingValues),
             color = MaterialTheme.colorScheme.background
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(vertical = 36.dp)) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(vertical = 36.dp)) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_launcher_background),
                     contentDescription = null,
@@ -82,21 +97,21 @@ fun CSTProfileScreen(navController: NavController, viewModel: MainViewModel){
                             .padding(16.dp)
                     ) {
                         Column(Modifier.background(Color.Cyan)){
-                            Text("[Nome Utente]")
+                            Text("[Nome Utente]")   //TODO mettere credenziali vere
                             Text("[Email")
                             Text("[Numero di telefono]")
                         }
-                        TextButton(onClick = { /*TODO*/ }) {
+                        TextButton(onClick = { performDevMsg(scope, snackbarHostState, context) }) {
                             Text("Modifica")
                         }
                     }
                 }
 
-                ProfileItemList(label = stringResource(R.string.title_my_orders).capitalize(), onClick = { navController.navigate("COrderListScreen") })
-                ProfileItemList(label = stringResource(R.string.title_address).capitalize(), onClick = {/*TODO*/})
-                ProfileItemList(label = stringResource(R.string.title_payment_methods).capitalize(), onClick = {/*TODO*/})
-                ProfileItemList(label = stringResource(R.string.title_help).capitalize(), onClick = {/*TODO*/})
-                ProfileItemList(label = stringResource(R.string.title_support).capitalize(), onClick = {/*TODO*/})
+                ProfileItemList(label = stringResource(R.string.title_my_orders).capitalize(), onClick = { navController.navigate(Screens.CstOrdersOverview.route) })
+                ProfileItemList(label = stringResource(R.string.title_address).capitalize(), onClick = {performDevMsg(scope, snackbarHostState, context)})
+                ProfileItemList(label = stringResource(R.string.title_payment_methods).capitalize(), onClick = {performDevMsg(scope, snackbarHostState, context)})
+                ProfileItemList(label = stringResource(R.string.title_help).capitalize(), onClick = {performDevMsg(scope, snackbarHostState, context)})
+                ProfileItemList(label = stringResource(R.string.title_support).capitalize(), onClick = { performDevMsg(scope, snackbarHostState, context) })
 
                 TextButton(onClick = { navController.navigate("Login") }) {
                     Text(stringResource(R.string.btn_log_out).capitalize())

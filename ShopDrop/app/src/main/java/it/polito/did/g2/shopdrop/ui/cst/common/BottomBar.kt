@@ -31,15 +31,16 @@ fun BottomBar(currentTab : TabScreen, navController: NavController, vm : MainVie
     val badgeNumber by vm.itemsInCart.observeAsState()
 
     NavigationBar() {
-        NavigationBarItem(
+        NavigationBarItem(  // HOME
             selected = currentTab== TabScreen.HOME,
-            onClick = { if(currentTab!= TabScreen.HOME) navController.navigate(Screens.CstHomeScreen.route) },
+            onClick = { if(currentTab!= TabScreen.HOME) navController.navigate(Screens.CstHome.route) },
             icon = { if(currentTab== TabScreen.HOME) Icon(Icons.Filled.Home, stringResource(R.string.tab_home).capitalize()) else Icon(Icons.Outlined.Home, stringResource(R.string.tab_home).capitalize()) },
             label = { Text(text = stringResource(R.string.tab_home).capitalize()) }
         )
-        NavigationBarItem(
+
+        NavigationBarItem(  // CART
             selected = currentTab== TabScreen.CART,
-            onClick = { if(currentTab!= TabScreen.CART) navController.navigate(Screens.CstCartScreen.route) },
+            onClick = { if(currentTab!= TabScreen.CART) navController.navigate(Screens.CstCart.route) },
             icon =
             {
                 BadgedBox(
@@ -59,9 +60,10 @@ fun BottomBar(currentTab : TabScreen, navController: NavController, vm : MainVie
             },
             label = { Text(text = stringResource(R.string.tab_cart).capitalize()) }
         )
-        NavigationBarItem(
+
+        NavigationBarItem(  // PROFILE
             selected = currentTab== TabScreen.PROFILE,
-            onClick = { if(currentTab!= TabScreen.PROFILE) navController.navigate(Screens.CstProfileScreen.route) },
+            onClick = { if(currentTab!= TabScreen.PROFILE) navController.navigate(Screens.CstProfile.route) },
             icon = { if(currentTab== TabScreen.PROFILE) Icon(Icons.Filled.Person, stringResource(R.string.tab_profile).capitalize()) else Icon(
                 Icons.Outlined.Person, stringResource(R.string.tab_profile).capitalize()) },
             label = { Text(text = stringResource(R.string.tab_profile).capitalize()) }

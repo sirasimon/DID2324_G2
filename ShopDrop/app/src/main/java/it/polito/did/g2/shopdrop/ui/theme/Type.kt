@@ -1,7 +1,6 @@
 package it.polito.did.g2.shopdrop.ui.theme
 
 import androidx.compose.material3.Typography
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -46,7 +45,7 @@ val Typography = Typography(
         fontSize = 24.sp,
         lineHeight = 44.sp,
         letterSpacing = 0.5.sp,
-        color = Color(0xFF202020)
+        color = Green100
     )
     /* Other default text styles to override
     titleLarge = TextStyle(

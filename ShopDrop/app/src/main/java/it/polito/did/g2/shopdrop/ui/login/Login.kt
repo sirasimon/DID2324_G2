@@ -1,10 +1,8 @@
 package it.polito.did.g2.shopdrop.ui.login
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,9 +24,7 @@ import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.Button
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -36,9 +32,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarData
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -70,9 +63,10 @@ import it.polito.did.g2.shopdrop.data.users.UserRole
 import it.polito.did.g2.shopdrop.navigation.ADM_ROUTE
 import it.polito.did.g2.shopdrop.navigation.CRR_ROUTE
 import it.polito.did.g2.shopdrop.navigation.CST_ROUTE
+import it.polito.did.g2.shopdrop.ui.cst.common.WIPMessage
+import it.polito.did.g2.shopdrop.ui.cst.common.performDevMsg
 import it.polito.did.g2.shopdrop.ui.theme.AlarmRed
 import it.polito.did.g2.shopdrop.ui.theme.Green100
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -196,29 +190,7 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
     }
 
     Scaffold(
-        snackbarHost = {
-            SnackbarHost(
-                hostState = snackbarHostState,
-                snackbar = { snackbarData: SnackbarData ->
-                    ElevatedCard(
-                        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth()
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.Center,
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth()
-                        ) {
-                            Text(text = stringResource(id = R.string.msg_developing), modifier = Modifier.padding(horizontal = 8.dp))
-                        }
-                    }
-                }
-            )
-        }
+        snackbarHost = { WIPMessage(snackbarHostState)}
     ) { paddingValues ->
         Surface(
             modifier = Modifier
@@ -385,7 +357,10 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
             }
 
             if(isLoading){
-                Box(Modifier.fillMaxSize().background(Color(0x77FFFFFF))){
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .background(Color(0x77FFFFFF))){
                     CircularProgressIndicator(
                         modifier = Modifier
                             .size(50.dp)
@@ -395,14 +370,5 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
             }
 
         }
-    }
-}
-
-fun performDevMsg(scope: CoroutineScope, snackbarHostState: SnackbarHostState, context: Context) {
-    scope.launch{
-        snackbarHostState.currentSnackbarData?.dismiss()
-        snackbarHostState.showSnackbar(
-            message = "",
-            duration = SnackbarDuration.Short)
     }
 }

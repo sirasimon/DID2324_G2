@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.History
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,7 +39,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -76,7 +74,7 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
     var searchBarFocussed by remember{ mutableStateOf(false) }
 
     //Items
-    val itemList by viewModel.storeItems.observeAsState()
+    val itemList = viewModel.storeItems.value
 
     //Bottom sheet
     val bottomSheetState = rememberModalBottomSheetState()
@@ -134,8 +132,8 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
                     //TODO Pending orders
                     //TODO impedire visualizzazione quando si sta cercando un prodotto
                     //TODO controllare il vm che ci siano ordini pendenti ed eventualmente mostrarli
-                    if(viewModel.hasPending.value!!)    //Condizione dei pending order
-                        PendingOrdersCard(navController, viewModel)
+                    //if(viewModel.hasPending.value!!)    //Condizione dei pending order
+                    //    PendingOrdersCard(navController, viewModel)
 
                     if(query==""){
                         itemList?.map{it.category}
@@ -186,15 +184,6 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
             ConfirmSheet(targetItem, viewModel, {showBottomSheet=false}, bottomSheetState, bottomSheetScope)
         }
     }
-}
-
-@Composable
-fun HintListItem(entry: String, navController: NavController){
-    ListItem(
-        headlineContent = { Text(text = entry)},
-        leadingContent = {Icon(Icons.Outlined.History, contentDescription = null)},
-        modifier = Modifier.clickable { navController.navigate("CategorySection/$entry/true") }
-    )
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -294,50 +283,6 @@ fun OrderListItem(order: Order, navController: NavController, viewModel: MainVie
             }
     )
 }
-
-/*
-@Composable
-fun HomeSection(sectionType: SectionName, navController: NavController, onClick : () -> Unit){
-    var sectionName = "[Section title]"
-
-    when(sectionType){
-        SectionName.BUY_AGAIN -> {
-            sectionName = stringResource(R.string.title_buy_again).capitalize()
-        }
-        SectionName.PROMO -> {
-            //sectionName = stringResource(R.string.title_promo).capitalize()
-        }
-    }
-
-    Column(modifier = Modifier.padding(vertical = 16.dp)){
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom){
-            Text(text = sectionName,
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            TextButton(
-                onClick = { navController.navigate("CategorySection/$sectionName") },
-                contentPadding = PaddingValues(0.dp)
-            ) {
-                Text(text = stringResource(R.string.btn_see_more).capitalize(),
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-        }
-
-        Row(modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .horizontalScroll(rememberScrollState())){
-            ItemCard(onClick)
-            ItemCard(onClick)
-            ItemCard(onClick)
-        }
-
-    }
-}
-*/
 
 fun getSystemLanguage(context: Context): Locale {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

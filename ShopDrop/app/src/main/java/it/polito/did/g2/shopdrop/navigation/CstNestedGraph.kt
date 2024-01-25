@@ -13,6 +13,7 @@ import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
 import it.polito.did.g2.shopdrop.ui.cst.home.CSTHomeScreen
 import it.polito.did.g2.shopdrop.ui.cst.home.CategoryScreen
+import it.polito.did.g2.shopdrop.ui.cst.orders.CstOrdersOverview
 import it.polito.did.g2.shopdrop.ui.cst.profile.CSTProfileScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -21,17 +22,17 @@ fun NavGraphBuilder.cstNavGraph(
     viewModel: MainViewModel
 ){
     navigation(
-        startDestination = Screens.CstHomeScreen.route,
+        startDestination = Screens.CstHome.route,
         route = CST_ROUTE
     ){
 
         // HOME SCREENS ////////////////////////////////////////////////////////////////////////////
 
-        composable(route = Screens.CstHomeScreen.route){
+        composable(route = Screens.CstHome.route){
             CSTHomeScreen(navController, viewModel)
         }
 
-        composable(route = Screens.CstCategoryScreen.route+"?categoryName={categoryName}&query={query}",
+        composable(route = Screens.CstCategory.route+"?categoryName={categoryName}&query={query}",
             arguments = listOf(
                 navArgument(name = "categoryName"){
                     type = NavType.StringType
@@ -52,18 +53,22 @@ fun NavGraphBuilder.cstNavGraph(
             )
         }
 
-        composable(route = Screens.CstCartScreen.route){
+        composable(route = Screens.CstCart.route){
             //TODO
             Text("CST CART SCREEN")
         }
 
-        composable(route = Screens.CstProfileScreen.route){
+        composable(route = Screens.CstProfile.route){
             CSTProfileScreen(navController, viewModel)
         }
 
-        composable(route = Screens.CstOrderDetailScreen.route){
+        composable(route = Screens.CstOrderDetail.route){
             //TODO
             //Text("CST ORDER DETAIL SCREEN")
+        }
+
+        composable(route= Screens.CstOrdersOverview.route){
+            CstOrdersOverview(navController, viewModel)
         }
 
         /*

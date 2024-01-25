@@ -61,4 +61,11 @@
     <string name="btn_open">open</string>
     <string name="btn_cancel">cancel</string>
     <string name="title_results_for">results for</string>
+    <string name="title_collected">collected</string>
+    <string name="title_cancelled">cancelled</string>
+    <string name="chip_pending">pending</string>
+    <string name="chip_collected">collected</string>
+    <string name="chip_cancelled">cancelled</string>
+    <string name="title_profile">Profile</string>
+    <string name="title_history">history</string>
 </resources>

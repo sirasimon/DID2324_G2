@@ -35,7 +35,7 @@ fun CategorySection(category: StoreItemCategory, itemList: List<StoreItem>, navC
             )
 
             TextButton(
-                onClick = { navController.navigate(Screens.CstCategoryScreen.route+"?categoryName=$category&query=$query") },
+                onClick = { navController.navigate(Screens.CstCategory.route+"?categoryName=$category&query=$query") },
                 contentPadding = PaddingValues(0.dp)
             ) {
                 Text(text = stringResource(R.string.btn_see_more).capitalize(),
@@ -49,8 +49,6 @@ fun CategorySection(category: StoreItemCategory, itemList: List<StoreItem>, navC
             .padding(horizontal = 16.dp)
             .horizontalScroll(rememberScrollState())){
 
-            //Text("TEST")
-
             val upperLimit = if(itemList.size<5) itemList.size else 5
             //Text("upper limit is $upperLimit")
 
@@ -59,24 +57,6 @@ fun CategorySection(category: StoreItemCategory, itemList: List<StoreItem>, navC
                     onClick(it)
                 }
             }
-
-
-            /*
-                        for(i in 0 until upperLimit){
-                            //ItemCard(itemList[i], onClick)
-                            Card(modifier = Modifier
-                                .size(width = 160.dp, height = 200.dp)
-                                .padding(8.dp)
-                                .clickable(onClick = onClick)) {
-                                Column {
-                                    Spacer(Modifier.height(160.dp))
-                                    Text(text = itemList[i].name)
-                                    Text(text = itemList[i].price.toString())
-                                }
-                            }
-                        }
-
-                         */
         }
     }
 }

@@ -9,21 +9,24 @@ sealed class Screens(val route: String) {
     // LOGIN SCREEN
     object ScreenLoginRoute : Screens("Login")
 
-    // CUSTOMER SCREENS
-    object CstHomeScreen : Screens("CstHomeScreen")
-    object CstCategoryScreen : Screens("CstCategoryScreen")
+    // CUSTOMER SCREENS ############################################################################
+    object CstHome : Screens("CstHomeScreen")
+    object CstCategory : Screens("CstCategoryScreen")
 
 
-    object CstCartScreen : Screens("CstCartScreen")
-    object CstProfileScreen : Screens("CstProfileScreen")
-    object CstOrderDetailScreen : Screens("CstOrderDetailScreen")
+    object CstCart : Screens("CstCartScreen")
+    object CstProfile : Screens("CstProfileScreen")
     object CstCameraScreen : Screens("CstProfileScreen")
 
-    // CARRIER SCREENS
+    // Orders
+    object CstOrdersOverview : Screens("CstOrdersOverviewScreen")
+    object CstOrderDetail : Screens("CstOrderDetailScreen")
+
+    // CARRIER SCREENS #############################################################################
     object CrrHomeScreen : Screens("CrrHomeScreen")
     object CrrCameraScreen : Screens("CrrCameraScreen")
     object CrrProfileScreen : Screens("CrrProfileScreen")
 
-    //ADMIN SCREENS
+    //ADMIN SCREENS ################################################################################
     object AdmHomeScreen : Screens("AdmHomeScreen")
 }

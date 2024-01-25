@@ -9,16 +9,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -31,31 +30,36 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import it.polito.did.g2.shopdrop.MainViewModel
+import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.data.TabScreen
 import it.polito.did.g2.shopdrop.ui.cst.common.BottomBar
+import it.polito.did.g2.shopdrop.ui.cst.common.TopBar
+
+enum class FilterTab{PEND, ARCH, CANC}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun COrderListScreen(navController : NavController, viewModel : MainViewModel){
+fun CstOrdersOverview(navController : NavController, viewModel : MainViewModel){
     val listNavController = rememberNavController()
 
     var state by remember { mutableStateOf(0) }
     val options = listOf("Pending", "Archived", "Cancelled")
 
-    var currentTab = TabScreen.PROFILE
+    val currentTab = TabScreen.PROFILE
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
-        //topBar = { TopBar(currentTab, "...", scrollBehavior = scrollBehavior) },
+        topBar = { TopBar(navController, stringResource(id = R.string.title_history), scrollBehavior) },
         bottomBar = { BottomBar(currentTab, navController, viewModel) },
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
         Surface(
             modifier = Modifier
@@ -64,51 +68,39 @@ fun COrderListScreen(navController : NavController, viewModel : MainViewModel){
             color = MaterialTheme.colorScheme.background
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                //SOLUZIONE 1
-                /*
-                PrimaryTabRow(selectedTabIndex = state) {
-                    options.forEachIndexed { index, title ->
-                        Tab(
-                            selected = state == index,
-                            onClick = {
-                                state = index
-                                listNavController.navigate(title)
-                                      },
-                            text = { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) }
-                        )
-                    }
+                var activeTab by remember { mutableStateOf(FilterTab.PEND) }
+                Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()){
+                    FilterChip(
+                        onClick = {activeTab = FilterTab.PEND; listNavController.navigate(FilterTab.PEND.toString())},
+                        label = { Text(stringResource(id = R.string.chip_pending).capitalize())},
+                        selected = activeTab==FilterTab.PEND,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+
+                    FilterChip(
+                        onClick = {activeTab = FilterTab.ARCH; listNavController.navigate(FilterTab.ARCH.toString())},
+                        label = { Text(stringResource(id = R.string.chip_collected).capitalize())},
+                        selected = activeTab==FilterTab.ARCH,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+
+                    FilterChip(
+                        onClick = {activeTab = FilterTab.CANC; listNavController.navigate(FilterTab.CANC.toString())},
+                        label = { Text(stringResource(id = R.string.chip_cancelled).capitalize())},
+                        selected = activeTab==FilterTab.CANC,
+                        shape = RoundedCornerShape(16.dp)
+                    )
                 }
-                */
-
-                //SOLUZIONE 2
-                MultiChoiceSegmentedButtonRow {
-                    options.forEachIndexed { index, label ->
-
-                        SegmentedButton(
-                            shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-                            onCheckedChange = {
-                                state = index
-                                listNavController.navigate(label)
-                                              },
-                            checked = index == state
-                        ) {
-                            Text(label)
-                        }
-                    }
-                }
-
-                //SOLUZIONE 3
-                //Provare con outlined button
 
                 Column {
-                    NavHost(navController = listNavController, startDestination = "Pending"){
-                        composable("Pending") {
+                    NavHost(navController = listNavController, startDestination = FilterTab.PEND.toString()){
+                        composable(FilterTab.PEND.toString()) {
                             PendingScreen()
                         }
-                        composable("Archived"){
+                        composable(FilterTab.ARCH.toString()){
                             ArchivedScreen()
                         }
-                        composable("Cancelled"){
+                        composable(FilterTab.CANC.toString()){
                             CancelledScreen()
                         }
                     }
