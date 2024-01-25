@@ -1,5 +1,6 @@
 package it.polito.did.g2.shopdrop
 
+import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -18,6 +19,7 @@ import it.polito.did.g2.shopdrop.data.Locker
 import it.polito.did.g2.shopdrop.data.Order
 import it.polito.did.g2.shopdrop.data.StoreItem
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
+import it.polito.did.g2.shopdrop.data.users.LoginCredentials
 import it.polito.did.g2.shopdrop.data.users.UserQuery
 import it.polito.did.g2.shopdrop.data.users.UserRole
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +34,8 @@ class MainViewModel() : ViewModel(){
     private val _isLoading = MutableStateFlow(true)
     val isLoading = _isLoading.asStateFlow()
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     //CART DATA
     private val _cart : MutableLiveData<MutableMap<String, Int>> = MutableLiveData(mutableMapOf())
     val cart : LiveData<MutableMap<String, Int>> = _cart
@@ -45,8 +49,38 @@ class MainViewModel() : ViewModel(){
     private val _collectionStep : MutableLiveData<CollectionStep> = MutableLiveData(CollectionStep.NONE)
     val collectionStep : LiveData<CollectionStep> = _collectionStep
 
-    //SHARED PREFs
-    //private val sharedPreferences = application.getSharedPreferences("shopdrop_pref", Context.MODE_PRIVATE)
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //SHARED PREF + LOGIN CREDENTIALS
+    private var prefEditor : SharedPreferences.Editor? = null
+    private val _loginCredentials : MutableLiveData<LoginCredentials?> = MutableLiveData(null)
+    val loginCredentials : LiveData<LoginCredentials?> = _loginCredentials
+
+    fun setPrefEditor(prefEditor : SharedPreferences.Editor){
+        this.prefEditor = prefEditor
+    }
+
+    fun saveCredentials(credentials: LoginCredentials){
+        prefEditor.apply {
+            this!!.putString("uid", credentials.uid)
+            putString("email", credentials.email)
+            putString("password", credentials.password)
+            putString("role", credentials.role.toString())
+            apply()
+        }
+    }
+
+    fun loadCredentials(sp: SharedPreferences){
+        if(sp.getString("uid", null)==null)
+            _loginCredentials.value =
+                LoginCredentials(sp.getString("uid", "")!!,
+                    sp.getString("email", "")!!,
+                    sp.getString("password", "")!!,
+                    enumValueOf<UserRole>(sp.getString("role", "")!!)
+                )
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     //DB REFs
     private val dbRef = Firebase.database.reference

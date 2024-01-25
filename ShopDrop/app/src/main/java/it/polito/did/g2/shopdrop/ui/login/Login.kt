@@ -81,6 +81,8 @@ data class User(val email : String, val password : String)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController : NavController, viewModel: MainViewModel){
+
+    // FORM VARS
     var email by remember { mutableStateOf("") }
     var emailError by remember { mutableStateOf(false) }
     var password by remember { mutableStateOf("") }
@@ -94,10 +96,12 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
         //.padding(vertical = 16.dp)
         .fillMaxWidth()
 
+    // SNACKBAR
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
+    /*
     fun checkForm(navController: NavController, userData : User, viewModel: MainViewModel){
 
         if(userData.email.contains("@shopdrop.com")){
@@ -108,7 +112,7 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                 navController.navigate("DeliveryHome")
             }
             */
-            navController.navigate("DeliveryHome")
+            navController.navigate(Screens.CrrHomeScreen.route)
             /*
             else {
                 Log.i("FORM_CHECK", "data is incorrect ($userData)")
@@ -117,7 +121,77 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
             }
              */
         }else{
-            navController.navigate("CustomerHome")
+            navController.navigate(Screens.CstHomeScreen.route)
+        }
+    }
+     */
+
+    fun login(){
+        Log.i("BTN_LOGIN", "LOGIN PRESSED")
+        Log.i("BTN_LOGIN", "\tisLoading = $isLoading, setting it to true")
+        Log.i("BTN_LOGIN", "\temailError = $emailError, passwordError = $passwordError")
+        isLoading = true
+
+        loginScope.launch{
+            Log.i("BTN_LOGIN", "\tLaunching suspend fun of view model")
+            emailError = false
+            passwordError = false
+
+
+            var userQuery = UserQuery(email, password)
+            Log.i("BTN_LOGIN", "\tCreating login query: $userQuery")
+
+            viewModel.login(userQuery)
+            delay(1500)
+            Log.i("BTN_LOGIN", "\tQuery changed to: $userQuery")
+
+            // Arresta l'animazione di caricamento
+            isLoading = false
+            Log.i("BTN_LOGIN", "\tisLoading = $isLoading, setting it to false")
+
+            if (userQuery.role!=null && userQuery.errType==null) {
+                when(userQuery.role){
+                    UserRole.ADM ->{
+                        Log.i("BTN_LOGIN", "\tVALID CREDENTIALS: role is ${userQuery.role} (exp ADM), navigating to Carrier Home")
+                        navController.navigate(ADM_ROUTE)
+                    }
+                    UserRole.CST -> {
+                        Log.i("BTN_LOGIN", "\tVALID CREDENTIALS: role is ${userQuery.role} (exp CST), navigating to Customer Home")
+                        navController.navigate(CST_ROUTE)
+                    }
+                    UserRole.CRR -> {
+                        Log.i("BTN_LOGIN", "\tVALID CREDENTIALS: role is ${userQuery.role} (exp CRR), navigating to Carrier Home")
+                        navController.navigate(CRR_ROUTE)
+                    }
+                    else -> {/*TODO forse qui l'alternativa all'if*/}
+                }
+            } else {
+                // Mostra un messaggio di errore all'utente
+
+                when(userQuery.errType){
+                    UserQuery.LOGIN_ERROR_TYPE.UNKNOWN ->{
+                        //TODO
+                    }
+                    UserQuery.LOGIN_ERROR_TYPE.NOT_FOUND ->{
+                        Log.e("BTN_LOGIN", "\tEMAIL NOT FOUNT: error is ${userQuery.errType}")
+
+                        emailError = true
+                        passwordError = false
+                    }
+                    UserQuery.LOGIN_ERROR_TYPE.PASSWORD ->{
+                        Log.e("BTN_LOGIN", "\tWRONG PASSWORD: error is ${userQuery.errType}")
+
+                        emailError = false
+                        passwordError = true
+                    }
+
+                    else -> {
+                        emailError = true
+                        passwordError = true
+                    }
+                }
+            }
+
         }
     }
 
@@ -190,7 +264,8 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                             imeAction = if (email != "" && password != "") ImeAction.Done else ImeAction.Next
                         ),
                         keyboardActions = KeyboardActions(
-                            onDone = { checkForm(navController, User(email, password), viewModel) }
+                            //onDone = { checkForm(navController, User(email, password), viewModel) }
+                            onDone = { login() }
                         ),
                         maxLines = 1,
                         isError = emailError,
@@ -241,7 +316,8 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                             imeAction = if (email != "" && password != "") ImeAction.Done else ImeAction.Previous
                         ),
                         keyboardActions = KeyboardActions(
-                            onDone = { checkForm(navController, User(email, password), viewModel) }
+                            //onDone = { checkForm(navController, User(email, password), viewModel) }
+                            onDone = { login() }
                         ),
                         maxLines = 1,
                         isError = passwordError,
@@ -263,78 +339,9 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
 
                     Spacer(Modifier.height(32.dp))
 
-                    // LOGIN BUTTON or LOADING CIRCLE
+                    // LOGIN BTN
                     Button(
-                        onClick = {
-                            Log.i("BTN_LOGIN", "LOGIN PRESSED")
-                            Log.i("BTN_LOGIN", "\tisLoading = $isLoading, setting it to true")
-                            Log.i("BTN_LOGIN", "\temailError = $emailError, passwordError = $passwordError")
-                            isLoading = true
-
-                            loginScope.launch{
-                                Log.i("BTN_LOGIN", "\tLaunching suspend fun of view model")
-                                emailError = false
-                                passwordError = false
-
-
-                                var userQuery = UserQuery(email, password)
-                                Log.i("BTN_LOGIN", "\tCreating login query: $userQuery")
-
-                                viewModel.login(userQuery)
-                                delay(1500)
-                                Log.i("BTN_LOGIN", "\tQuery changed to: $userQuery")
-
-                                // Arresta l'animazione di caricamento
-                                isLoading = false
-                                Log.i("BTN_LOGIN", "\tisLoading = $isLoading, setting it to false")
-
-                                if (userQuery.role!=null && userQuery.errType==null) {
-                                    when(userQuery.role){
-                                        UserRole.ADM ->{
-                                            Log.i("BTN_LOGIN", "\tVALID CREDENTIALS: role is ${userQuery.role} (exp ADM), navigating to Carrier Home")
-                                            navController.navigate(ADM_ROUTE)
-                                        }
-                                        UserRole.CST -> {
-                                            Log.i("BTN_LOGIN", "\tVALID CREDENTIALS: role is ${userQuery.role} (exp CST), navigating to Customer Home")
-                                            navController.navigate(CST_ROUTE)
-                                        }
-                                        UserRole.CRR -> {
-                                            Log.i("BTN_LOGIN", "\tVALID CREDENTIALS: role is ${userQuery.role} (exp CRR), navigating to Carrier Home")
-                                            navController.navigate(CRR_ROUTE)
-                                        }
-                                        else -> {/*TODO forse qui l'alternativa all'if*/}
-                                    }
-                                } else {
-                                    // Mostra un messaggio di errore all'utente
-
-                                    when(userQuery.errType){
-                                        UserQuery.LOGIN_ERROR_TYPE.UNKNOWN ->{
-                                            //TODO
-                                        }
-                                        UserQuery.LOGIN_ERROR_TYPE.NOT_FOUND ->{
-                                            Log.e("BTN_LOGIN", "\tEMAIL NOT FOUNT: error is ${userQuery.errType}")
-
-                                            emailError = true
-                                            passwordError = false
-                                        }
-                                        UserQuery.LOGIN_ERROR_TYPE.PASSWORD ->{
-                                            Log.e("BTN_LOGIN", "\tWRONG PASSWORD: error is ${userQuery.errType}")
-
-                                            emailError = false
-                                            passwordError = true
-                                        }
-
-                                        else -> {
-                                            emailError = true
-                                            passwordError = true
-                                        }
-                                    }
-                                }
-
-                            }
-
-
-                        },
+                        onClick = { login() },
                         enabled = !isLoading,
                         modifier = baseMod
                     ) {
@@ -399,7 +406,3 @@ fun performDevMsg(scope: CoroutineScope, snackbarHostState: SnackbarHostState, c
             duration = SnackbarDuration.Short)
     }
 }
-
-/*
-
-*/

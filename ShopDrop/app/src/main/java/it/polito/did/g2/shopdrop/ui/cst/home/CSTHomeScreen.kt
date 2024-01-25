@@ -6,27 +6,25 @@ import android.os.LocaleList
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Business
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DirectionsBusFilled
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,53 +33,50 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.isTraversalGroup
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.traversalIndex
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.data.Order
 import it.polito.did.g2.shopdrop.data.OrderStateName
 import it.polito.did.g2.shopdrop.data.StoreItem
-import it.polito.did.g2.shopdrop.data.StoreItemCategory
 import it.polito.did.g2.shopdrop.data.TabScreen
 import it.polito.did.g2.shopdrop.ui.cst.common.BottomBar
-import it.polito.did.g2.shopdrop.ui.cst.common.StoreItemCard
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
 
-    var currentTab = TabScreen.HOME
+    val currentTab = TabScreen.HOME
 
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    var query by remember { mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
+    var searchBarFocussed by remember{ mutableStateOf(false) }
 
-    var query by rememberSaveable { mutableStateOf("") }
-    var searchBoxActive by rememberSaveable { mutableStateOf(false) }
+    //Items
+    val itemList by viewModel.storeItems.observeAsState()
 
     //Bottom sheet
     val bottomSheetState = rememberModalBottomSheetState()
@@ -91,11 +86,7 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
     var targetItem by remember{ mutableStateOf<StoreItem?>(null) }
 
     Scaffold(
-        //topBar = { TopBar(currentTab, scrollBehavior = scrollBehavior) },
-        bottomBar = { BottomBar(currentTab, navController, viewModel) },
-        //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        //floatingActionButton = { AddButton(onClick = {/*TODO*/}) },
-        //floatingActionButtonPosition = FabPosition.End
+        bottomBar = { BottomBar(currentTab, navController, viewModel) }
     ) { paddingValues ->
         Surface(
             modifier = Modifier
@@ -104,120 +95,106 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
         ) {
             Column(
                 Modifier
-                    .fillMaxSize()
-                    .semantics { isTraversalGroup = true }){
-                SearchBar(  //https://www.youtube.com/watch?v=90gokceSYdM
+                    .fillMaxSize()){
+
+                // SEARCH BAR                                                                       SEARCH BAR
+
+                OutlinedTextField(
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search icon") },
+                    value = query,
+                    placeholder = { Text(text = stringResource(R.string.placeholder_search_main).capitalize(),)},
+                    onValueChange = {
+                        searchBarFocussed = true
+                        query = it
+                    },
+                    shape = RoundedCornerShape(32.dp),
+                    maxLines = 1,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Search
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onSearch = {
+                            searchBarFocussed = false
+                            focusManager.clearFocus()
+                        }
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp)
-                        .semantics { traversalIndex = -1f },
-                    query = query,
-                    onQueryChange = { query = it },
-                    onSearch = {
-                        searchBoxActive = false
-                        Log.d("SEARCH","Search for $query")
-                        //TODO
-                    },
-                    active = searchBoxActive,
-                    onActiveChange = {
-                        searchBoxActive = it
-                    },
-                    placeholder = {
-                        Row(){
-                            Text(stringResource(R.string.placeholder_search_main).capitalize())
-                            Text("[APP LOGO]")
-                        } },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search icon") },
-                    trailingIcon = {
-                        if(searchBoxActive){
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = "Close icon",
-                                Modifier.clickable {
-                                    if(query.isNotEmpty())
-                                        query = ""
-                                    else
-                                        searchBoxActive = false
-                                }
-                            )
+                        .padding(16.dp)
+                )
+
+
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                ) {
+
+                    // PENDING ORDERS                                                           PENDING ORDERS
+                    //TODO Pending orders
+                    //TODO impedire visualizzazione quando si sta cercando un prodotto
+                    //TODO controllare il vm che ci siano ordini pendenti ed eventualmente mostrarli
+                    if(viewModel.hasPending.value!!)    //Condizione dei pending order
+                        PendingOrdersCard(navController, viewModel)
+
+                    if(query==""){
+                        itemList?.map{it.category}
+                            ?.distinct()
+                            ?.sortedBy { it.toString() }
+                            ?.forEach {
+                                val itList = itemList?.filter{ storeItem -> storeItem.category==it }
+
+                                if(!itList.isNullOrEmpty())
+                                    CategorySection(
+                                        it!!,
+                                        itList,
+                                        navController,
+                                        { item ->
+                                            targetItem = item
+                                            showBottomSheet = true
+                                        }
+                                    )
                         }
+                    }else{
+                        itemList?.filter{it.name.contains(query)}
+                            ?.map{it.category}
+                            ?.distinct()
+                            ?.sortedBy { it.toString() }
+                            ?.forEach {
+                                val itList = itemList?.filter{ storeItem -> storeItem.category==it && storeItem.name.contains(query) }
 
-                    }
-                ){
-                    //HINTS -> TODO: mettere ultime 3 ricerche e poi i risultati
-                    repeat(4) { idx ->
-                        val resultText = "Suggestion $idx"
-                        ListItem(
-                            headlineContent = { Text(resultText) },
-                            supportingContent = { Text("Additional info") },
-                            leadingContent = { Icon(Icons.Filled.Star, contentDescription = null) },
-                            modifier = Modifier
-                                .clickable {
-                                    query = resultText
-                                    searchBoxActive = false
-                                }
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 4.dp)
-                        )
-                    }
-                }
-
-                if(!searchBoxActive){
-                    Column(modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                    ) {
-
-                        /*
-                        BasicTextField(
-                            value = TextFieldValue(query),
-                            onValueChange = {it -> query=it},
-                            //label = {Text("Cerca su ShopDrop")},
-                            singleLine = true,
-                            //leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
-                            shape = RoundedCornerShape(48.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(48.dp)
-                                .padding(horizontal = 16.dp)
-                        )
-                         */
-
-
-
-
-                        //TODO Pending orders
-                        //TODO controllare il vm che ci siano ordini pendenti ed eventualmente mostrarli
-                        if(viewModel.hasPending.value!!)    //Condizione dei pending order
-                            PendingOrdersCard(navController, viewModel)
-                        //TODO demo oggetti acquistabili
-
-                        /*
-                        HomeSection(SectionName.BUY_AGAIN, navController = navController, onClick = { showBottomSheet = true })
-                        HomeSection(SectionName.PROMO, navController = navController, onClick = { showBottomSheet = true })
-                        */
-
-                        //SEZIONI CATEGORIE MERCEOLOGICHE
-                        enumValues<StoreItemCategory>().forEach {
-                            val itList = viewModel.storeItems.value?.filter{storeItem -> storeItem.category==it }
-
-                            if(!itList.isNullOrEmpty())
-                                HomeCatSection(it, itList, navController = navController){ item ->
-                                    targetItem = item
-                                    showBottomSheet = true
-                                }
-                        }
+                                if(!itList.isNullOrEmpty())
+                                    CategorySection(
+                                        it!!,
+                                        itList,
+                                        navController,
+                                        { item ->
+                                            targetItem = item
+                                            showBottomSheet = true
+                                        },
+                                        query
+                                    )
+                            }
                     }
                 }
             }
-
         }
 
+        // CONFIRM SHEET                                                                            CONFIRM SHEET
         if(showBottomSheet){
             Log.d("MODAL", "Dovrebbe aprirsi qui")
             ConfirmSheet(targetItem, viewModel, {showBottomSheet=false}, bottomSheetState, bottomSheetScope)
         }
     }
+}
+
+@Composable
+fun HintListItem(entry: String, navController: NavController){
+    ListItem(
+        headlineContent = { Text(text = entry)},
+        leadingContent = {Icon(Icons.Outlined.History, contentDescription = null)},
+        modifier = Modifier.clickable { navController.navigate("CategorySection/$entry/true") }
+    )
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -316,63 +293,6 @@ fun OrderListItem(order: Order, navController: NavController, viewModel: MainVie
                 navController.navigate("COrderDetailScreen")
             }
     )
-}
-
-@Composable
-fun HomeCatSection(category: StoreItemCategory, itemList: List<StoreItem>, navController: NavController, onClick : (it: StoreItem) -> Unit){
-
-    Column {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom){
-            Text(text = stringResource(id = category.getStringRef()).capitalize(),
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            TextButton(
-                onClick = { navController.navigate("CategorySection/$category") },
-                contentPadding = PaddingValues(0.dp)
-            ) {
-                Text(text = stringResource(R.string.btn_see_more).capitalize(),
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-        }
-
-        Row(modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .horizontalScroll(rememberScrollState())){
-
-            //Text("TEST")
-
-            val upperLimit = if(itemList.size<5) itemList.size else 5
-            //Text("upper limit is $upperLimit")
-
-            for (i in 0 until upperLimit){
-                StoreItemCard(itemList[i]) {
-                    onClick(it)
-                }
-            }
-
-
-/*
-            for(i in 0 until upperLimit){
-                //ItemCard(itemList[i], onClick)
-                Card(modifier = Modifier
-                    .size(width = 160.dp, height = 200.dp)
-                    .padding(8.dp)
-                    .clickable(onClick = onClick)) {
-                    Column {
-                        Spacer(Modifier.height(160.dp))
-                        Text(text = itemList[i].name)
-                        Text(text = itemList[i].price.toString())
-                    }
-                }
-            }
-
-             */
-        }
-    }
 }
 
 /*

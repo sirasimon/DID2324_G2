@@ -1,34 +1,13 @@
 package it.polito.did.g2.shopdrop
 
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import it.polito.did.g2.shopdrop.data.StoreItemCategory
 import it.polito.did.g2.shopdrop.navigation.Nav
-import it.polito.did.g2.shopdrop.ui.camera.CameraScreen
-import it.polito.did.g2.shopdrop.ui.crr.home.CarrierHomeScreen
-import it.polito.did.g2.shopdrop.ui.cst.cart.CartScreen
-import it.polito.did.g2.shopdrop.ui.cst.cart.CartSummary
-import it.polito.did.g2.shopdrop.ui.cst.cart.OrderConfirmed
-import it.polito.did.g2.shopdrop.ui.cst.home.CSTHomeScreen
-import it.polito.did.g2.shopdrop.ui.cst.home.CategorySection
-import it.polito.did.g2.shopdrop.ui.cst.orders.COrderDetailScreen
-import it.polito.did.g2.shopdrop.ui.cst.orders.COrderListScreen
-import it.polito.did.g2.shopdrop.ui.cst.profile.CProfileScreen
-import it.polito.did.g2.shopdrop.ui.cst.unlocker.OpeningScreens
-import it.polito.did.g2.shopdrop.ui.cst.unlocker.UnlockScreen
-import it.polito.did.g2.shopdrop.ui.login.LoginScreen
 import it.polito.did.g2.shopdrop.ui.theme.ShopDropTheme
 
 class MainActivity : ComponentActivity() {
@@ -37,11 +16,16 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val sharedPreferences = application.getSharedPreferences("shopdrop_pref", Context.MODE_PRIVATE)
+
+        //val sharedPref = getSharedPreferences("shopdrop_pref", Context.MODE_PRIVATE)
+        //val editor = sharedPref.edit()
 
         viewModel.debugInit()
 
+        //viewModel.setPrefEditor(editor)
+
         installSplashScreen().apply{//Prima di setContent per avviare splashscreen
+            //viewModel.loadCredentials(sharedPref)
             this.setKeepOnScreenCondition{
                 viewModel.isLoading.value
             }
@@ -63,6 +47,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/*
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navigation(viewModel: MainViewModel){
@@ -100,7 +85,7 @@ fun Navigation(viewModel: MainViewModel){
         }
 
         composable("ClientProfile"){
-            CProfileScreen(navController = navController, viewModel)
+            CSTProfileScreen(navController = navController, viewModel)
         }
         composable(
             "CategorySection/{sectionName}",
@@ -131,3 +116,4 @@ fun Navigation(viewModel: MainViewModel){
         }
     }
 }
+ */

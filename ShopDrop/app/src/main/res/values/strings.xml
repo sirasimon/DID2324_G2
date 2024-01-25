@@ -60,4 +60,5 @@
     <string name="txt_close_locker">Close the locker</string>
     <string name="btn_open">open</string>
     <string name="btn_cancel">cancel</string>
+    <string name="title_results_for">results for</string>
 </resources>

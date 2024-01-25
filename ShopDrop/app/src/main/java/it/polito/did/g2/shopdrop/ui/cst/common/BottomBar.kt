@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.data.TabScreen
+import it.polito.did.g2.shopdrop.navigation.Screens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,13 +33,13 @@ fun BottomBar(currentTab : TabScreen, navController: NavController, vm : MainVie
     NavigationBar() {
         NavigationBarItem(
             selected = currentTab== TabScreen.HOME,
-            onClick = { if(currentTab!= TabScreen.HOME) navController.navigate("CustomerHome") },
+            onClick = { if(currentTab!= TabScreen.HOME) navController.navigate(Screens.CstHomeScreen.route) },
             icon = { if(currentTab== TabScreen.HOME) Icon(Icons.Filled.Home, stringResource(R.string.tab_home).capitalize()) else Icon(Icons.Outlined.Home, stringResource(R.string.tab_home).capitalize()) },
             label = { Text(text = stringResource(R.string.tab_home).capitalize()) }
         )
         NavigationBarItem(
             selected = currentTab== TabScreen.CART,
-            onClick = { if(currentTab!= TabScreen.CART) navController.navigate("ClientCart") },
+            onClick = { if(currentTab!= TabScreen.CART) navController.navigate(Screens.CstCartScreen.route) },
             icon =
             {
                 BadgedBox(
@@ -60,7 +61,7 @@ fun BottomBar(currentTab : TabScreen, navController: NavController, vm : MainVie
         )
         NavigationBarItem(
             selected = currentTab== TabScreen.PROFILE,
-            onClick = { if(currentTab!= TabScreen.PROFILE) navController.navigate("ClientProfile") },
+            onClick = { if(currentTab!= TabScreen.PROFILE) navController.navigate(Screens.CstProfileScreen.route) },
             icon = { if(currentTab== TabScreen.PROFILE) Icon(Icons.Filled.Person, stringResource(R.string.tab_profile).capitalize()) else Icon(
                 Icons.Outlined.Person, stringResource(R.string.tab_profile).capitalize()) },
             label = { Text(text = stringResource(R.string.tab_profile).capitalize()) }

@@ -43,7 +43,7 @@ import it.polito.did.g2.shopdrop.ui.cst.common.BottomBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CProfileScreen(navController: NavController, viewModel: MainViewModel){
+fun CSTProfileScreen(navController: NavController, viewModel: MainViewModel){
     var currentTab = TabScreen.PROFILE
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
