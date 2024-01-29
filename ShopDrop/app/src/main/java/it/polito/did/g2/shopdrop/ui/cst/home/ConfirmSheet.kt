@@ -41,7 +41,7 @@ fun ConfirmSheet(
     bottomSheetState: SheetState,
     bottomSheetScope: CoroutineScope
 ) {
-    val quantity = mutableIntStateOf(viewModel.cart.value?.get(item?.name) ?: 0)
+    val quantity = mutableIntStateOf(viewModel.cart.value?.items?.get(item?.name) ?: 0)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,

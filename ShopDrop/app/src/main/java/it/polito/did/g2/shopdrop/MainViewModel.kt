@@ -14,6 +14,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import com.google.firebase.database.getValue
 import com.google.firebase.storage.storage
+import it.polito.did.g2.shopdrop.data.Cart
 import it.polito.did.g2.shopdrop.data.CollectionStep
 import it.polito.did.g2.shopdrop.data.Locker
 import it.polito.did.g2.shopdrop.data.Order
@@ -37,6 +38,9 @@ class MainViewModel() : ViewModel(){
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     //CART DATA
+    private val _cart : MutableLiveData<Cart?> = MutableLiveData(null)
+    val cart : LiveData<Cart?> = _cart
+    /*
     private val _cart : MutableLiveData<MutableMap<String, Int>> = MutableLiveData(mutableMapOf())
     val cart : LiveData<MutableMap<String, Int>> = _cart
 
@@ -44,6 +48,7 @@ class MainViewModel() : ViewModel(){
     val subtot : LiveData<Float> = _subtot
     private val _itemsInCart : MutableLiveData<Int> = MutableLiveData(0)
     val itemsInCart : LiveData<Int> = _itemsInCart
+    */
 
     //OPENING PROCEDURE
     private val _collectionStep : MutableLiveData<CollectionStep> = MutableLiveData(CollectionStep.NONE)
@@ -361,6 +366,18 @@ class MainViewModel() : ViewModel(){
     fun modifyCart(item: StoreItem?, quantity: Int){
         Log.i("MODIFY_CART", "Trying to modify the cart")
 
+        if(_cart.value==null)
+            _cart.value = Cart()
+
+        if(item!=null){
+            _cart.value?.modify(item, quantity)
+
+            Log.i("MODIFY_CART", "\tUpdated quantity of \"${item.name}\" in map is ${_cart.value?.items?.get(item.name) ?:"[ERROR]"} (desired change was $quantity)")
+        }else{
+            Log.w("MODIFY_CART", "\tITEM IS NULL")
+        }
+
+        /*
         if(item!=null){
             if(_cart.value!!.contains(item.name)){
                 Log.i("MODIFY_CART", "\t\"${item.name}\" already in the cart with quantity ${_cart.value!![item.name]}, but willing to change into $quantity")
@@ -376,12 +393,15 @@ class MainViewModel() : ViewModel(){
         }else{
             Log.w("MODIFY_CART", "\tITEM IS NULL")
         }
+         */
     }
 
     fun getCartTotal(): Float{
-        return (subtot.value ?:0f) + shipmentFee + serviceFee
+        //return (subtot.value ?:0f) + shipmentFee + serviceFee
+        return (_cart.value?.subtot?:0f) + shipmentFee + serviceFee
     }
 
+    /*
     private fun updateSubtot(){
         Log.i("UPD_SUBTOT", "UPDATING SUBTOTAL")
 
@@ -403,6 +423,7 @@ class MainViewModel() : ViewModel(){
 
         Log.i("UPD_ItInCrt", "\tNow cart has ${_itemsInCart.value} items")
     }
+    */
 
     private fun updateCollectionStep(isDone : Boolean? = null){
         if(isDone==null){

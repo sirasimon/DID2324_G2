@@ -28,7 +28,7 @@ import it.polito.did.g2.shopdrop.navigation.Screens
 @Composable
 fun BottomBar(currentTab : TabScreen, navController: NavController, vm : MainViewModel){
     //val hasBadge by remember{ mutableStateOf(vm.cart.value?.count() != 0) }
-    val badgeNumber by vm.itemsInCart.observeAsState()
+    val badgeNumber by vm.cart.observeAsState()
 
     NavigationBar() {
         NavigationBarItem(  // HOME
@@ -45,9 +45,9 @@ fun BottomBar(currentTab : TabScreen, navController: NavController, vm : MainVie
             {
                 BadgedBox(
                     badge = {
-                        if(badgeNumber!=0){
+                        if((badgeNumber?.totalItems?:0) !=0){
                             Badge{
-                                Text("${badgeNumber}")
+                                Text("${badgeNumber?.totalItems}")
                             }
                         }
                     }

@@ -59,11 +59,11 @@ import it.polito.did.g2.shopdrop.ui.cst.common.TopBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CSTCartScreen(navController: NavController, viewModel: MainViewModel){
-    var currentTab = TabScreen.CART
+    val currentTab = TabScreen.CART
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-    var subtotal = mutableStateOf(viewModel.subtot.value)
+    val subtotal = mutableStateOf(viewModel.cart.value?.subtot)
 
-    var hasItems = viewModel.itemsInCart.value != 0
+    val hasItems = viewModel.cart.value?.totalItems != 0
 
 
 
@@ -85,8 +85,8 @@ fun CSTCartScreen(navController: NavController, viewModel: MainViewModel){
                 .fillMaxHeight()
                 .verticalScroll(rememberScrollState())){
 
-                if(!viewModel.cart.value.isNullOrEmpty()){
-                    viewModel.cart.value!!.forEach {
+                if(!viewModel.cart.value?.items.isNullOrEmpty()){
+                    viewModel.cart.value?.items?.forEach {
                         //ProductListItem(viewModel.storeItems.value?.find { item -> item.name==it.key }, it.value)
                         ProductListItem(viewModel, it.key)
                     }
@@ -124,7 +124,7 @@ fun CSTCartScreen(navController: NavController, viewModel: MainViewModel){
 fun ProductListItem(viewModel: MainViewModel, itemName: String){
 
     val cart = viewModel.cart.observeAsState()
-    val quantity = mutableIntStateOf(viewModel.cart.value?.get(itemName) ?: 0)
+    val quantity = mutableIntStateOf(viewModel.cart.value?.items?.get(itemName) ?: 0)
     val storeItem = viewModel.storeItems.value?.find { item -> item.name == itemName }
 
     ElevatedCard(

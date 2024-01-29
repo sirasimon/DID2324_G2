@@ -76,8 +76,8 @@ fun CSTCheckoutScreen(navController: NavController, viewModel: MainViewModel) {
                     .padding(16.dp)
             ) {
                 Column(Modifier.fillMaxWidth()) {
-                    if(!viewModel.cart.value.isNullOrEmpty()){
-                        viewModel.cart.value!!.forEach {
+                    if(!viewModel.cart.value?.items.isNullOrEmpty()){
+                        viewModel.cart.value?.items?.forEach {
                             val subTot : Float =
                                 viewModel.storeItems.value?.filter { si -> si.name == it.key }?.map{ si -> si.price}?.sum()?.times(it.value) ?: 0f
 
@@ -135,7 +135,7 @@ fun CSTCheckoutScreen(navController: NavController, viewModel: MainViewModel) {
 
                     PriceItemList(
                         stringResource(R.string.price_subtotal).capitalize(),
-                        String.format("%.2f €", viewModel.subtot.value)
+                        String.format("%.2f €", viewModel.cart.value?.subtot?:0f)
                     )  //TODO
                     PriceItemList(
                         stringResource(R.string.price_shipment).capitalize(),
@@ -149,7 +149,7 @@ fun CSTCheckoutScreen(navController: NavController, viewModel: MainViewModel) {
                         stringResource(R.string.price_total).uppercase(),
                         String.format(
                             "%.2f €",
-                            (viewModel.subtot.value
+                            (viewModel.cart.value?.subtot
                                 ?: 0f) + viewModel.shipmentFee + viewModel.serviceFee
                         )
                     )
