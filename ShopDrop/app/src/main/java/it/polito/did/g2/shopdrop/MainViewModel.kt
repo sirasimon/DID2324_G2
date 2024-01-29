@@ -27,8 +27,8 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class MainViewModel() : ViewModel(){
     //TODO
-    val shipmentFee = 2.5
-    val serviceFee = 0.0
+    val shipmentFee = 2.5f
+    val serviceFee = 0.0f
 
     //STARTING APP (SPLASH SCREEN)
     private val _isLoading = MutableStateFlow(true)
@@ -376,6 +376,10 @@ class MainViewModel() : ViewModel(){
         }else{
             Log.w("MODIFY_CART", "\tITEM IS NULL")
         }
+    }
+
+    fun getCartTotal(): Float{
+        return (subtot.value ?:0f) + shipmentFee + serviceFee
     }
 
     private fun updateSubtot(){

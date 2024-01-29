@@ -2,7 +2,6 @@ package it.polito.did.g2.shopdrop.navigation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.material3.Text
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -11,6 +10,8 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
+import it.polito.did.g2.shopdrop.ui.cst.cart.CSTCartScreen
+import it.polito.did.g2.shopdrop.ui.cst.cart.CSTCheckoutScreen
 import it.polito.did.g2.shopdrop.ui.cst.home.CSTHomeScreen
 import it.polito.did.g2.shopdrop.ui.cst.home.CategoryScreen
 import it.polito.did.g2.shopdrop.ui.cst.orders.CstOrdersHistory
@@ -53,13 +54,26 @@ fun NavGraphBuilder.cstNavGraph(
             )
         }
 
+        // CART ////////////////////////////////////////////////////////////////////////////////////
+
         composable(route = Screens.CstCart.route){
-            //TODO
-            Text("CST CART SCREEN")
+            CSTCartScreen(navController, viewModel)
         }
+
+        composable(route = Screens.CstCheckout.route){
+            CSTCheckoutScreen(navController, viewModel)
+        }
+
+        // PROFILE /////////////////////////////////////////////////////////////////////////////////
 
         composable(route = Screens.CstProfile.route){
             CSTProfileScreen(navController, viewModel)
+        }
+
+        // ORDERS //////////////////////////////////////////////////////////////////////////////////
+
+        composable(route= Screens.CstOrderHistory.route){
+            CstOrdersHistory(navController, viewModel)
         }
 
         composable(route = Screens.CstOrderDetail.route){
@@ -67,9 +81,7 @@ fun NavGraphBuilder.cstNavGraph(
             //Text("CST ORDER DETAIL SCREEN")
         }
 
-        composable(route= Screens.CstOrdersOverview.route){
-            CstOrdersHistory(navController, viewModel)
-        }
+        // UNLOCK PROCEDURE ////////////////////////////////////////////////////////////////////////
 
         /*
         composable(route = Screens.CstCameraScreen.route){

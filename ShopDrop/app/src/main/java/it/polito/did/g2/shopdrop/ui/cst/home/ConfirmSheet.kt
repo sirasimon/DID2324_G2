@@ -1,5 +1,6 @@
 package it.polito.did.g2.shopdrop.ui.cst.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,12 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
@@ -43,7 +41,7 @@ fun ConfirmSheet(
     bottomSheetState: SheetState,
     bottomSheetScope: CoroutineScope
 ) {
-    var quantity = mutableIntStateOf(viewModel.cart.value?.get(item?.name) ?: 0)
+    val quantity = mutableIntStateOf(viewModel.cart.value?.get(item?.name) ?: 0)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -73,6 +71,8 @@ fun ConfirmSheet(
                 .padding(horizontal = 16.dp)
         )
 
+        Spacer(Modifier.height(16.dp))
+
         Card(shape = CircleShape, modifier = Modifier
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
@@ -90,15 +90,20 @@ fun ConfirmSheet(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .padding(horizontal = 16.dp)){
-                    IconButton(onClick = { if(quantity.value>0) quantity.value-- }, enabled = quantity.value>0) {
-                        if(quantity.value != 1)
-                            Icon(painter = painterResource(R.drawable.outline_do_disturb_on_24), contentDescription = "Decrease quantity")
-                        else
-                            Icon(Icons.Filled.Delete, contentDescription = "Delete item from list")
+                    if(quantity.value!=0) {
+                        IconButton(
+                            onClick = { if (quantity.value > 0) quantity.value-- },
+                            enabled = quantity.value > 0
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.btn_sub),
+                                contentDescription = "Decrease quantity"
+                            )
+                        }
                     }
                     Text("${quantity.value}")
                     IconButton(onClick = { quantity.value++ }) {
-                        Icon(painter = painterResource(R.drawable.round_add_circle_outline_24), contentDescription = "increase quantity")
+                        Image(painter = painterResource(R.drawable.btn_add), contentDescription = "increase quantity")
                     }
                 }
             }

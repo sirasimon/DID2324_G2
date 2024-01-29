@@ -107,7 +107,7 @@ fun CSTProfileScreen(navController: NavController, viewModel: MainViewModel){
                     }
                 }
 
-                ProfileItemList(label = stringResource(R.string.title_my_orders).capitalize(), onClick = { navController.navigate(Screens.CstOrdersOverview.route) })
+                ProfileItemList(label = stringResource(R.string.title_my_orders).capitalize(), onClick = { navController.navigate(Screens.CstOrderHistory.route) })
                 ProfileItemList(label = stringResource(R.string.title_address).capitalize(), onClick = {performDevMsg(scope, snackbarHostState, context)})
                 ProfileItemList(label = stringResource(R.string.title_payment_methods).capitalize(), onClick = {performDevMsg(scope, snackbarHostState, context)})
                 ProfileItemList(label = stringResource(R.string.title_help).capitalize(), onClick = {performDevMsg(scope, snackbarHostState, context)})
