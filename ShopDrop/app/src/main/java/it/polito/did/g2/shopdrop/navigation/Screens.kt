@@ -16,6 +16,8 @@ sealed class Screens(val route: String) {
 
     object CstCart : Screens("CstCartScreen")
     object CstCheckout : Screens("CstCheckoutScreen")
+    object CstLockerSelector : Screens("CstLockerSelectorScreen")
+    object CstOrderSent : Screens("CstOrderSentScreen")
 
     object CstProfile : Screens("CstProfileScreen")
     object CstCameraScreen : Screens("CstProfileScreen")

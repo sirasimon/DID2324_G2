@@ -110,7 +110,10 @@ fun CSTCartScreen(navController: NavController, viewModel: MainViewModel){
                         Spacer(Modifier.height(80.dp))
                     }
                 }else{
-                    Text(text = stringResource(id = R.string.txt_empty_cart))   //TODO
+                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()){
+                        Text(text = stringResource(id = R.string.txt_empty_cart))
+                    }
+
                 }
             }
         }

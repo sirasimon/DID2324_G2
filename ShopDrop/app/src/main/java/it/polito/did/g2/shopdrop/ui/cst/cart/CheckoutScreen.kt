@@ -1,8 +1,10 @@
 package it.polito.did.g2.shopdrop.ui.cst.cart
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -25,7 +28,9 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -37,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
+import it.polito.did.g2.shopdrop.navigation.Screens
 import it.polito.did.g2.shopdrop.ui.cst.common.TopBar
 import it.polito.did.g2.shopdrop.ui.cst.common.WIPMessage
 import it.polito.did.g2.shopdrop.ui.cst.common.performDevMsg
@@ -54,7 +60,7 @@ fun CSTCheckoutScreen(navController: NavController, viewModel: MainViewModel) {
     Scaffold(
         topBar = { TopBar(navController, stringResource(id = R.string.title_order_summary), scrollBehavior) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        floatingActionButton = { ProceedBtn(navController, viewModel) },
+        floatingActionButton = { FabProceed(navController, viewModel) },
         floatingActionButtonPosition = FabPosition.Center,
         snackbarHost = { WIPMessage(snackbarHostState) }
     ) { paddingValues ->
@@ -90,7 +96,12 @@ fun CSTCheckoutScreen(navController: NavController, viewModel: MainViewModel) {
                     }
                 }
                 Spacer(Modifier.height(16.dp))
-                Text("[Qui la mappa del locker che sarebbe cliccabile]")
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.background(Color.LightGray, RoundedCornerShape(16.dp)).fillMaxWidth().height(200.dp).clickable { navController.navigate(Screens.CstLockerSelector.route) }
+                ){
+                    Text("[Locker selector]")
+                }
                 
                 Card(
                     Modifier
@@ -151,9 +162,9 @@ fun CSTCheckoutScreen(navController: NavController, viewModel: MainViewModel) {
 }
 
 @Composable
-fun ProceedBtn(navController: NavController, viewModel: MainViewModel) {
+private fun FabProceed(navController: NavController, viewModel: MainViewModel) {
     ExtendedFloatingActionButton(
-        onClick = { navController.navigate("OrderConfirmed") },
+        onClick = { navController.navigate(Screens.CstOrderSent.route) },
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 32.dp)
