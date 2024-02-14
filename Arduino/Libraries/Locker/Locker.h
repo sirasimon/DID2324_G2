@@ -11,6 +11,7 @@ class Locker {
     void send_input(char com);
     void update();
     void init();
+    bool isClosed();
     enum state {
       invalid,
       openUnlock,
@@ -19,11 +20,11 @@ class Locker {
       closed
     };
     char _id;
+    state _currentState;
   private:
     CustomServo& _servo;
     CustomServo& _bumpServo;
     MagneticSensor& _sensor;
-    state _currentState;
     char _com;
     bool _input_sent;
     bool _closeEnabled;

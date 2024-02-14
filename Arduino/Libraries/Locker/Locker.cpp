@@ -41,10 +41,11 @@ void Locker::_open_enter() {
   _closeEnabled = false;
 }
 void Locker::_open_update() {
-  if (_input_sent && _com == '0') {
+  if (!_closeEnabled && _sensor.check()) {
+    _sensor.calibrationValue = _sensor.read();
     _closeEnabled = true;
   }
-  if (_sensor.check() && _closeEnabled) {
+  else if (_closeEnabled && _sensor.check()) {
     _change_state(closed);
   }
 }
@@ -54,10 +55,11 @@ void Locker::_open_exit() { }
 #pragma region Closed State
 void Locker::_closed_enter() {
   Serial.println("Locker " + String(_id) + " state has changed to CLOSED");
+  _sensor.calibrationValue = _sensor.read();
   _servo.sweep(90);
 }
 void Locker::_closed_update() {
-  if (_input_sent && _com == '1') {
+  if (_input_sent && _com == '0') {
     _change_state(openUnlock);
   }
 }
@@ -67,6 +69,7 @@ void Locker::_closed_exit() { }
 #pragma region Other
 void Locker::init() {
   _change_state(open);
+  _closeEnabled = true;
 }
 void Locker::send_input(char com) {
    _com = com;
@@ -124,5 +127,8 @@ void Locker::_change_state(state nextState) {
       _closed_enter();
       break;
   }
+}
+bool Locker::isClosed() {
+  return _currentState == closed;
 }
 #pragma endregion
