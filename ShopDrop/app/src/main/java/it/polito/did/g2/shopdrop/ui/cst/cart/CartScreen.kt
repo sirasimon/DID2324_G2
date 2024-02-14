@@ -51,6 +51,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
+import it.polito.did.g2.shopdrop.data.Fees
 import it.polito.did.g2.shopdrop.data.TabScreen
 import it.polito.did.g2.shopdrop.navigation.Screens
 import it.polito.did.g2.shopdrop.ui.cst.common.BottomBar
@@ -65,13 +66,11 @@ fun CSTCartScreen(navController: NavController, viewModel: MainViewModel){
 
     val hasItems = viewModel.cart.value?.totalItems != 0
 
-
-
     Scaffold(
         topBar = { TopBar(navController, stringResource(id = R.string.title_cart), scrollBehavior) },
         bottomBar = { BottomBar(currentTab, navController, viewModel) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        floatingActionButton = { if(hasItems) CheckoutButton { navController.navigate(Screens.CstCheckout.route) } },
+        floatingActionButton = { if(hasItems) CheckoutButton { navController.navigate(Screens.CstCheckout.route); viewModel.createOrder() } },
         floatingActionButtonPosition = FabPosition.Center
     ) { paddingValues ->
 
@@ -103,9 +102,9 @@ fun CSTCartScreen(navController: NavController, viewModel: MainViewModel){
                                 .height(24.dp)){}
 
                         PriceItemList(stringResource(R.string.price_subtotal).capitalize(), String.format("%.2f €", subtotal.value))  //TODO
-                        PriceItemList(stringResource(R.string.price_shipment).capitalize(), String.format("%.2f €", viewModel.shipmentFee))
-                        PriceItemList(stringResource(R.string.price_service).capitalize(), String.format("%.2f €", viewModel.serviceFee))
-                        PriceListTotal(stringResource(R.string.price_total).uppercase(), String.format("%.2f €", (subtotal.value?:0f)+viewModel.shipmentFee+viewModel.serviceFee))
+                        PriceItemList(stringResource(R.string.price_shipment).capitalize(), String.format("%.2f €", Fees.SHIPMENT))
+                        PriceItemList(stringResource(R.string.price_service).capitalize(), String.format("%.2f €", Fees.SERVICE))
+                        PriceListTotal(stringResource(R.string.price_total).uppercase(), String.format("%.2f €", (subtotal.value?:0f)+Fees.total()))
 
                         Spacer(Modifier.height(80.dp))
                     }
@@ -113,7 +112,6 @@ fun CSTCartScreen(navController: NavController, viewModel: MainViewModel){
                     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()){
                         Text(text = stringResource(id = R.string.txt_empty_cart))
                     }
-
                 }
             }
         }
@@ -125,7 +123,7 @@ fun ProductListItem(viewModel: MainViewModel, itemName: String){
 
     val cart = viewModel.cart.observeAsState()
     val quantity = mutableIntStateOf(viewModel.cart.value?.items?.get(itemName) ?: 0)
-    val storeItem = viewModel.storeItems.value?.find { item -> item.name == itemName }
+    val storeItem = viewModel.prodsList.value?.find { item -> item.name == itemName }
 
     ElevatedCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),

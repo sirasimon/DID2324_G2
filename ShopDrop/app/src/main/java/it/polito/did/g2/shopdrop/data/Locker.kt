@@ -2,6 +2,7 @@ package it.polito.did.g2.shopdrop.data
 
 class Locker(
     val id : String? = null,
+    val name: String? = null,
     val address : String,
     val compartments : List<Compartment>? = null,
     var isOnline : Boolean = false,
@@ -22,5 +23,14 @@ class Locker(
         }
 
         return freeCompartment
+    }
+
+    override fun toString(): String {
+
+        var compartmentslist = ""
+        compartments?.forEach { compartmentslist += it.toString()+"\n" }
+
+        return "Locker \"$name\" ($id) @ $address\n\tSTATUS: online = $isOnline – working = $isWorking – full = $isFull – empty = $isEmpty" +
+                "\n\ttotal compartments: ${compartments?.size}" + compartments?.forEach { it.toString() }
     }
 }

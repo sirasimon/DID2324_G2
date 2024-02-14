@@ -27,7 +27,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -39,11 +38,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -57,6 +56,7 @@ import it.polito.did.g2.shopdrop.data.Order
 import it.polito.did.g2.shopdrop.data.OrderStateName
 import it.polito.did.g2.shopdrop.data.StoreItem
 import it.polito.did.g2.shopdrop.data.TabScreen
+import it.polito.did.g2.shopdrop.navigation.Screens
 import it.polito.did.g2.shopdrop.ui.cst.common.BottomBar
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -74,7 +74,7 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
     var searchBarFocussed by remember{ mutableStateOf(false) }
 
     //Items
-    val itemList = viewModel.storeItems.value
+    val itemList = viewModel.prodsList.observeAsState()
 
     //Bottom sheet
     val bottomSheetState = rememberModalBottomSheetState()
@@ -132,15 +132,15 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
                     //TODO Pending orders
                     //TODO impedire visualizzazione quando si sta cercando un prodotto
                     //TODO controllare il vm che ci siano ordini pendenti ed eventualmente mostrarli
-                    //if(viewModel.hasPending.value!!)    //Condizione dei pending order
-                    //    PendingOrdersCard(navController, viewModel)
+                    if(viewModel.hasPending.value!!)    //Condizione dei pending order
+                        PendingOrdersCard(navController, viewModel)
 
                     if(query==""){
-                        itemList?.map{it.category}
+                        itemList.value?.map{it.category}
                             ?.distinct()
                             ?.sortedBy { it.toString() }
                             ?.forEach {
-                                val itList = itemList?.filter{ storeItem -> storeItem.category==it }
+                                val itList = itemList.value?.filter{ storeItem -> storeItem.category==it }
 
                                 if(!itList.isNullOrEmpty())
                                     CategorySection(
@@ -154,12 +154,12 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
                                     )
                         }
                     }else{
-                        itemList?.filter{it.name.contains(query)}
+                        itemList.value?.filter{it.name.contains(query)}
                             ?.map{it.category}
                             ?.distinct()
                             ?.sortedBy { it.toString() }
                             ?.forEach {
-                                val itList = itemList?.filter{ storeItem -> storeItem.category==it && storeItem.name.contains(query) }
+                                val itList = itemList.value?.filter{ storeItem -> storeItem.category==it && storeItem.name.contains(query) }
 
                                 if(!itList.isNullOrEmpty())
                                     CategorySection(
@@ -204,6 +204,7 @@ fun PendingOrdersCard(navController: NavController, viewModel: MainViewModel){
                 .padding(16.dp)
                 .fillMaxWidth()
         ){
+            /*
             viewModel.pendingOrdersList.value?.forEachIndexed{i, it ->
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()){
                     OrderListItem(order = it, navController, viewModel)
@@ -212,6 +213,8 @@ fun PendingOrdersCard(navController: NavController, viewModel: MainViewModel){
                         HorizontalDivider()
                 }
             }
+
+             */
         }
 
         /*
@@ -271,7 +274,7 @@ fun OrderListItem(order: Order, navController: NavController, viewModel: MainVie
         leadingContent = { Icon(icon, contentDescription = null) },
         trailingContent = {
             if (scannable)
-                IconButton(onClick = { navController.navigate("CameraScreen") }) {
+                IconButton(onClick = { navController.navigate(Screens.CstCamera.route) }) { //TODO: aggiungere qui l'argomento alla navigazione dell'ID dell'ordine
                     Icon(Icons.Filled.QrCodeScanner, contentDescription = null)
                 }
         },
@@ -279,7 +282,7 @@ fun OrderListItem(order: Order, navController: NavController, viewModel: MainVie
             .fillMaxWidth()
             .clickable {
                 viewModel.targetOrderID = order.id
-                navController.navigate("COrderDetailScreen")
+                navController.navigate(Screens.CstOrderDetail.route) //TODO: aggiungere qui l'argomento alla navigazione dell'ID dell'ordine
             }
     )
 }

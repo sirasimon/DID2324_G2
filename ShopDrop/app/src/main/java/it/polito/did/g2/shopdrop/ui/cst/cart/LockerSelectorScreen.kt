@@ -117,8 +117,21 @@ fun LockerSelectorScreen(navController: NavController, viewModel: MainViewModel)
 
                         composable(ViewTab.LIST.toString()){
                             Column(Modifier.fillMaxWidth()) {
+                                //viewModel.getLockers()
                                 ListItem(
                                     headlineContent = { Text(text = "Locker #1") },
+                                    trailingContent = {
+                                        RadioButton(
+                                            selected = true,
+                                            onClick = { /*TODO*/ })
+                                    },
+                                    modifier = Modifier.clickable {
+                                        //TODO
+                                    }
+                                )
+
+                                ListItem(
+                                    headlineContent = { Text(text = "Locker #2") },
                                     trailingContent = {
                                         RadioButton(
                                             selected = true,
@@ -141,13 +154,13 @@ fun LockerSelectorScreen(navController: NavController, viewModel: MainViewModel)
 @Composable
 private fun FabSelectLocker(navController: NavController, viewModel: MainViewModel) {
     ExtendedFloatingActionButton(
-        onClick = { navController.navigateUp() /*TODO*/ },
+        onClick = { navController.navigateUp() /*TODO Libera tutti gli altri e impegna solo quello selezionato*/ },
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 32.dp)
     ) {
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()){
-            Text(text="${String.format("%.2f", viewModel.getCartTotal())} €")
+            Text(text= stringResource(id = R.string.btn_select_locker).capitalize())
             Text(stringResource(id = R.string.btn_order_now).capitalize())
         }
     }

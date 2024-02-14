@@ -103,4 +103,6 @@ dependencies {
     implementation("com.google.zxing:core:3.3.3")
 
     implementation("androidx.core:core-splashscreen:1.0.1")
+
+    implementation("androidx.datastore:datastore-preferences-core:1.0.0")
 }

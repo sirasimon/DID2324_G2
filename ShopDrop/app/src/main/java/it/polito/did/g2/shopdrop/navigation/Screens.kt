@@ -7,7 +7,7 @@ const val CRR_ROUTE = "crr"
 
 sealed class Screens(val route: String) {
     // LOGIN SCREEN
-    object ScreenLoginRoute : Screens("Login")
+    object Login : Screens("Login")
 
     // CUSTOMER SCREENS ############################################################################
     object CstHome : Screens("CstHomeScreen")
@@ -20,7 +20,7 @@ sealed class Screens(val route: String) {
     object CstOrderSent : Screens("CstOrderSentScreen")
 
     object CstProfile : Screens("CstProfileScreen")
-    object CstCameraScreen : Screens("CstProfileScreen")
+    object CstCamera : Screens("CstCameraScreen")
 
     // Orders
     object CstOrderHistory : Screens("CstOrdersOverviewScreen")

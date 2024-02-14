@@ -3,27 +3,15 @@ package it.polito.did.g2.shopdrop.ui.cst.orders
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material3.Card
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -33,28 +21,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
-import it.polito.did.g2.shopdrop.data.Order
 import it.polito.did.g2.shopdrop.data.TabScreen
-import it.polito.did.g2.shopdrop.ui.cst.common.BottomBar
-import it.polito.did.g2.shopdrop.ui.cst.common.ScanButton
-import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun COrderDetailScreen(navController : NavController, vm : MainViewModel){
-    var currentTab = TabScreen.HOME
+    val currentTab = TabScreen.HOME
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
-    val order : Order? = vm.pendingOrdersList.value?.find{it.id==vm.targetOrderID}
+    //val order : Order? = vm.pendingOrdersList.value?.find{it.id==vm.targetOrderID}
 
+    Text("TODO!!!")
+    /*
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -144,6 +129,8 @@ fun COrderDetailScreen(navController : NavController, vm : MainViewModel){
             }
         }
     }
+
+     */
 }
 
 @Composable
@@ -178,7 +165,8 @@ fun OrderStateList(msg : String, time : String?){
 
 //UTILI e vecchi
 //TODO Utile per la spesa sotto, qui non ha bisogno di essere scrollabile
-/*              val updateScrollState = rememberScrollState()
+/*
+val updateScrollState = rememberScrollState()
                 Column(modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp)

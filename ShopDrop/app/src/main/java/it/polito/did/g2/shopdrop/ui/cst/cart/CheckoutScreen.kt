@@ -1,5 +1,7 @@
 package it.polito.did.g2.shopdrop.ui.cst.cart
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,7 +33,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -42,7 +43,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
+import it.polito.did.g2.shopdrop.data.Fees
 import it.polito.did.g2.shopdrop.navigation.Screens
+import it.polito.did.g2.shopdrop.ui.cst.common.ArrowRt
 import it.polito.did.g2.shopdrop.ui.cst.common.TopBar
 import it.polito.did.g2.shopdrop.ui.cst.common.WIPMessage
 import it.polito.did.g2.shopdrop.ui.cst.common.performDevMsg
@@ -57,10 +60,16 @@ fun CSTCheckoutScreen(navController: NavController, viewModel: MainViewModel) {
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun placeOrder(){
+        viewModel.placeOrder()
+        navController.navigate(Screens.CstOrderSent.route)
+    }
+
     Scaffold(
         topBar = { TopBar(navController, stringResource(id = R.string.title_order_summary), scrollBehavior) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        floatingActionButton = { FabProceed(navController, viewModel) },
+        floatingActionButton = { FabProceed(viewModel.getCartTotal()) { placeOrder() } },
         floatingActionButtonPosition = FabPosition.Center,
         snackbarHost = { WIPMessage(snackbarHostState) }
     ) { paddingValues ->
@@ -79,7 +88,7 @@ fun CSTCheckoutScreen(navController: NavController, viewModel: MainViewModel) {
                     if(!viewModel.cart.value?.items.isNullOrEmpty()){
                         viewModel.cart.value?.items?.forEach {
                             val subTot : Float =
-                                viewModel.storeItems.value?.filter { si -> si.name == it.key }?.map{ si -> si.price}?.sum()?.times(it.value) ?: 0f
+                                viewModel.prodsList.value?.filter { si -> si.name == it.key }?.map{ si -> si.price}?.sum()?.times(it.value) ?: 0f
 
                             Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()){
                                 Row(){
@@ -98,7 +107,11 @@ fun CSTCheckoutScreen(navController: NavController, viewModel: MainViewModel) {
                 Spacer(Modifier.height(16.dp))
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.background(Color.LightGray, RoundedCornerShape(16.dp)).fillMaxWidth().height(200.dp).clickable { navController.navigate(Screens.CstLockerSelector.route) }
+                    modifier = Modifier
+                        .background(Color.LightGray, RoundedCornerShape(16.dp))
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .clickable { navController.navigate(Screens.CstLockerSelector.route) }
                 ){
                     Text("[Locker selector]")
                 }
@@ -108,20 +121,23 @@ fun CSTCheckoutScreen(navController: NavController, viewModel: MainViewModel) {
                         .fillMaxWidth()
                 ){
                     ListItem(
-                        modifier = Modifier.height(70.dp).clickable { performDevMsg(scope, snackbarHostState, context) },
+                        modifier = Modifier
+                            .height(70.dp)
+                            .clickable { performDevMsg(scope, snackbarHostState, context) },
                         headlineContent = {
                             Column {
                                 Text(stringResource(id = R.string.title_payment_method).capitalize())
                                 
                                 Row(){
                                     Text("**** 4187")
-                                    Image(painter= painterResource(id = R.drawable.mastercard), contentDescription = "mastercard logo", Modifier.height(24.dp).padding(horizontal = 8.dp))
+                                    Image(painter= painterResource(id = R.drawable.mastercard), contentDescription = "mastercard logo",
+                                        Modifier
+                                            .height(24.dp)
+                                            .padding(horizontal = 8.dp))
                                 }
                             }
                         },
-                        trailingContent = {
-                            Image(painter = painterResource(id = R.drawable.btn_back), modifier = Modifier.graphicsLayer { rotationY = 180f }, contentDescription = null)
-                        }
+                        trailingContent = { ArrowRt() }
                     )
                 }
 
@@ -139,18 +155,18 @@ fun CSTCheckoutScreen(navController: NavController, viewModel: MainViewModel) {
                     )  //TODO
                     PriceItemList(
                         stringResource(R.string.price_shipment).capitalize(),
-                        String.format("%.2f €", viewModel.shipmentFee)
+                        String.format("%.2f €", Fees.SHIPMENT)
                     )
                     PriceItemList(
                         stringResource(R.string.price_service).capitalize(),
-                        String.format("%.2f €", viewModel.serviceFee)
+                        String.format("%.2f €", Fees.SERVICE)
                     )
                     PriceListTotal(
                         stringResource(R.string.price_total).uppercase(),
                         String.format(
                             "%.2f €",
                             (viewModel.cart.value?.subtot
-                                ?: 0f) + viewModel.shipmentFee + viewModel.serviceFee
+                                ?: 0f) + Fees.total()
                         )
                     )
 
@@ -162,15 +178,15 @@ fun CSTCheckoutScreen(navController: NavController, viewModel: MainViewModel) {
 }
 
 @Composable
-private fun FabProceed(navController: NavController, viewModel: MainViewModel) {
+private fun FabProceed(total: Float = 0f, onClick: () -> Unit) {
     ExtendedFloatingActionButton(
-        onClick = { navController.navigate(Screens.CstOrderSent.route) },
+        onClick = onClick, //navController.navigate(Screens.CstOrderSent.route)
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 32.dp)
     ) {
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()){
-            Text(text="${String.format("%.2f", viewModel.getCartTotal())} €")
+            Text(text="${String.format("%.2f", total)} €")   //viewModel.getCartTotal()
             Text(stringResource(id = R.string.btn_order_now).capitalize())
         }
     }

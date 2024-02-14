@@ -1,6 +1,8 @@
 package it.polito.did.g2.shopdrop.ui.cst.orders
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,12 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -39,11 +38,13 @@ import androidx.navigation.compose.rememberNavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.data.TabScreen
+import it.polito.did.g2.shopdrop.ui.cst.common.ArrowRt
 import it.polito.did.g2.shopdrop.ui.cst.common.BottomBar
 import it.polito.did.g2.shopdrop.ui.cst.common.TopBar
 
-enum class FilterTab{PEND, ARCH, CANC}
+private enum class CstFilterChip{PEND, ARCH, CANC}
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
@@ -54,9 +55,9 @@ fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     val chipLabels = mapOf(
-        FilterTab.PEND to R.string.chip_pending,
-        FilterTab.ARCH to R.string.chip_collected,
-        FilterTab.CANC to R.string.chip_cancelled
+        CstFilterChip.PEND to R.string.chip_pending,
+        CstFilterChip.ARCH to R.string.chip_collected,
+        CstFilterChip.CANC to R.string.chip_cancelled
     )
 
     Scaffold(
@@ -71,10 +72,10 @@ fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
             color = MaterialTheme.colorScheme.background
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                var activeTab by remember { mutableStateOf(FilterTab.PEND) }
+                var activeTab by remember { mutableStateOf(CstFilterChip.PEND) }
                 Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()){
 
-                    enumValues<FilterTab>().forEach {
+                    enumValues<CstFilterChip>().forEach {
                         FilterChip(
                             onClick = {activeTab = it; listNavController.navigate(it.toString())},
                             label = { Text(stringResource(id = chipLabels[it]!!).capitalize())},
@@ -85,14 +86,14 @@ fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
                 }
 
                 Column {
-                    NavHost(navController = listNavController, startDestination = FilterTab.PEND.toString()){
-                        composable(FilterTab.PEND.toString()) {
+                    NavHost(navController = listNavController, startDestination = CstFilterChip.PEND.toString()){
+                        composable(CstFilterChip.PEND.toString()) {
                             PendingScreen()
                         }
-                        composable(FilterTab.ARCH.toString()){
+                        composable(CstFilterChip.ARCH.toString()){
                             ArchivedScreen()
                         }
-                        composable(FilterTab.CANC.toString()){
+                        composable(CstFilterChip.CANC.toString()){
                             CancelledScreen()
                         }
                     }
@@ -156,7 +157,7 @@ fun OrderListItem(label : String, onClick : ()->Unit){
                 .padding(16.dp)
         ){
             Text(text = label)
-            Icon(Icons.Filled.KeyboardArrowRight, "Open")
+            ArrowRt()
         }
     }
 }

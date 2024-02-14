@@ -19,5 +19,6 @@ enum class UserRole {
     /**
      * Admin
      */
-    ADM
+    ADM,
+    NUL
 }

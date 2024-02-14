@@ -72,7 +72,7 @@ fun CategoryScreen(navController: NavController, viewModel: MainViewModel, categ
             //Text(text = "TEST")
 
             val itemList =
-                viewModel.storeItems.value?.filter{
+                viewModel.prodsList.value?.filter{
                     storeItem ->
                         if(query==null || query=="")
                             storeItem.category==categoryName

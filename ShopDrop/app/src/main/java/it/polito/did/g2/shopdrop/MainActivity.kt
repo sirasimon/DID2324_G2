@@ -1,31 +1,38 @@
 package it.polito.did.g2.shopdrop
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.firebase.ui.storage.BuildConfig
 import it.polito.did.g2.shopdrop.navigation.Nav
 import it.polito.did.g2.shopdrop.ui.theme.ShopDropTheme
 
 class MainActivity : ComponentActivity() {
     private val viewModel by viewModels<MainViewModel>()
 
+    private lateinit var loginSP: SharedPreferences
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.i("MAoCr", "## STARTS HERE ##")
         super.onCreate(savedInstanceState)
 
-        //val sharedPref = getSharedPreferences("shopdrop_pref", Context.MODE_PRIVATE)
-        //val editor = sharedPref.edit()
+        //viewModel.debugInit()
 
-        viewModel.debugInit()
+        Log.i("MAoCr", "\tGetting shared refs at '${BuildConfig.LIBRARY_PACKAGE_NAME}.login_info'")
+        loginSP = getSharedPreferences(BuildConfig.LIBRARY_PACKAGE_NAME+".login_info", Context.MODE_PRIVATE)
 
-        //viewModel.setPrefEditor(editor)
+        viewModel.setLoginSP(loginSP)
+        viewModel.loadCredentials()
 
         installSplashScreen().apply{//Prima di setContent per avviare splashscreen
-            //viewModel.loadCredentials(sharedPref)
             this.setKeepOnScreenCondition{
                 viewModel.isLoading.value
             }
@@ -43,7 +50,7 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
 
-        viewModel.debugSetDefault()
+        //viewModel.debugSetDefault()
     }
 }
 

@@ -18,5 +18,6 @@ enum class OrderStateName {
     RECEIVED,
     CARRIED,
     AVAILABLE,
-    COLLECTED
+    COLLECTED,
+    ERROR
 }
