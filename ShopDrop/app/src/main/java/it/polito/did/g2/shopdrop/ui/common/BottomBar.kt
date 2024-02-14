@@ -15,21 +15,25 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
+import it.polito.did.g2.shopdrop.data.TabScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomBar(currentTab : TabScreen, navController: NavController/*, vm : ViewModel*/){
-    var totalItem = 0
+fun BottomBar(currentTab : TabScreen, navController: NavController, vm : MainViewModel){
+    //val hasBadge by remember{ mutableStateOf(vm.cart.value?.count() != 0) }
+    val badgeNumber by vm.itemsInCart.observeAsState()
 
     NavigationBar() {
         NavigationBarItem(
             selected = currentTab== TabScreen.HOME,
-            onClick = { if(currentTab!= TabScreen.HOME) navController.navigate("ClientHome") },
-            icon = { if(currentTab== TabScreen.HOME) Icon(Icons.Filled.Home, stringResource(R.string.tab_home).capitalize()) else Icon(
-                Icons.Outlined.Home, stringResource(R.string.tab_home).capitalize()) },
+            onClick = { if(currentTab!= TabScreen.HOME) navController.navigate("CustomerHome") },
+            icon = { if(currentTab== TabScreen.HOME) Icon(Icons.Filled.Home, stringResource(R.string.tab_home).capitalize()) else Icon(Icons.Outlined.Home, stringResource(R.string.tab_home).capitalize()) },
             label = { Text(text = stringResource(R.string.tab_home).capitalize()) }
         )
         NavigationBarItem(
@@ -39,16 +43,17 @@ fun BottomBar(currentTab : TabScreen, navController: NavController/*, vm : ViewM
             {
                 BadgedBox(
                     badge = {
-                        if(totalItem!=0){
+                        if(badgeNumber!=0){
                             Badge{
-                                val badgeNumber = "0" /*TODO here read to VM items in cart*/
-                                Text(badgeNumber)
+                                Text("${badgeNumber}")
                             }
                         }
                     }
                 ) {
-                    if(currentTab== TabScreen.CART) Icon(Icons.Filled.ShoppingCart, stringResource(R.string.tab_cart).capitalize()) else Icon(
-                        Icons.Outlined.ShoppingCart, stringResource(R.string.tab_cart).capitalize())
+                    if(currentTab== TabScreen.CART)
+                        Icon(Icons.Filled.ShoppingCart, stringResource(R.string.tab_cart).capitalize())
+                    else
+                        Icon(Icons.Outlined.ShoppingCart, stringResource(R.string.tab_cart).capitalize())
                 }
             },
             label = { Text(text = stringResource(R.string.tab_cart).capitalize()) }

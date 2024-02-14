@@ -16,12 +16,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
-import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
@@ -33,19 +31,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import it.polito.did.g2.shopdrop.MainViewModel
+import it.polito.did.g2.shopdrop.data.TabScreen
 import it.polito.did.g2.shopdrop.ui.common.BottomBar
-import it.polito.did.g2.shopdrop.ui.common.TabScreen
-import it.polito.did.g2.shopdrop.ui.common.TopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun COrderListScreen(navController : NavController){
+fun COrderListScreen(navController : NavController, viewModel : MainViewModel){
     val listNavController = rememberNavController()
 
     var state by remember { mutableStateOf(0) }
@@ -56,11 +53,9 @@ fun COrderListScreen(navController : NavController){
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
-        topBar = { TopBar(currentTab, "...", scrollBehavior = scrollBehavior) },
-        bottomBar = { BottomBar(currentTab, navController) },
+        //topBar = { TopBar(currentTab, "...", scrollBehavior = scrollBehavior) },
+        bottomBar = { BottomBar(currentTab, navController, viewModel) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        //floatingActionButton = { AddButton(onClick = {/*TODO*/}) },
-        //floatingActionButtonPosition = FabPosition.End
     ) { paddingValues ->
         Surface(
             modifier = Modifier
@@ -70,6 +65,7 @@ fun COrderListScreen(navController : NavController){
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 //SOLUZIONE 1
+                /*
                 PrimaryTabRow(selectedTabIndex = state) {
                     options.forEachIndexed { index, title ->
                         Tab(
@@ -82,19 +78,27 @@ fun COrderListScreen(navController : NavController){
                         )
                     }
                 }
+                */
 
                 //SOLUZIONE 2
                 MultiChoiceSegmentedButtonRow {
                     options.forEachIndexed { index, label ->
+
                         SegmentedButton(
                             shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-                            onCheckedChange = { state = index },
+                            onCheckedChange = {
+                                state = index
+                                listNavController.navigate(label)
+                                              },
                             checked = index == state
                         ) {
                             Text(label)
                         }
                     }
                 }
+
+                //SOLUZIONE 3
+                //Provare con outlined button
 
                 Column {
                     NavHost(navController = listNavController, startDestination = "Pending"){
