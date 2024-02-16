@@ -152,7 +152,8 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
                                             showBottomSheet = true
                                         }
                                     )
-                        }
+                            }
+
                     }else{
                         itemList.value?.filter{it.name.contains(query)}
                             ?.map{it.category}

@@ -113,7 +113,12 @@ fun CSTProfileScreen(navController: NavController, viewModel: MainViewModel){
                 ProfileItemList(label = stringResource(R.string.title_help).capitalize(), onClick = {performDevMsg(scope, snackbarHostState, context)})
                 ProfileItemList(label = stringResource(R.string.title_support).capitalize(), onClick = { performDevMsg(scope, snackbarHostState, context) })
 
-                TextButton(onClick = { navController.navigate("Login") }) {
+                TextButton(
+                    onClick = {
+                        viewModel.logout()
+                        navController.navigate(Screens.Login.route)
+                    }
+                ) {
                     Text(stringResource(R.string.btn_log_out).capitalize())
                 }
             }

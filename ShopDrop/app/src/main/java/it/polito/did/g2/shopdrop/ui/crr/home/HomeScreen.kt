@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
@@ -32,12 +33,13 @@ import androidx.navigation.compose.rememberNavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.data.TabScreen
+import it.polito.did.g2.shopdrop.navigation.Screens
 
 private enum class CrrFilterChip{COL, DEL}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CarrierHomeScreen(navController : NavController, viewModel: MainViewModel){
+fun CRRHomeScreen(navController : NavController, viewModel: MainViewModel){
 
     val listNavController = rememberNavController()
 
@@ -84,6 +86,14 @@ fun CarrierHomeScreen(navController : NavController, viewModel: MainViewModel){
                         composable(CrrFilterChip.DEL.toString()){
                             //ArchivedScreen()
                         }
+                    }
+
+                    Button(onClick = {navController.navigate(Screens.CrrProfileScreen.route)}){
+                        Text(text = "Go to profile")
+                    }
+
+                    Button(onClick = {viewModel.logout(); navController.navigate(Screens.Login.route)}){
+                        Text(text = "Log out")
                     }
                 }
             }

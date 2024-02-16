@@ -6,7 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import it.polito.did.g2.shopdrop.MainViewModel
-import it.polito.did.g2.shopdrop.ui.crr.home.CarrierHomeScreen
+import it.polito.did.g2.shopdrop.ui.crr.home.CRRHomeScreen
+import it.polito.did.g2.shopdrop.ui.crr.profile.CRRProfileScreen
 
 fun NavGraphBuilder.crrNavGraph(
     navController: NavHostController,
@@ -18,12 +19,12 @@ fun NavGraphBuilder.crrNavGraph(
     ){
         composable(route = Screens.CrrHomeScreen.route){
             //TODO
-            CarrierHomeScreen(navController, viewModel)
+            CRRHomeScreen(navController, viewModel)
         }
 
         composable(route = Screens.CrrProfileScreen.route){
             //TODO
-            Text("CRR PROFILE SCREEN")
+            CRRProfileScreen(navController, viewModel)
         }
 
         composable(route = Screens.CrrCameraScreen.route){

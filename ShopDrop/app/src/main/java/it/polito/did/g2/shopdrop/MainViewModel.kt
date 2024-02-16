@@ -93,7 +93,7 @@ class MainViewModel() : ViewModel(){
         Log.i("SAVE_CREDS", "DONE!")
     }
 
-    suspend fun login(userQuery: UserQuery){
+    fun login(userQuery: UserQuery){
 
         val targetUID = fbRepo.usersList.value?.find { it.email == userQuery.email }?.uid
 
@@ -102,6 +102,7 @@ class MainViewModel() : ViewModel(){
 
             if(fbRepo.usersList.value?.find { it.uid == targetUID }?.password == userQuery.password){
                 _currUser.value = fbRepo.usersList.value!!.find { it.uid == targetUID }
+                userQuery.role = _currUser.value?.role
 
                 saveCredentials(_currUser.value!!)
 
@@ -111,68 +112,11 @@ class MainViewModel() : ViewModel(){
         }else{
             userQuery.errType = UserQuery.LOGIN_ERROR_TYPE.NOT_FOUND
         }
+    }
 
-        /*
-        users.orderByChild("email")
-            .equalTo(userQuery.email)
-            .addListenerForSingleValueEvent(
-                object : ValueEventListener {
-                    override fun onDataChange(dataSnapshot: DataSnapshot) {
-                        if(dataSnapshot.children.count()==1){
-                            Log.i("LOGIN", "FOUND 1 OCCURRENCE FOR EMAIL ${userQuery.email}")
-                            for (snapshot in dataSnapshot.children) {
-                                // Trovato un nodo con l'attributo desiderato e il valore noto
-                                _userID.value = snapshot.key
-
-                                userQuery.role = enumValueOf<UserRole>(snapshot.child("role").getValue<String>()?:"")
-                                Log.i("LOGIN", "FOUND ${_userID.value}")
-
-                                users.child(snapshot.key?:"").child("password")
-                                    .addValueEventListener(
-                                        object : ValueEventListener {
-                                            override fun onDataChange(dataSnapshot: DataSnapshot) {
-
-                                                Log.i("LOGIN", "Stored password is ${dataSnapshot.value}")
-
-                                                if(userQuery.password!=dataSnapshot.value){
-                                                    userQuery.errType = UserQuery.LOGIN_ERROR_TYPE.PASSWORD
-
-                                                    Log.e("LOGIN", "PASSWORD IS NOT VALID")
-                                                }else{
-                                                    userQuery.errType = null
-                                                    Log.i("LOGIN", "PASSWORD IS VALID")
-                                                }
-
-                                            }
-
-                                            override fun onCancelled(databaseError: DatabaseError) {
-                                                userQuery.role = null
-                                                userQuery.errType = UserQuery.LOGIN_ERROR_TYPE.UNKNOWN
-
-                                                Log.e("LOGIN", "UNKNOWN ERROR")
-                                            }
-                                        }
-                                    )
-                            }
-                        }else{
-                            if(userQuery.errType == null){
-                                Log.e("LOGIN", "FOR EMAIL ${userQuery.email} COUNTED ${dataSnapshot.children.count()} OCCURRENCES")
-                                userQuery.role = null
-                                userQuery.errType = UserQuery.LOGIN_ERROR_TYPE.NOT_FOUND
-                            }
-                        }
-                    }
-
-                    override fun onCancelled(databaseError: DatabaseError) {
-                        userQuery.role = null
-                        userQuery.errType = UserQuery.LOGIN_ERROR_TYPE.UNKNOWN
-
-                        Log.e("LOGIN", "UNKNOWN ERROR")
-                    }
-                }
-            )
-
-         */
+    fun logout(){
+        Log.i("LOGOUT", "Removing login data from shared preferences")
+        loginSP.edit().clear().apply()
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////        PRODUCTS
