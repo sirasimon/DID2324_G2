@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- source: https://www.youtube.com/watch?v=Loo4i5IrZ4Y -->
+<resources>
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#FFE0B1</item>
+
+        <item name="windowSplashScreenAnimatedIcon">@drawable/shopdrop_logo</item>
+
+        <item name="postSplashScreenTheme">@style/Theme.ShopDrop</item>
+    </style>
+</resources>
