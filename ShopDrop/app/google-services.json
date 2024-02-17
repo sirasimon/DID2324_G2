@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "450842886913",
+    "firebase_url": "https://did23-shopdrop-default-rtdb.firebaseio.com",
+    "project_id": "did23-shopdrop",
+    "storage_bucket": "did23-shopdrop.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:450842886913:android:606d765fac59fd935ed100",
+        "android_client_info": {
+          "package_name": "it.polito.did.g2.shopdrop"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrqBhyxB3Dq6OsfoWc-0YqXhSzdx43oRY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
