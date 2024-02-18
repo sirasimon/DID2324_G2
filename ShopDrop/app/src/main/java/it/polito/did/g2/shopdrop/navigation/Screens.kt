@@ -30,6 +30,7 @@ sealed class Screens(val route: String) {
     object CrrHomeScreen : Screens("CrrHomeScreen")
     object CrrCameraScreen : Screens("CrrCameraScreen")
     object CrrProfileScreen : Screens("CrrProfileScreen")
+    object CrrDeliveryScreen: Screens("CrrDeliveryScreen")
 
     //ADMIN SCREENS ################################################################################
     object AdmHomeScreen : Screens("AdmHomeScreen")
