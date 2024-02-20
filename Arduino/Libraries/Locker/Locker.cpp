@@ -5,7 +5,7 @@
 #include "CustomTimer.h"
 #include "Locker.h"
 
-Locker::Locker(CustomServo& servo, CustomServo& bumpServo, MagneticSensor& sensor, char id): _servo(servo), _bumpServo(bumpServo), _sensor(sensor) {
+Locker::Locker(CustomServo& servo, CustomServo& bumpServo, MagneticSensor& sensor, String id): _servo(servo), _bumpServo(bumpServo), _sensor(sensor) {
   _id = id;
 }
 
@@ -23,7 +23,7 @@ void Locker::_openUnlock_exit() { }
 #pragma endregion 
 
 #pragma region OpenBump State
-void Locker::_openBump_enter() {
+void Locker::_openBump_enter() { 
   _bumpServo.sweep(180);
 }
 void Locker::_openBump_update() {
@@ -41,12 +41,18 @@ void Locker::_open_enter() {
   _closeEnabled = false;
 }
 void Locker::_open_update() {
-  if (!_closeEnabled && _sensor.check()) {
-    _sensor.calibrationValue = _sensor.read();
-    _closeEnabled = true;
+  if (!debugMode) {
+    if (!_closeEnabled && (!_sensor.check())) {
+      _closeEnabled = true;
+    }
+    else if (_closeEnabled && _sensor.check()) {
+      _change_state(closed);
+    }
   }
-  else if (_closeEnabled && _sensor.check()) {
-    _change_state(closed);
+  else {
+    if (_input_sent && _com == 'c') {
+      _change_state(closed);
+    }
   }
 }
 void Locker::_open_exit() { }
@@ -55,20 +61,36 @@ void Locker::_open_exit() { }
 #pragma region Closed State
 void Locker::_closed_enter() {
   Serial.println("Locker " + String(_id) + " state has changed to CLOSED");
-  _sensor.calibrationValue = _sensor.read();
   _servo.sweep(90);
 }
 void Locker::_closed_update() {
-  if (_input_sent && _com == '0') {
+  if (_input_sent && _com == 'o') {
     _change_state(openUnlock);
   }
 }
 void Locker::_closed_exit() { }
 #pragma endregion
 
+#pragma region Starting State
+void Locker::_starting_enter() {
+  Serial.println("Locker " + String(_id) + " STATE has changed to STARTING");
+  _servo.sweep(90);
+}
+void Locker::_starting_update() {
+  if (_servo._currentAngle == 90) {
+    _change_state(closed);
+  }
+}
+void Locker::_starting_exit() {
+  delay(5000);
+  _sensor.calibrationValue = _sensor.readTimeAverage(5000);
+  Serial.println("Locker " + String(_id) + " magnetic calibration value: " + String(_sensor.calibrationValue));
+}
+#pragma endregion
+
 #pragma region Other
 void Locker::init() {
-  _change_state(open);
+  _change_state(starting);
   _closeEnabled = true;
 }
 void Locker::send_input(char com) {
@@ -88,6 +110,9 @@ void Locker::update() {
     case open:
       _open_update();
       break;
+    case starting:
+      _starting_update();
+      break;
     case closed:
       _closed_update();  
       break; 
@@ -106,6 +131,9 @@ void Locker::_change_state(state nextState) {
     case open: 
       _open_exit(); 
       break;
+    case starting:
+      _starting_exit();
+      break;
     case closed:
       _closed_exit();
       break;
@@ -122,6 +150,9 @@ void Locker::_change_state(state nextState) {
       break;
     case open: 
       _open_enter(); 
+      break;
+    case starting:
+      _starting_enter();
       break;
     case closed:
       _closed_enter();

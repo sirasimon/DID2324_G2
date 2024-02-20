@@ -7,20 +7,22 @@
 #include "CustomTimer.h"
 class Locker {
   public:
-    Locker(CustomServo& servo, CustomServo& bumpServo, MagneticSensor& sensor, char id);
+    Locker(CustomServo& servo, CustomServo& bumpServo, MagneticSensor& sensor, String id);
     void send_input(char com);
     void update();
     void init();
     bool isClosed();
     enum state {
       invalid,
+      starting,
       openUnlock,
       open,
       openBump,
       closed
     };
-    char _id;
+    String _id;
     state _currentState;
+    bool debugMode;
   private:
     CustomServo& _servo;
     CustomServo& _bumpServo;
@@ -40,6 +42,9 @@ class Locker {
     void _closed_enter();
     void _closed_update();
     void _closed_exit();
+    void _starting_enter();
+    void _starting_update();
+    void _starting_exit();
     void _change_state(state nextState);
 };
 #endif

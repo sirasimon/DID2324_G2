@@ -14,45 +14,112 @@ COMMANDS FOR LOCKERS
 #include <CustomServo.h>
 #include <Locker.h>
 
-Servo doorServoA;
+Servo lockServoA;
 Servo bumpServoA;
-MagneticSensor doorSensorA(A0, 30);
-CustomServo doorCustomServoA(doorServoA, 11, 200, 1);
-CustomServo bumpCustomServoA(bumpServoA, 10, 400, 1);
-Locker lockerA(doorCustomServoA, bumpCustomServoA, doorSensorA, 'A');
+Servo lockServoB;
+Servo bumpServoB;
+MagneticSensor doorSensorA(A0, 35);
+MagneticSensor doorSensorB(A1, 100);
+CustomServo lockCustomServoA(lockServoA, 11, 200, 1);
+CustomServo bumpCustomServoA(bumpServoA, 10, 200, 1);
+CustomServo lockCustomServoB(lockServoB, 6, 200, 1);
+CustomServo bumpCustomServoB(bumpServoB, 9, 200, 1);
+Locker lockerA(lockCustomServoA, bumpCustomServoA, doorSensorA, "LT02_1");
+Locker lockerB(lockCustomServoB, bumpCustomServoB, doorSensorB, "LT02_2");
 int charCounter = 0;
 int locker;
+bool espReady = false;
 
+void i2cReceiveCallback(int size) {
+  while (Wire.available() > 0) {
+    char data = Wire.read();
+    if (data == 'a') {
+      lockerA.send_input('o');
+    }
+    else if (data == 'b') {
+      lockerB.send_input('o');
+    }
+    else if (data == 'r') {
+      espReady = true;
+    }
+  }
+}
+void i2cRequestCallback() {
+  if (lockerA.isClosed()) {
+    Wire.write('a');
+  }
+  else {
+    Wire.write('_');
+  }
+  if (lockerB.isClosed()) {
+    Wire.write('b');
+  }
+  else {
+    Wire.write('_');
+  }
+}
 void setup() {
-  Serial.begin(9600);
-  Serial.println("START");
-  doorSensorA.init();
-  //Serial.println("Sensor A calibration " + String(doorSensorA.calibrationValue));
-  doorCustomServoA.init();
+  Serial.begin(115200);
+  delay(1000);
+  Serial.println(" ");
+  Serial.println("=======================================================================");
+  Serial.println("STARTING UNO");
+  lockCustomServoA.init();
   bumpCustomServoA.init();
+  lockCustomServoB.init();
+  bumpCustomServoB.init();
   lockerA.init();
+  lockerB.init();
   Wire.begin(8);
-  Wire.onReceive(receiveEvent);
-  Wire.onRequest(requestEvent);
-  delay(2000);
+  Wire.onReceive(i2cReceiveCallback);
+  Wire.onRequest(i2cRequestCallback);
+  delay(1000);
+  Serial.println("WAITING FOR ESP");
+  while (!espReady) {
+    Serial.print(".");
+    delay(300);
+  }
+  Serial.print("\n");
+  Serial.println("Esp ready");
+  Serial.println("UNO STARTED");
 }   
 
 void loop() {
   lockerA.update();
-  //Serial.println("Sensor reading: " + String(doorSensorA.read()));
+  lockerB.update();
+  //simReceiveEvent();
 }
-void receiveEvent(int size) {
-  while (Wire.available() > 0) {
-    char c = Wire.read();
+
+/*
+void simReceiveEvent() {
+  char data = Serial.read();
+  if (data == 'a') {
+    lockerA.send_input('c');
+  }
+  else if (data == 'b') {
+    lockerB.send_input('c');
+  }
+}
+*/
+
+/*
+void simReceiveEvent() {
+  while (Serial.available() > 0) {
+    char c = Serial.read();
     if (charCounter == 0) {
       if (c == lockerA._id)
         locker = 1;
+      else if (c == lockerB._id)
+        locker = 2;
     }
     else if (c != '\n') {
       if (locker == 1)
       {
-        Serial.println("sent input to locker1 " + String(c));
+        Serial.println("Received input for locker A " + String(c));
         lockerA.send_input(c);
+      }
+      else if (locker == 2) {
+        Serial.println("Received input for locker B " + String(c));
       }
     }
   charCounter++;
@@ -60,11 +127,28 @@ void receiveEvent(int size) {
     charCounter = 0;
   }
 }
-void requestEvent() {
-  if (lockerA.isClosed()) {
-    Wire.write('c');
-  }
-  else {
-    Wire.write('o');
+void i2cReceiveCallback(int size) {
+  while (Wire.available() > 0) {
+    char c = Wire.read();
+    if (charCounter == 0) {
+      if (c == lockerA._id)
+        locker = 1;
+      else if (c == lockerB._id)
+        locker = 2;
+    }
+    else if (c != '\n') {
+      if (locker == 1)
+      {
+        Serial.println("Received input for locker A " + String(c));
+        lockerA.send_input(c);
+      }
+      else if (locker == 2) {
+        Serial.println("Received input for locker B " + String(c));
+      }
+    }
+  charCounter++;
+  if (c == '\n')
+    charCounter = 0;
   }
 }
+*/
