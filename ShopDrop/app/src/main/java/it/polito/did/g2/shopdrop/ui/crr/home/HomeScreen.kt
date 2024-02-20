@@ -27,9 +27,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -46,7 +45,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -58,7 +56,7 @@ import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.data.TabScreen
 import it.polito.did.g2.shopdrop.navigation.Screens
 
-private enum class CrrFilterChip{COL, DEL}
+private enum class CrrFilterChip{COLL, DELI}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,8 +71,8 @@ fun CRRHomeScreen(navController : NavController, viewModel: MainViewModel){
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     val chipLabels = mapOf(
-        CrrFilterChip.COL to R.string.chip_to_collect,
-        CrrFilterChip.DEL to R.string.chip_to_deliver
+        CrrFilterChip.COLL to R.string.chip_to_collect,
+        CrrFilterChip.DELI to R.string.chip_to_deliver
     )
 
     Scaffold(
@@ -100,8 +98,17 @@ fun CRRHomeScreen(navController : NavController, viewModel: MainViewModel){
                 Button(onClick = {navController.navigate(Screens.CrrProfileScreen.route)}){
                     Text(text = "Go to profile")
                 }
+
+                TextButton(
+                    onClick = {
+                        viewModel.logout()
+                        navController.navigate(Screens.Login.route)
+                    }
+                ) {
+                    Text(stringResource(R.string.btn_log_out).capitalize())
+                }
             }
-            }
+        }
 
 
 
@@ -155,12 +162,12 @@ fun TabSection(navController: NavController) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     val chipLabels = mapOf(
-        CrrFilterChip.COL to R.string.chip_to_collect,
-        CrrFilterChip.DEL to R.string.chip_to_deliver
+        CrrFilterChip.COLL to R.string.chip_to_collect,
+        CrrFilterChip.DELI to R.string.chip_to_deliver
     )
     val selectedTabIndex = remember { mutableStateOf(0) }
 
-    var activeTab by remember { mutableStateOf(CrrFilterChip.COL) }
+    var activeTab by remember { mutableStateOf(CrrFilterChip.COLL) }
     Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()){
 
         enumValues<CrrFilterChip>().forEach {
@@ -175,11 +182,11 @@ fun TabSection(navController: NavController) {
     }
 
     Column {
-        NavHost(navController = listNavController, startDestination = CrrFilterChip.COL.toString()){
-            composable(CrrFilterChip.COL.toString()) {
+        NavHost(navController = listNavController, startDestination = CrrFilterChip.COLL.toString()){
+            composable(CrrFilterChip.COLL.toString()) {
                 //PendingScreen()
             }
-            composable(CrrFilterChip.DEL.toString()){
+            composable(CrrFilterChip.DELI.toString()){
                 //ArchivedScreen()
             }
         }

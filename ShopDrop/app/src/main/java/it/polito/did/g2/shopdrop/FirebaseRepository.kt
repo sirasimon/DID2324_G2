@@ -340,7 +340,11 @@ class FirebaseRepository {
 
             dbRefUsers.child(userID)
                 .child("orders")
-                .setValue(mapOf(orderRef to order.stateList?.last()?.state.toString()))
+                .setValue(
+                    mapOf(
+                        orderRef.key to order.stateList?.last()?.state.toString()
+                    )
+                )
                 .addOnSuccessListener { cLog("\tOrder ${order.id} added to user $userID") }
                 .addOnFailureListener { Log.e("ADD_ORD", "FAILED TO ADD THE ORDER (# ${order.id}) TO THE USER $userID") }
 

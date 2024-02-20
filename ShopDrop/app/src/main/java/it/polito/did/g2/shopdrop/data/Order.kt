@@ -34,6 +34,11 @@ class Order(
     }
 
     override fun toString(): String {
-        return "ID: $id – last state: ${stateList?.last()?.state.toString()}\n\tstoreID: $storeID | carrierID: $carrierID | customerID: $customerID | lockerID: $lockerID\n\titems: ${items?.toString()}\n\tstate list: ${stateList?.toString()}"
+
+        var statesString = ""
+
+        stateList?.forEach { statesString+=" ${it.state} @ ${it.timestamp} –> " }
+
+        return "ID: $id – last state: ${stateList?.last()?.state.toString()}\n\tstoreID: $storeID | carrierID: $carrierID | customerID: $customerID | lockerID: $lockerID\n\titems: ${items?.toString()}\n\tstate list: [$statesString]"
     }
 }
