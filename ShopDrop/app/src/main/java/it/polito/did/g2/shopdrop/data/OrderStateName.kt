@@ -19,5 +19,6 @@ enum class OrderStateName {
     CARRIED,
     AVAILABLE,
     COLLECTED,
-    ERROR
+    ERROR,
+    CANCELLED
 }

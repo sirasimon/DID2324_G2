@@ -4,13 +4,25 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesomeMosaic
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DeliveryDining
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.MoveToInbox
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import it.polito.did.g2.shopdrop.data.Cart
 import it.polito.did.g2.shopdrop.data.CollectionStep
 import it.polito.did.g2.shopdrop.data.Fees
+import it.polito.did.g2.shopdrop.data.Locker
 import it.polito.did.g2.shopdrop.data.Order
+import it.polito.did.g2.shopdrop.data.OrderStateName
+import it.polito.did.g2.shopdrop.data.Store
 import it.polito.did.g2.shopdrop.data.StoreItem
 import it.polito.did.g2.shopdrop.data.users.AdmUser
 import it.polito.did.g2.shopdrop.data.users.CrrUser
@@ -20,6 +32,8 @@ import it.polito.did.g2.shopdrop.data.users.UserQuery
 import it.polito.did.g2.shopdrop.data.users.UserRole
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class MainViewModel() : ViewModel(){
     ////////////////////////////////////////////////////////////////////////////////////////////////        GLOBAL DATA
@@ -123,7 +137,15 @@ class MainViewModel() : ViewModel(){
 
     val prodsList : LiveData<MutableList<StoreItem>> = fbRepo.prodsList
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////        SHOPPING DATA
+    val storesList : LiveData<MutableList<Store>> = fbRepo.storesList
+
+    val ordersList : LiveData<MutableList<Order>> = fbRepo.ordersList
+
+    val lockersList : LiveData<MutableList<Locker>> = fbRepo.lockersList
+
+    val usersList : LiveData<MutableList<User>> = fbRepo.usersList
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////        SHOPPING AND ORDER DATA
 
     //CART DATA
     private val _cart : MutableLiveData<Cart?> = MutableLiveData(null)
@@ -164,12 +186,21 @@ class MainViewModel() : ViewModel(){
      */
     fun createOrder(){
         Log.i("ORD_CR", "Creazione dell'ordine")
-        _currOrder.value = Order()
+        _currOrder.value = Order(
+            storeID = fbRepo.assignStore(),
+            carrierID = fbRepo.assignCarrier(),
+            customerID = _currUser.value?.uid,
+            lockerID = lockersList.value?.first { it.isWorking && !it.isFull }?.id
+        )
 
         Log.i("ORD_CR", "\tOrdine creato vuoto:\n${_currOrder.value.toString()}")
         _currOrder.value!!.items = _cart.value!!.items.toMap()
 
         Log.i("ORD_CR", "\tAggiunti gli elementi del carrello:\n${_currOrder.value.toString()}")
+    }
+
+    fun setNewLocker(newID: String){
+        _currOrder.value?.lockerID = newID
     }
 
     /**
@@ -191,9 +222,16 @@ class MainViewModel() : ViewModel(){
         _currOrder.value = null
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////        ORDERS MANAGEMENT
+    fun getPendingOrders(): List<String>?{
+        val currentUser = _currUser.value
+        var orders : List<String>? = null
 
+        if(currentUser is CstUser){
+            orders = currentUser.orders?.map { it.key }
+        }
 
+        return orders
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////        OPENING PROCEDURE
 
@@ -305,6 +343,7 @@ class MainViewModel() : ViewModel(){
      */
 
     init{
+        Log.i("MVM INIT", "####################")
         fbRepo.initUsers()
         fbRepo.initProducts()
         fbRepo.initOrders()
@@ -347,6 +386,57 @@ class MainViewModel() : ViewModel(){
                 CollectionStep.TIMEOUT      -> _collectionStep.value = CollectionStep.DONE
                 CollectionStep.DONE         -> _collectionStep.value = CollectionStep.NONE
                 else -> _collectionStep.value = CollectionStep.NONE
+            }
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////        UTILITIES
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getDateString(date: LocalDateTime): String{
+        return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+    }
+
+    fun getOrderStateStringId(state: OrderStateName?): Int{
+        return when(state){
+            OrderStateName.CANCELLED -> R.string.order_state_cancelled
+            OrderStateName.CREATED -> R.string.order_state_created
+            OrderStateName.RECEIVED -> R.string.order_state_received
+            OrderStateName.CARRIED -> R.string.order_state_carried
+            OrderStateName.AVAILABLE -> R.string.order_state_available
+            OrderStateName.COLLECTED -> R.string.order_state_collected
+            OrderStateName.ERROR -> R.string.order_state_error
+            else -> R.string.order_state_error
+        }
+    }
+
+    fun getOrderStateIcon(state: OrderStateName?): ImageVector{
+        return when(state){
+            OrderStateName.CANCELLED -> Icons.Filled.Close
+            OrderStateName.CREATED -> Icons.Filled.Add
+            OrderStateName.RECEIVED -> Icons.Filled.MoveToInbox
+            OrderStateName.CARRIED -> Icons.Filled.DeliveryDining
+            OrderStateName.AVAILABLE -> Icons.Filled.AutoAwesomeMosaic
+            OrderStateName.COLLECTED -> Icons.Filled.CheckCircle
+            OrderStateName.ERROR -> Icons.Filled.Error
+            else -> Icons.Filled.Error
+        }
+    }
+
+    enum class db_reset{ ORDERS, LOCKERS }
+
+
+    // DEBUG
+    fun debugDBReset(target: db_reset){
+        when(target){
+            db_reset.ORDERS -> {
+                Log.w("RESET", "RESETTING ORDERS DB")
+                fbRepo.DebugResetOrders()
+            }
+
+            db_reset.LOCKERS -> {
+                Log.w("RESET", "RESETTING LOCKERS DB")
+                fbRepo.DebugResetLockers()
             }
         }
     }

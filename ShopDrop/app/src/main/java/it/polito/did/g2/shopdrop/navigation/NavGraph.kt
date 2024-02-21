@@ -2,7 +2,6 @@ package it.polito.did.g2.shopdrop.navigation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -80,10 +79,13 @@ fun Nav(viewModel: MainViewModel){
         */
 
         //ADMIN BRANCH (ADM)
-        //admNavGraph(navController, viewModel)
+        admNavGraph(navController, viewModel)
+        /*
         composable(route = Screens.AdmHomeScreen.route){
             //TODO
             Text("ADM HOME SCREEN")
         }
+
+         */
     }
 }

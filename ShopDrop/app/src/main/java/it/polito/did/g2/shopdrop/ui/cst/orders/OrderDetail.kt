@@ -31,12 +31,12 @@ import it.polito.did.g2.shopdrop.data.TabScreen
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun COrderDetailScreen(navController : NavController, vm : MainViewModel){
-    val currentTab = TabScreen.HOME
+fun CSTOrderDetail(navController : NavController, viewModel : MainViewModel, orderID : String?){
+    val currentTab = TabScreen.PROFILE
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
-    //val order : Order? = vm.pendingOrdersList.value?.find{it.id==vm.targetOrderID}
+    val order = viewModel.ordersList.value?.find { it.id == orderID }
 
     Text("TODO!!!")
     /*

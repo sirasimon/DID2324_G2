@@ -191,11 +191,6 @@ fun TabSection(navController: NavController) {
             }
         }
 
-
-
-
-
-
         val orders = generateOrdersList()
         LazyColumn(modifier = Modifier.fillMaxWidth()
             .padding(4.dp)) {

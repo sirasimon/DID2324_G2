@@ -78,4 +78,9 @@
     <string name="chip_to_collect">to collect</string>
     <string name="chip_to_deliver">to deliver</string>
     <string name="btn_select_locker">select locker</string>
+    <string name="txt_item">item</string>
+    <string name="txt_items">items</string>
+    <string name="txt_no_orders_yet">There are no orders yet to view</string>
+    <string name="order_state_cancelled">cancelled</string>
+    <string name="order_state_error">error</string>
 </resources>

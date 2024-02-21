@@ -63,15 +63,19 @@ class FirebaseRepository {
 
         dbRefUsers.addValueEventListener(
             object : ValueEventListener{
+
                 override fun onDataChange(snapshot: DataSnapshot) {
                     cLog("DATA CHANGED in USERS")
                     cLog("\tReading updated users collection (number of children ${snapshot.childrenCount})")
 
                     for(snap in snapshot.children) {
                         var newUser : User?
+                        cLog("\tCreation of a new user (id: ${snap.key.toString()}) to add locally (of role ${snap.child("role").getValue<String>()})")
 
                         when(UserRole.valueOf(snap.child("role").getValue<String>()?:"NUL")){
                             UserRole.ADM -> {
+                                cLog("\tNew user has role ADM and id ${snap.key.toString()}")
+
                                 newUser = AdmUser(
                                     uid = snap.key.toString(),
                                     email = snap.child("email").getValue<String>()?:"ERR",
@@ -79,13 +83,20 @@ class FirebaseRepository {
                                     name = snap.child("name").getValue<String>()?:"ERR",
                                     role = UserRole.valueOf(snap.child("role").getValue<String>()?:"ADM"),
                                 )
+
+                                cLog("\tNew user is $newUser")
                             }
 
                             UserRole.CST -> {
+                                cLog("\tNew user has role CST")
+
+                                cLog("\tPreparing list of orders...")
+
                                 val orderMap = mutableMapOf<String, OrderStateName>()
                                 for(order in snap.child("orders").children){
                                     orderMap[order.key.toString()] = OrderStateName.valueOf(order.getValue<String>()?:"ERROR")
                                 }
+                                cLog("\tOrder list is ${orderMap.size} item long")
 
                                 newUser = CstUser(
                                     uid = snap.key.toString(),
@@ -96,9 +107,13 @@ class FirebaseRepository {
                                     orders = orderMap.toMap(),
                                     isBanned = snap.child("isBanned").getValue<Boolean>()?:false,
                                 )
+
+                                cLog("\tNew user is $newUser")
                             }
 
                             UserRole.CRR -> {
+                                cLog("\tNew user has role CRR")
+
                                 newUser = CrrUser(
                                     uid = snap.key.toString(),
                                     email = snap.child("email").getValue<String>()?:"ERR",
@@ -107,6 +122,8 @@ class FirebaseRepository {
                                     role = UserRole.valueOf(snap.child("role").getValue<String>()?:"ADM"),
                                     isFree = snap.child("isFree").getValue<Boolean>()?:false
                                 )
+
+                                cLog("\tNew user is $newUser")
                             }
 
                             else -> {
@@ -120,7 +137,6 @@ class FirebaseRepository {
                         }else{
                             Log.w("DB_USRS", "CONVERSIONE ANDATA STORTO")
                         }
-
                     }
                 }
 
@@ -185,17 +201,24 @@ class FirebaseRepository {
         dbRefOrders.addValueEventListener(
             object : ValueEventListener {
                 @RequiresApi(Build.VERSION_CODES.O)
+
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    cLog("DATA CHANGED in ORDERS")
+                    cLog("DATA ADDED in ORDERS")
                     cLog("\tReading updated orders collection (number of children ${snapshot.childrenCount})")
 
                     for(snap in snapshot.children){
-                        cLog("Trying to add to list the order ${snap.key}")
+                        cLog("Trying to add to list the order ${snap.key.toString()}")
+
+                        cLog("Creazione della mappa di item...")
 
                         val itemMap = mutableMapOf<String, Int>()
                         for(item in snap.child("items").children){
                             itemMap[item.key.toString()] = item.getValue<Int>()?:0
                         }
+
+                        cLog("Fatto! (num elementi ${itemMap.size})")
+
+                        cLog("Creazione della lista di stati...")
 
                         val stateList = mutableListOf<OrderState>()
                         for(state in snap.child("stateList").children){
@@ -206,6 +229,10 @@ class FirebaseRepository {
                                 )
                             )
                         }
+
+                        cLog("Fatto! (num stati = ${stateList.size})")
+
+                        cLog("Creazione dell'ordine...")
 
                         val newOrder = Order(
                             snap.key.toString(),
@@ -243,9 +270,10 @@ class FirebaseRepository {
 
         dbRefLockers.addValueEventListener(
             object : ValueEventListener {
+
                 @RequiresApi(Build.VERSION_CODES.O)
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    cLog("DATA CHANGED in LOCKERS")
+                    cLog("DATA ADDED in LOCKERS")
                     cLog("\tReading updated lockers collection (number of children ${snapshot.childrenCount})")
 
                     for(snap in snapshot.children){
@@ -369,5 +397,67 @@ class FirebaseRepository {
         }else{
             Log.w("ADD_ORD", "THE ORDER PASSED IS NULL!!!")
         }
+    }
+
+    // ASSIGN FUNS
+    fun assignStore(): String {
+        return dbRefStores.child("STO_01").key.toString()
+    }
+
+    fun assignCarrier(): String {
+        val carriersList : List<CrrUser>? = _usersList.value?.filterIsInstance<CrrUser>()
+
+        return if(carriersList!=null){
+            carriersList.filter { it.isFree }.sortedBy { it.uid }[0].uid
+        }else{
+            "ERR"
+        }
+    }
+
+    // DEBUG
+    fun DebugResetOrders(){
+        Log.w("RESET ORDERS", "RESET STARTED")
+
+        //TODO: leggo la lista di ordini e per ognuno di esso
+        _ordersList.value?.forEach {ord ->
+            if(ord.id!=null) {
+                if (ord.customerID != null)
+                    dbRefUsers.child(ord.customerID).child(ord.id).removeValue()
+                        .addOnSuccessListener {
+                            Log.w("RESET ORDERS", "Order ${ord.id} succesfully removed from ${ord.customerID}")
+                        }
+                        .addOnFailureListener {
+                            Log.e("RESET ORDERS", "ERROR WHILE REMOVING DATA! – $it")
+                        }
+
+                if (ord.lockerID!=null){
+                    dbRefLockers.child(ord.lockerID!!).child("compartments").addListenerForSingleValueEvent(
+                        object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                for(snap in snapshot.children){
+                                    if(snap.child("orderID").getValue<String>()==ord.id){
+                                        snap.child("isAvailable").ref.setValue(true)
+                                        snap.child("orderID").ref.setValue("null")
+                                    }
+                                }
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                                TODO("Not yet implemented")
+                            }
+                        }
+                    )
+                }
+
+                dbRefOrders.child(ord.id).removeValue()
+            }
+        }
+
+        //TODO: elimino dal db l'oggetto ordine
+    }
+
+    fun DebugResetLockers(){
+        //TODO
+        Log.w("RESET LOCKERS", "TODO")
     }
 }
