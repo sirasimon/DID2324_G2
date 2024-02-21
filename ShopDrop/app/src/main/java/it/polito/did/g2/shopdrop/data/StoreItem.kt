@@ -4,5 +4,5 @@ data class StoreItem(
     val name: String,
     val price: Float,
     val category: StoreItemCategory?,
-    val thumbnail: String //Bitmap?
+    val thumbnail: String
 )

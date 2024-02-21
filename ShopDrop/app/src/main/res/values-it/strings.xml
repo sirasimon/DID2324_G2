@@ -26,7 +26,7 @@
     <string name="title_order_summary">riepilogo ordine</string>
     <string name="alternative_login">Oppure accedi con...</string>
     <string name="title_login">accedi</string>
-    <string name="msg_developing">Caratteristica non ancora disponibile</string>
+    <string name="msg_developing">Funzione non ancora disponibile</string>
     <string name="order_dated">ordine del</string>
     <string name="title_camera_on">Scansiona il codice QR</string>
     <string name="btn_back">indietro</string>
@@ -59,4 +59,21 @@
     <string name="txt_close_locker">Chiudi il locker</string>
     <string name="btn_open">apri</string>
     <string name="btn_cancel">annulla</string>
+    <string name="title_results_for">risultati per</string>
+    <string name="title_collected">ritirati</string>
+    <string name="title_cancelled">annullati</string>
+    <string name="chip_pending">in corso</string>
+    <string name="chip_collected">ritirati</string>
+    <string name="chip_cancelled">annullati</string>
+    <string name="title_profile">Profilo</string>
+    <string name="title_history">i miei ordini</string>
+    <string name="title_cart">carrello</string>
+    <string name="txt_something_gone_wrong">Ops... Qualcosa è andato storto...</string>
+    <string name="title_payment_method">metodo di pagamento</string>
+    <string name="title_select_locker">seleziona il tuo locker</string>
+    <string name="tab_map">mappa</string>
+    <string name="tab_list">lista</string>
+    <string name="btn_goto_home">vai all\'home</string>
+    <string name="chip_to_collect">da ritirare</string>
+    <string name="chip_to_deliver">da consegnare</string>
 </resources>

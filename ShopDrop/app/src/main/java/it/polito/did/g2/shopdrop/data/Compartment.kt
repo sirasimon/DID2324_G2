@@ -26,4 +26,8 @@ class Compartment (
         orderID = null
         isAvailable = false
     }
+
+    override fun toString(): String {
+        return "CMP#$id\topen = $isOpen\tempty = $isEmpty\tworking = $isWorking\tavailable = $isAvailable\torderID = $orderID"
+    }
 }

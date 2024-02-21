@@ -1,48 +1,48 @@
 package it.polito.did.g2.shopdrop
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import it.polito.did.g2.shopdrop.data.StoreItemCategory
-import it.polito.did.g2.shopdrop.ui.camera.CameraScreen
-import it.polito.did.g2.shopdrop.ui.cart.CartScreen
-import it.polito.did.g2.shopdrop.ui.cart.CartSummary
-import it.polito.did.g2.shopdrop.ui.cart.OrderConfirmed
-import it.polito.did.g2.shopdrop.ui.home.CSTHomeScreen
-import it.polito.did.g2.shopdrop.ui.home.CarrierHomeScreen
-import it.polito.did.g2.shopdrop.ui.home.CategorySection
-import it.polito.did.g2.shopdrop.ui.login.LoginScreen
-import it.polito.did.g2.shopdrop.ui.orders.COrderDetailScreen
-import it.polito.did.g2.shopdrop.ui.orders.COrderListScreen
-import it.polito.did.g2.shopdrop.ui.profile.CProfileScreen
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.firebase.ui.storage.BuildConfig
+import it.polito.did.g2.shopdrop.navigation.Nav
 import it.polito.did.g2.shopdrop.ui.theme.ShopDropTheme
-import it.polito.did.g2.shopdrop.ui.unlocker.OpeningScreens
-import it.polito.did.g2.shopdrop.ui.unlocker.UnlockScreen
 
 class MainActivity : ComponentActivity() {
-    private val vm by viewModels<MainViewModel>()
+    private val viewModel by viewModels<MainViewModel>()
+
+    private lateinit var loginSP: SharedPreferences
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.i("MAoCr", "## STARTS HERE ##")
         super.onCreate(savedInstanceState)
-        val sharedPreferences = application.getSharedPreferences("shopdrop_pref", Context.MODE_PRIVATE)
 
-        vm.debugInit()
+        //viewModel.debugInit()
+
+        Log.i("MAoCr", "\tGetting shared refs at '${BuildConfig.LIBRARY_PACKAGE_NAME}.login_info'")
+        loginSP = getSharedPreferences(BuildConfig.LIBRARY_PACKAGE_NAME+".login_info", Context.MODE_PRIVATE)
+
+        viewModel.setLoginSP(loginSP)
+        viewModel.loadCredentials()
+
+        installSplashScreen().apply{//Prima di setContent per avviare splashscreen
+            this.setKeepOnScreenCondition{
+                viewModel.isLoading.value
+            }
+        }
 
         setContent {
             ShopDropTheme {
                 // A surface container using the 'background' color from the theme
-                Navigation(vm)
+                //Navigation(vm)
+                Nav(viewModel)
             }
         }
     }
@@ -50,10 +50,11 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
 
-        vm.debugSetDefault()
+        //viewModel.debugSetDefault()
     }
 }
 
+/*
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navigation(viewModel: MainViewModel){
@@ -91,7 +92,7 @@ fun Navigation(viewModel: MainViewModel){
         }
 
         composable("ClientProfile"){
-            CProfileScreen(navController = navController, viewModel)
+            CSTProfileScreen(navController = navController, viewModel)
         }
         composable(
             "CategorySection/{sectionName}",
@@ -122,3 +123,4 @@ fun Navigation(viewModel: MainViewModel){
         }
     }
 }
+ */
