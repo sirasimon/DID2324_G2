@@ -9,7 +9,7 @@ class Order(
     val storeID : String? = null,
     val carrierID : String? = null,
     val customerID : String? = null,
-    val lockerID : String? = null,
+    var lockerID : String? = null,
     var items: Map<String, Int>? = null,
     var stateList : MutableList<OrderState>? = null,
 ){
@@ -39,6 +39,6 @@ class Order(
 
         stateList?.forEach { statesString+=" ${it.state} @ ${it.timestamp} –> " }
 
-        return "ID: $id – last state: ${stateList?.last()?.state.toString()}\n\tstoreID: $storeID | carrierID: $carrierID | customerID: $customerID | lockerID: $lockerID\n\titems: ${items?.toString()}\n\tstate list: [$statesString]"
+        return "ID: $id – last state: ${if(stateList?.isNotEmpty()==true) stateList?.last()?.state.toString() else "EMPTY LIST"}\n\tstoreID: $storeID | carrierID: $carrierID | customerID: $customerID | lockerID: $lockerID\n\titems: ${items?.toString()}\n\tstate list: [$statesString]"
     }
 }

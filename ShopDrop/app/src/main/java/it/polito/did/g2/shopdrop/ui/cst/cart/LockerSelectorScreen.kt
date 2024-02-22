@@ -27,6 +27,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -58,6 +59,9 @@ fun LockerSelectorScreen(navController: NavController, viewModel: MainViewModel)
     val listViewNC = rememberNavController()
     var selectedTab by remember { mutableStateOf(0) }
 
+    //LOCKER SELECTOR
+    var selectedLocker by remember{mutableStateOf(viewModel.currOrder.value?.lockerID)}
+
     // SNACKBAR
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -66,7 +70,7 @@ fun LockerSelectorScreen(navController: NavController, viewModel: MainViewModel)
     Scaffold(
         topBar = { TopBar(navController, stringResource(id = R.string.title_select_locker), scrollBehavior) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        floatingActionButton = { FabSelectLocker(navController, viewModel) },
+        floatingActionButton = { FabSelectLocker(navController, viewModel, selectedLocker) },
         floatingActionButtonPosition = FabPosition.Center,
         snackbarHost = { WIPMessage(snackbarHostState) }
     ) { paddingValues ->
@@ -117,7 +121,24 @@ fun LockerSelectorScreen(navController: NavController, viewModel: MainViewModel)
 
                         composable(ViewTab.LIST.toString()){
                             Column(Modifier.fillMaxWidth()) {
-                                //viewModel.getLockers()
+                                viewModel.lockersList.observeAsState().value?.forEach {
+                                    ListItem(
+                                        headlineContent = {
+                                            Column(){
+                                                Text("${it.id} | ${it.name?.uppercase()}")
+                                                Text(it.address, maxLines = 1, softWrap = true)
+                                            }
+                                        },
+                                        trailingContent = {
+                                            RadioButton(
+                                                selected = it.id == selectedLocker,
+                                                onClick = { selectedLocker = it.id },
+                                                enabled = it.isWorking && !it.isFull
+                                            )
+                                        }
+                                    )
+                                }
+                                /*
                                 ListItem(
                                     headlineContent = { Text(text = "Locker #1") },
                                     trailingContent = {
@@ -141,6 +162,8 @@ fun LockerSelectorScreen(navController: NavController, viewModel: MainViewModel)
                                         //TODO
                                     }
                                 )
+
+                                 */
                             }
                         }
                     }
@@ -152,9 +175,14 @@ fun LockerSelectorScreen(navController: NavController, viewModel: MainViewModel)
 }
 
 @Composable
-private fun FabSelectLocker(navController: NavController, viewModel: MainViewModel) {
+private fun FabSelectLocker(navController: NavController, viewModel: MainViewModel, targetLocker: String?) {
     ExtendedFloatingActionButton(
-        onClick = { navController.navigateUp() /*TODO Libera tutti gli altri e impegna solo quello selezionato*/ },
+        onClick = {
+            if(targetLocker!=null){
+                viewModel.setNewLocker(targetLocker)
+                navController.navigateUp()
+            }
+                  },
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 32.dp)

@@ -1,40 +1,40 @@
 package it.polito.did.g2.shopdrop.data.users
 
-import it.polito.did.g2.shopdrop.data.OrderStateName
-
 //data class User(val uid: String, val email: String, val password: String, val name: String, val role: UserRole)
 
-interface User {
-    val uid: String
-    val email: String
-    val password: String
-    val name: String
+open class User (
+    val uid: String,
+    val email: String,
+    val password: String,
+    val name: String,
     val role: UserRole
-}
+)
 
+/*
 class AdmUser(
-    override val uid: String,
-    override val email: String,
-    override val password: String,
-    override val name: String,
-    override val role: UserRole,
-) : User
+    uid: String,
+    email: String,
+    password: String,
+    name: String,
+    role: UserRole,
+) : User(uid, email, password, name, role)
 
 class CstUser(
-    override val uid: String,
-    override val email: String,
-    override val password: String,
-    override val name: String,
-    override val role: UserRole,
-    orders : Map<String, OrderStateName>? = null,
-    isBanned : Boolean = false
-) : User
+    uid: String,
+    email: String,
+    password: String,
+    name: String,
+    role: UserRole,
+    var orders : Map<String, OrderStateName>? = null,
+    var isBanned : Boolean = false
+) : User(uid, email, password, name, role)
 
 class CrrUser(
-    override val uid: String,
-    override val email: String,
-    override val password: String,
-    override val name: String,
-    override val role: UserRole,
-    isFree : Boolean = false
-) : User
+    uid: String,
+    email: String,
+    password: String,
+    name: String,
+    role: UserRole,
+    var isFree : Boolean = false
+) : User(uid, email, password, name, role)
+*/

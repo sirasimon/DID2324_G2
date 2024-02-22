@@ -11,12 +11,14 @@ import androidx.navigation.navigation
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
 import it.polito.did.g2.shopdrop.ui.camera.CameraScreen
+import it.polito.did.g2.shopdrop.ui.cst.CSTCollection
 import it.polito.did.g2.shopdrop.ui.cst.cart.CSTCartScreen
 import it.polito.did.g2.shopdrop.ui.cst.cart.CSTCheckoutScreen
 import it.polito.did.g2.shopdrop.ui.cst.cart.LockerSelectorScreen
 import it.polito.did.g2.shopdrop.ui.cst.cart.OrderSent
 import it.polito.did.g2.shopdrop.ui.cst.home.CSTHomeScreen
 import it.polito.did.g2.shopdrop.ui.cst.home.CategoryScreen
+import it.polito.did.g2.shopdrop.ui.cst.orders.CSTOrderDetail
 import it.polito.did.g2.shopdrop.ui.cst.orders.CstOrdersHistory
 import it.polito.did.g2.shopdrop.ui.cst.profile.CSTProfileScreen
 
@@ -87,16 +89,26 @@ fun NavGraphBuilder.cstNavGraph(
             CstOrdersHistory(navController, viewModel)
         }
 
-        composable(route = Screens.CstOrderDetail.route){
-            //TODO
-            //Text("CST ORDER DETAIL SCREEN")
+        composable(
+            route = Screens.CstOrderDetail.route+"/{orderID}",
+            arguments = listOf(navArgument("orderID") { type = NavType.StringType })
+            )
+        {
+            CSTOrderDetail(navController, viewModel, it.arguments?.getString("orderID") )
         }
 
         // UNLOCK PROCEDURE ////////////////////////////////////////////////////////////////////////
 
-        composable(route = Screens.CstCamera.route){
-            //TODO
-            CameraScreen(navController, viewModel)
+        composable(route = Screens.CstCamera.route+"/{orderID}",
+            arguments = listOf(navArgument("orderID") { type = NavType.StringType })
+        ){
+            CameraScreen(navController, viewModel, it.arguments?.getString("orderID")!!)
+        }
+
+        composable(route = Screens.CstCollectionScreen.route+"/{orderID}",
+            arguments = listOf(navArgument("orderID") { type = NavType.StringType })
+        ){
+            CSTCollection(navController, viewModel, it.arguments?.getString("orderID")!!)
         }
     }
 }

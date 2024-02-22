@@ -1,19 +1,21 @@
-package it.polito.did.g2.shopdrop.ui.camera
+package it.polito.did.g2.shopdrop.ui.crr
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Size
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -47,10 +49,15 @@ import it.polito.did.g2.shopdrop.QrCodeAnalyzer
 import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.navigation.Screens
 
+
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CameraScreen(navController : NavController, viewModel: MainViewModel, orderID : String){
+fun CrrDepositCamera(navController : NavController, viewModel: MainViewModel, orderID : String){
     var code by remember{ mutableStateOf("") }
+
+    var lockerScanned by remember{ mutableStateOf(false) }
+
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember {
@@ -101,7 +108,7 @@ fun CameraScreen(navController : NavController, viewModel: MainViewModel, orderI
                             previewView.width,
                             previewView.height)
                     )
-                    .setBackpressureStrategy(STRATEGY_KEEP_ONLY_LATEST)
+                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                     .build()
 
                 imageAnalysis.setAnalyzer(
@@ -110,8 +117,14 @@ fun CameraScreen(navController : NavController, viewModel: MainViewModel, orderI
                         code = result
 
                         //TODO Forse è qui il pezzo dove intervenire
-                        if(viewModel.cstStartsCollection(code, orderID))
-                            navController.navigate(Screens.CstCollectionScreen.route+"/$orderID")
+                        if(!lockerScanned){
+                            lockerScanned = viewModel.crrStartsDeposit(code, orderID)
+                        }else{
+                            if(code == orderID) {
+                                viewModel.crrDepositing(code)
+                                navController.navigate(Screens.CrrDepositedScreen.route+"/$orderID")
+                            }
+                        }
                     }
                 )
                 try{
@@ -128,10 +141,19 @@ fun CameraScreen(navController : NavController, viewModel: MainViewModel, orderI
             })
 
             //DEBUG
-            Text(text= code, modifier = Modifier
-                .background(Color.White)
-                .fillMaxWidth()
-                .align(Alignment.Center))
+            Column(Modifier.fillMaxWidth().align(Alignment.Center)){
+                Text(
+                    text = if(!lockerScanned)"SCAN LOCKER'S QR CODE" else "SCAN PARCEL QR", modifier = Modifier
+                        .background(Color.White)
+                        .fillMaxWidth()
+                )
+
+                Text(
+                    text = code, modifier = Modifier
+                        .background(Color.White)
+                        .fillMaxWidth()
+                )
+            }
         }
 
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
