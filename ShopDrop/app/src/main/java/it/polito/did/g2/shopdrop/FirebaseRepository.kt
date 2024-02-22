@@ -69,6 +69,8 @@ class FirebaseRepository {
                 Log.i("DB_USRS", msg)
         }
 
+        val newUserList = mutableListOf<User>()
+
         dbRefUsers.addValueEventListener(
             object : ValueEventListener{
 
@@ -149,12 +151,15 @@ class FirebaseRepository {
                         */
 
                         if(newUser!=null){
-                            _usersList.value?.add(newUser)
-                            cLog("\tAdded new user to list: ${_usersList.value?.last()?.name.toString()}")
+                            newUserList.add(newUser)
+                            cLog("\tAdded new user to list: ${newUserList.last().name}")
                         }else{
                             Log.w("DB_USRS", "CONVERSIONE ANDATA STORTO")
                         }
                     }
+
+                    _usersList.value = newUserList.toMutableList()
+
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -162,6 +167,8 @@ class FirebaseRepository {
                 }
             }
         )
+
+        Log.i("DB_USRS", "_userList has ${_usersList.value?.size} values")
     }
 
     suspend fun initProducts() {
@@ -209,6 +216,8 @@ class FirebaseRepository {
     }
 
     suspend fun initOrders() {
+
+        var newOrderList = mutableListOf<Order>()
 
         fun cLog(msg: String){
             if(FB_DEBUG)
@@ -263,10 +272,11 @@ class FirebaseRepository {
 
                         cLog("\tNew object of Order is: ${newOrder}\n\tPutting it inside the list")
 
-                        _ordersList.value?.add(newOrder)
+                        newOrderList.add(newOrder)
+
                         //_storeItems.value = _storeItems.value
 
-                        cLog("\tList is now ${_ordersList.value?.size} items long and the last product added is ${_ordersList.value?.last().toString()}")
+                        cLog("\tList will is now be ${newOrderList.size} items long and the last product added is ${newOrderList.last().toString()}")
                     }
                 }
 
@@ -276,6 +286,9 @@ class FirebaseRepository {
 
             }
         )
+
+        _ordersList.value = newOrderList
+
     }
 
     suspend fun initLockers() {
@@ -284,6 +297,8 @@ class FirebaseRepository {
             if(FB_DEBUG)
                 Log.i("DB_LKRS", msg)
         }
+
+        var newLockersList = mutableListOf<Locker>()
 
         dbRefLockers.addValueEventListener(
             object : ValueEventListener {
@@ -323,9 +338,9 @@ class FirebaseRepository {
 
                         cLog("\tNew object of Order is: ${newLocker}\n\tPutting it inside the list")
 
-                        _lockersList.value?.add(newLocker)
+                        newLockersList.add(newLocker)
 
-                        cLog("\tList is now ${_lockersList.value?.size} items long and the last product added is ${_lockersList.value?.last().toString()}")
+                        cLog("\tList will now be ${newLockersList.size} items long and the last product added is ${newLockersList.last().toString()}")
                     }
                 }
 
@@ -335,6 +350,8 @@ class FirebaseRepository {
 
             }
         )
+
+        _lockersList.value = newLockersList
     }
 
     fun getUserByEmail(email : String) : User?{
@@ -463,21 +480,42 @@ class FirebaseRepository {
                 Log.i("ADD_ORD", msg)
         }
 
-        if(order!=null && userID!=null){
+        if(order!=null && userID!=null && order.lockerID!=null){
             cLog("\tAdding a new order into the DB")
 
             val orderRef = dbRefOrders.push()
 
+            // AGGIUNGO VOCE ALL'UTENTE
             dbRefUsers.child(userID)
                 .child("orders")
+                .child(orderRef.key.toString())
                 .setValue(
-                    mapOf(
-                        orderRef.key to order.stateList?.last()?.state.toString()
-                    )
+                    order.stateList?.last()?.state.toString()
                 )
                 .addOnSuccessListener { cLog("\tOrder ${order.id} added to user $userID") }
                 .addOnFailureListener { Log.e("ADD_ORD", "FAILED TO ADD THE ORDER (# ${order.id}) TO THE USER $userID") }
 
+            // AGGIUNGO VOCE AL LOCKER
+            // Find free compartment
+            var targetCompartment : Int? = _lockersList.value?.find { it.id == order.lockerID }?.compartments?.find { it.isAvailable }?.id
+
+            if(targetCompartment!=null){
+                dbRefLockers.child(order.lockerID!!)
+                    .child("compartments")
+                    .child(targetCompartment.toString())
+                    .child("isAvailable").setValue(false)
+                    .addOnSuccessListener { cLog("Modifica avvenuta con successo del campo isAvailable sul compartimento $targetCompartment del locker ${order.lockerID}") }
+                    .addOnFailureListener { Log.e("ADD_ORD", "FAILED TO ADD THE ORDER TO COMPARTMENT") }
+
+                dbRefLockers.child(order.lockerID!!)
+                    .child("compartments")
+                    .child(targetCompartment.toString())
+                    .child("orderID").setValue(orderRef.key.toString())
+                    .addOnSuccessListener { cLog("Modifica avvenuta con successo del campo orderID sul compartimento $targetCompartment del locker ${order.lockerID}") }
+                    .addOnFailureListener { Log.e("ADD_ORD", "FAILED TO ADD THE ORDER TO COMPARTMENT") }
+            }
+
+            // AGGIUNGO VOCE IN ORDINI
             orderRef.setValue(
                 mapOf(
                     "carrierID" to order.carrierID,
@@ -503,13 +541,144 @@ class FirebaseRepository {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun updateOrderState(id: String){
-        val currState : OrderState? = ordersList.value?.find { it.id==id }?.stateList?.last()
+        val targetOrder : Order? = ordersList.value?.find { it.id==id }
+        val lastState = targetOrder?.stateList?.last()?.state
 
-        if(currState!=null){
-            val nextStateName = OrderStateName.values()[currState.state.ordinal+1]
+        if(targetOrder!=null && lastState!=null){
+            val nextStateName = OrderStateName.values()[lastState.ordinal+1]
 
+            dbRefOrders.child(id)
+                .child("stateList")
+                .child(nextStateName.toString())
+                .setValue(LocalDateTime.now().toString())
+                .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in Order DB") }
+                .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
 
-            dbRefOrders.child(id).child("stateList").setValue(mapOf(nextStateName.toString() to LocalDateTime.now().toString()))
+            dbRefUsers.child(targetOrder.customerID!!)
+                .child("orders")
+                .child(targetOrder.id!!)
+                .setValue(nextStateName.toString())
+                .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in User DB") }
+                .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
+        }
+    }
+
+    fun cstStartsCollection(lockerCode: String, orderID: String) : Boolean{
+        Log.i("CST_COLLECTION", "Customer tries to collect goods")
+
+        val lockerID = lockerCode.substring(0,6)
+        val otp = lockerCode.substring(6)
+
+        Log.i("CST_COLLECTION", "\tFrom QR: LockerID = $lockerID, OTP=$otp")
+        Log.i("CST_COLLECTION", "\tChecking if correct locker")
+
+        if(_ordersList.value?.find { it.id==orderID }?.lockerID != lockerID) {
+            Log.w("CST_COLLECTION", "\tWrong locker")
+            return false
+        }
+
+        Log.i("CST_COLLECTION", "\tRight locker")
+
+        Log.i("CST_COLLECTION", "\tChecking OTP")
+
+        val currOTP : String = dbRefLockers.child(lockerID)
+            .child("otp")
+            .get().toString()
+
+        if(currOTP!=otp){
+            Log.w("CST_COLLECTION", "\tWrong OTP")
+            return false
+        }
+
+        Log.i("CST_COLLECTION", "\tRight OTP")
+
+        var success = false
+
+        dbRefLockers.child(lockerID).child("showCode").setValue(false)
+            .addOnSuccessListener { Log.i("CST_COLLECTION", "\tShow code is now false, the locker results occupied"); success = true }
+            .addOnFailureListener { Log.e("CST_COLLECTION", "\tFAILED TO OCCUPY THE LOCKER") ; success = false }
+
+        //TODO apertura
+        dbRefLockers.child(lockerID)
+            .child("compartments")
+            .addListenerForSingleValueEvent(
+                object : ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        for(snap in snapshot.children){
+                            if(snap.child("orderID").getValue<String>()==orderID) {
+                                snap.child("isOpen").ref.setValue(true)
+                                success = true
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        success = false
+                    }
+                }
+            )
+
+        return success
+    }
+
+    fun crrOccupyLocker(lockerCode: String, orderID: String) : Boolean{
+        Log.i("CRR_OCC_LOCK", "Carrier tries to occupy locker")
+
+        val lockerID = lockerCode.substring(0,6)
+        val otp = lockerCode.substring(6)
+
+        Log.i("CRR_OCC_LOCK", "\tFrom QR: LockerID = $lockerID, OTP=$otp")
+        Log.i("CRR_OCC_LOCK", "\tChecking if correct locker")
+
+        if(_ordersList.value?.find { it.id==orderID }?.lockerID != lockerID) {
+            Log.w("CRR_OCC_LOCK", "\tWrong locker")
+            return false
+        }
+
+        Log.i("CRR_OCC_LOCK", "\tRight locker")
+
+        Log.i("CRR_OCC_LOCK", "\tChecking OTP")
+
+        val currOTP : String = dbRefLockers.child(lockerID)
+            .child("otp")
+            .get().toString()
+
+        if(currOTP!=otp){
+            Log.w("CRR_OCC_LOCK", "\tWrong OTP")
+            return false
+        }
+
+        Log.i("CRR_OCC_LOCK", "\tRight OTP")
+
+        var success = false
+        dbRefLockers.child(lockerID).child("showCode").setValue(false)
+            .addOnSuccessListener { Log.i("CRR_OCC_LOCK", "\tShow code is now false, the locker results occupied"); success = true }
+            .addOnFailureListener { Log.e("CRR_OCC_LOCK", "\tFAILED TO OCCUPY THE LOCKER") ; success = false }
+
+        return success
+    }
+
+    fun crrDepositing(orderID: String){
+        val currOrder = _ordersList.value?.find { it.id == orderID }
+
+        if(currOrder!=null){
+            dbRefLockers.child(currOrder.lockerID!!)
+                .child("compartments")
+                .addListenerForSingleValueEvent(
+                    object : ValueEventListener{
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            for(snap in snapshot.children){
+                                if(snap.child("orderID").getValue<String>()==orderID)
+                                    snap.child("isOpen").ref.setValue(true)
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            TODO("Not yet implemented")
+                        }
+
+                    }
+                )
         }
     }
 

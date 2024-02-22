@@ -11,6 +11,7 @@ import androidx.navigation.navigation
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
 import it.polito.did.g2.shopdrop.ui.camera.CameraScreen
+import it.polito.did.g2.shopdrop.ui.cst.CSTCollection
 import it.polito.did.g2.shopdrop.ui.cst.cart.CSTCartScreen
 import it.polito.did.g2.shopdrop.ui.cst.cart.CSTCheckoutScreen
 import it.polito.did.g2.shopdrop.ui.cst.cart.LockerSelectorScreen
@@ -101,7 +102,13 @@ fun NavGraphBuilder.cstNavGraph(
         composable(route = Screens.CstCamera.route+"/{orderID}",
             arguments = listOf(navArgument("orderID") { type = NavType.StringType })
         ){
-            CameraScreen(navController, viewModel, it.arguments?.getString("orderID"))
+            CameraScreen(navController, viewModel, it.arguments?.getString("orderID")!!)
+        }
+
+        composable(route = Screens.CstCollectionScreen.route+"/{orderID}",
+            arguments = listOf(navArgument("orderID") { type = NavType.StringType })
+        ){
+            CSTCollection(navController, viewModel, it.arguments?.getString("orderID")!!)
         }
     }
 }

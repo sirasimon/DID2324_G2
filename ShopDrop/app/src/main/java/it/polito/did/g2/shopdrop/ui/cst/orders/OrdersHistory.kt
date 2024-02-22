@@ -23,6 +23,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -92,11 +93,11 @@ fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
                     NavHost(navController = listNavController, startDestination = CstFilterChip.PEND.toString()){
                         composable(CstFilterChip.PEND.toString()) {
                             ListedOrders(
-                                viewModel.ordersList.value?.filter {
+                                viewModel.ordersList.observeAsState().value?.filter {
                                     it.customerID==viewModel.currUser.value?.uid &&
                                             it.stateList?.last()?.state != OrderStateName.COLLECTED &&
                                             it.stateList?.last()?.state != OrderStateName.CANCELLED
-                                                                   },
+                                }?.toMutableList(),
                                 viewModel
                             ) {
                                 navController.navigate(
@@ -106,10 +107,10 @@ fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
                         }
                         composable(CstFilterChip.ARCH.toString()){
                             ListedOrders(
-                                viewModel.ordersList.value?.filter {
+                                viewModel.ordersList.observeAsState().value?.filter {
                                     it.customerID==viewModel.currUser.value?.uid &&
                                             it.stateList?.last()?.state == OrderStateName.COLLECTED
-                                                                   },
+                                }?.toMutableList(),
                                 viewModel
                             ) {
                                 navController.navigate(
@@ -119,10 +120,10 @@ fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
                         }
                         composable(CstFilterChip.CANC.toString()){
                             ListedOrders(
-                                viewModel.ordersList.value?.filter {
+                                viewModel.ordersList.observeAsState().value?.filter {
                                     it.customerID==viewModel.currUser.value?.uid &&
                                             it.stateList?.last()?.state == OrderStateName.CANCELLED
-                                },
+                                }?.toMutableList(),
                                 viewModel
                             ) {
                                 navController.navigate(
@@ -139,10 +140,10 @@ fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ListedOrders(list: List<Order>?, viewModel: MainViewModel, onClick: () -> Unit) {
+fun ListedOrders(list: MutableList<Order>?, viewModel: MainViewModel, onClick: () -> Unit) {
 
     Column(Modifier.fillMaxWidth()){
-        if(list!=null){
+        if(!list.isNullOrEmpty()){
             for (item in list) {
                 Card(
                     Modifier

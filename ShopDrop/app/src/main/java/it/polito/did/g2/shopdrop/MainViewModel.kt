@@ -323,6 +323,42 @@ class MainViewModel() : ViewModel(){
         fbRepo.updateOrderState(id)
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////        CRR COLLECTION + DEPOSIT
+    //TODO: unire con script dopo
+
+    fun cstStartsCollection(lockerCode : String, orderID: String) : Boolean{
+        return fbRepo.cstStartsCollection(lockerCode, orderID)
+    }
+
+    fun checkClosed(orderID: String): Boolean{
+        return lockersList.value
+            ?.find { lk -> lk.id == ordersList.value?.find { or -> or.id == orderID }?.lockerID }
+            ?.compartments
+            ?.find { co -> co.orderID == orderID }
+            ?.isOpen
+            ?:false
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////        CRR COLLECTION + DEPOSIT
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun crrHasCollected(orderID: String){
+        updateOrderState(orderID)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun crrHasDeposited(orderID: String){
+        updateOrderState(orderID)
+    }
+
+    fun crrStartsDeposit(lockerCode: String, orderID: String) : Boolean{
+        return fbRepo.crrOccupyLocker(lockerCode, orderID)
+    }
+
+    fun crrDepositing(orderID: String){
+        fbRepo.crrDepositing(orderID)
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////        OPENING PROCEDURE
 
     private val _collectionStep : MutableLiveData<CollectionStep> = MutableLiveData(CollectionStep.NONE)
