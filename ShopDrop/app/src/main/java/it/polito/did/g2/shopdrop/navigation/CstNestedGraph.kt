@@ -98,9 +98,10 @@ fun NavGraphBuilder.cstNavGraph(
 
         // UNLOCK PROCEDURE ////////////////////////////////////////////////////////////////////////
 
-        composable(route = Screens.CstCamera.route){
-            //TODO
-            CameraScreen(navController, viewModel)
+        composable(route = Screens.CstCamera.route+"/{orderID}",
+            arguments = listOf(navArgument("orderID") { type = NavType.StringType })
+        ){
+            CameraScreen(navController, viewModel, it.arguments?.getString("orderID"))
         }
     }
 }

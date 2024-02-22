@@ -5,11 +5,10 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.database
 import com.google.firebase.database.getValue
 import it.polito.did.g2.shopdrop.data.Compartment
 import it.polito.did.g2.shopdrop.data.Locker
@@ -19,9 +18,6 @@ import it.polito.did.g2.shopdrop.data.OrderStateName
 import it.polito.did.g2.shopdrop.data.Store
 import it.polito.did.g2.shopdrop.data.StoreItem
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
-import it.polito.did.g2.shopdrop.data.users.AdmUser
-import it.polito.did.g2.shopdrop.data.users.CrrUser
-import it.polito.did.g2.shopdrop.data.users.CstUser
 import it.polito.did.g2.shopdrop.data.users.User
 import it.polito.did.g2.shopdrop.data.users.UserRole
 import java.time.LocalDateTime
@@ -31,6 +27,14 @@ const val FB_DEBUG = true
 
 class FirebaseRepository {
     //DB REFs
+    private val dbRef = FirebaseDatabase.getInstance()
+    private val debugRef = dbRef.getReference("debug")
+    private val dbRefLockers = dbRef.getReference("lockers")
+    private val dbRefUsers = dbRef.getReference("users")
+    private val dbRefOrders = dbRef.getReference("orders")
+    private val dbRefProducts = dbRef.getReference("products")
+    private val dbRefStores = dbRef.getReference("stores")
+    /*
     private val dbRef = Firebase.database.reference
     private val debugRef = dbRef.child("debug")
     private val dbRefLockers = dbRef.child("lockers")
@@ -38,8 +42,12 @@ class FirebaseRepository {
     private val dbRefOrders = dbRef.child("orders")
     private val dbRefProducts = dbRef.child("products")
     private val dbRefStores = dbRef.child("stores")
+     */
 
     //DATA RETRIVED
+    private val _isDataSet : MutableLiveData<Boolean> = MutableLiveData(false)
+    val isDataSet : LiveData<Boolean> = _isDataSet
+
     private val _usersList : MutableLiveData<MutableList<User>> = MutableLiveData(mutableListOf())
     val usersList : LiveData<MutableList<User>> = _usersList
 
@@ -55,7 +63,7 @@ class FirebaseRepository {
     private val _storesList : MutableLiveData<MutableList<Store>> = MutableLiveData(mutableListOf())
     val storesList : LiveData<MutableList<Store>> = _storesList
 
-    fun initUsers(){
+    suspend fun initUsers(){
         fun cLog(msg: String){
             if(FB_DEBUG)
                 Log.i("DB_USRS", msg)
@@ -72,6 +80,14 @@ class FirebaseRepository {
                         var newUser : User?
                         cLog("\tCreation of a new user (id: ${snap.key.toString()}) to add locally (of role ${snap.child("role").getValue<String>()})")
 
+                        newUser = User(
+                            uid = snap.key.toString(),
+                            email = snap.child("email").getValue<String>()?:"ERR",
+                            password = snap.child("password").getValue<String>()?:"ERR",
+                            name = snap.child("name").getValue<String>()?:"ERR",
+                            role = UserRole.valueOf(snap.child("role").getValue<String>()?:"ADM"),
+                        )
+                        /*
                         when(UserRole.valueOf(snap.child("role").getValue<String>()?:"NUL")){
                             UserRole.ADM -> {
                                 cLog("\tNew user has role ADM and id ${snap.key.toString()}")
@@ -130,6 +146,7 @@ class FirebaseRepository {
                                 newUser = null
                             }
                         }
+                        */
 
                         if(newUser!=null){
                             _usersList.value?.add(newUser)
@@ -147,7 +164,7 @@ class FirebaseRepository {
         )
     }
 
-    fun initProducts() {
+    suspend fun initProducts() {
 
         fun cLog(msg: String){
             if(FB_DEBUG)
@@ -191,7 +208,7 @@ class FirebaseRepository {
         )
     }
 
-    fun initOrders() {
+    suspend fun initOrders() {
 
         fun cLog(msg: String){
             if(FB_DEBUG)
@@ -261,7 +278,7 @@ class FirebaseRepository {
         )
     }
 
-    fun initLockers() {
+    suspend fun initLockers() {
 
         fun cLog(msg: String){
             if(FB_DEBUG)
@@ -320,7 +337,92 @@ class FirebaseRepository {
         )
     }
 
-    fun initStores(){
+    fun getUserByEmail(email : String) : User?{
+        var user: User? = null
+
+        /*
+        dbRefUsers.addListenerForSingleValueEvent(
+            object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for(snap in snapshot.children){
+                        if(snap.child("email").getValue<String>()==email){
+                            Log.i("getUbE", "TROVATO!")
+
+                            user = User(
+                                uid = snap.key.toString(),
+                                email = snap.child("email").getValue<String>() ?: "ERR",
+                                password = snap.child("password").getValue<String>()
+                                    ?: "ERR",
+                                name = snap.child("name").getValue<String>() ?: "ERR",
+                                role = UserRole.CST
+                            )
+
+                            /*
+                            when(UserRole.valueOf(snap.child("role").getValue<String>()!!)){
+                                UserRole.CST -> {
+                                    val orderMap = mutableMapOf<String, OrderStateName>()
+                                    for(order in snap.child("orders").children){
+                                        orderMap[order.key.toString()] = OrderStateName.valueOf(order.getValue<String>()?:"ERROR")
+                                    }
+
+                                    user = CstUser(
+                                        uid = snap.key.toString(),
+                                        email = snap.child("email").getValue<String>() ?: "ERR",
+                                        password = snap.child("password").getValue<String>()
+                                            ?: "ERR",
+                                        name = snap.child("name").getValue<String>() ?: "ERR",
+                                        role = UserRole.CST,
+                                        orders = orderMap.toMap(),
+                                        isBanned = snap.child("isBanned").getValue<Boolean>()?:false
+                                    )
+                                }
+
+                                UserRole.CRR -> {
+                                    user = CrrUser(
+                                        uid = snap.key.toString(),
+                                        email = snap.child("email").getValue<String>()?:"ERR",
+                                        password = snap.child("password").getValue<String>()?:"ERR",
+                                        name = snap.child("name").getValue<String>()?:"ERR",
+                                        role = UserRole.valueOf(snap.child("role").getValue<String>()?:"ADM"),
+                                        isFree = snap.child("isFree").getValue<Boolean>()?:false
+                                    )
+                                }
+                                UserRole.ADM -> {
+                                    user = AdmUser(
+                                        uid = snap.key.toString(),
+                                        email = snap.child("email").getValue<String>()?:"ERR",
+                                        password = snap.child("password").getValue<String>()?:"ERR",
+                                        name = snap.child("name").getValue<String>()?:"ERR",
+                                        role = UserRole.valueOf(snap.child("role").getValue<String>()?:"ADM"),
+                                    )
+                                }
+                                UserRole.NUL -> {
+                                    user = null
+                                }
+                            }
+                             */
+
+                            break
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            }
+        )
+
+        */
+
+        user = _usersList.value?.find { it.email == email }
+
+        Log.i("!!!", "Sto mandando al main l'utente ${user?.uid}")
+
+        return user
+    }
+
+    suspend fun initStores(){
         fun cLog(msg: String){
             if(FB_DEBUG)
                 Log.i("DB_STRS", msg)
@@ -399,23 +501,37 @@ class FirebaseRepository {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateOrderState(id: String){
+        val currState : OrderState? = ordersList.value?.find { it.id==id }?.stateList?.last()
+
+        if(currState!=null){
+            val nextStateName = OrderStateName.values()[currState.state.ordinal+1]
+
+
+            dbRefOrders.child(id).child("stateList").setValue(mapOf(nextStateName.toString() to LocalDateTime.now().toString()))
+        }
+    }
+
     // ASSIGN FUNS
     fun assignStore(): String {
         return dbRefStores.child("STO_01").key.toString()
     }
 
     fun assignCarrier(): String {
-        val carriersList : List<CrrUser>? = _usersList.value?.filterIsInstance<CrrUser>()
+        //val carriersList : List<CrrUser>? = _usersList.value?.filterIsInstance<CrrUser>()
+        val carriersList : List<User>? = _usersList.value?.filter { it.role==UserRole.CRR }
 
         return if(carriersList!=null){
-            carriersList.filter { it.isFree }.sortedBy { it.uid }[0].uid
+            //carriersList.filter { it.isFree }.sortedBy { it.uid }[0].uid
+            carriersList.first().uid
         }else{
             "ERR"
         }
     }
 
     // DEBUG
-    fun DebugResetOrders(){
+    fun debugResetOrders(){
         Log.w("RESET ORDERS", "RESET STARTED")
 
         //TODO: leggo la lista di ordini e per ognuno di esso

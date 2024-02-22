@@ -10,7 +10,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.firebase.ui.storage.BuildConfig
 import it.polito.did.g2.shopdrop.navigation.Nav
 import it.polito.did.g2.shopdrop.ui.theme.ShopDropTheme
 
@@ -26,22 +25,23 @@ class MainActivity : ComponentActivity() {
 
         //viewModel.debugInit()
 
-        Log.i("MAoCr", "\tGetting shared refs at '${BuildConfig.LIBRARY_PACKAGE_NAME}.login_info'")
-        loginSP = getSharedPreferences(BuildConfig.LIBRARY_PACKAGE_NAME+".login_info", Context.MODE_PRIVATE)
+        Log.i("MAoCr", "\tGetting shared refs at 'shopdrop.login_info'")
+        loginSP = getSharedPreferences("shopdrop.login_info", Context.MODE_PRIVATE)
 
-        viewModel.setLoginSP(loginSP)
-        viewModel.loadCredentials()
 
-        installSplashScreen().apply{//Prima di setContent per avviare splashscreen
+        installSplashScreen()
+            .apply{//Prima di setContent per avviare splashscreen
+
             this.setKeepOnScreenCondition{
                 viewModel.isLoading.value
             }
+
+            viewModel.setLoginSP(loginSP)
+            viewModel.loadCredentials()
         }
 
         setContent {
             ShopDropTheme {
-                // A surface container using the 'background' color from the theme
-                //Navigation(vm)
                 Nav(viewModel)
             }
         }

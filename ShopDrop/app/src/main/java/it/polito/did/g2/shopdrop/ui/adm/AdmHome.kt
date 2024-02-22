@@ -1,7 +1,11 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3Api::class
+)
 
 package it.polito.did.g2.shopdrop.ui.adm
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -66,6 +70,7 @@ import kotlinx.coroutines.launch
 
 enum class AdminViews { USR, ORD, LKR, STO, PRD, DBG }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ADMHomeScreen(navController : NavController, viewModel: MainViewModel){
@@ -279,22 +284,50 @@ fun UsersScreen(viewModel: MainViewModel) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun OrdersScreen(viewModel: MainViewModel) {
-    viewModel.ordersList.observeAsState().value?.forEach {
-        Card(Modifier.fillMaxWidth()){
-            Row(horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("${it.id}")
-                Text("${it.carrierID}")
-            }
-            HorizontalDivider(thickness = 2.dp)
 
-            Row(horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("${it.storeID}")
-                Text("->")
-                Text("${it.lockerID}")
-                Text("->")
-                Text("${it.customerID}")
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(4.dp)){
+        viewModel.ordersList.observeAsState().value?.forEach {
+            Card(
+                Modifier
+                    .fillMaxWidth()
+            ){
+                Column(Modifier.fillMaxWidth().padding(8.dp)){
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("${it.id}")
+                        Text("${it.carrierID}")
+                    }
+                    HorizontalDivider(thickness = 2.dp)
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("${it.storeID}")
+                        Text("->")
+                        Text("${it.lockerID}")
+                        Text("->")
+                        Text("${it.customerID}")
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    ) {
+                        Button(onClick = { viewModel.updateOrderState(it.id!!) }) {
+                            Text(text = "UPDATE STATE")
+                        }
+                    }
+                }
             }
         }
     }

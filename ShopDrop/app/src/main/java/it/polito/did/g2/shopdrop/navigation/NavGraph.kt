@@ -1,6 +1,7 @@
 package it.polito.did.g2.shopdrop.navigation
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
@@ -22,6 +23,11 @@ fun Nav(viewModel: MainViewModel){
         else -> Screens.Login.route
     }
 
+    if(viewModel.currUser.value?.role!=null)
+        Log.i("NAV", "Current user already loaded, so start destination is $startDestination")
+    else
+        Log.i("NAV", "Current user NOT loaded yet, so start destination is $startDestination")
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -34,58 +40,11 @@ fun Nav(viewModel: MainViewModel){
 
         //CUSTOMER BRANCH (CST)
         cstNavGraph(navController, viewModel)
-        /*
-        composable(route = Screens.CstHomeScreen.route){
-            CSTHomeScreen(navController, viewModel)
-        }
-
-        composable(route = Screens.CstCartScreen.route){
-            //TODO
-            Text("CST CART SCREEN")
-        }
-
-        composable(route = Screens.CstProfileScreen.route){
-            CSTProfileScreen(navController, viewModel)
-        }
-
-        composable(route = Screens.CstOrderDetailScreen.route){
-            //TODO
-            Text("CST ORDER DETAIL SCREEN")
-        }
-
-        composable(route = Screens.CstCameraScreen.route){
-            //TODO
-            Text("CST CAMERA SCREEN")
-        }
-         */
 
         //CARRIER BRANCH (CRR)
         crrNavGraph(navController, viewModel)
-        /*
-        composable(route = Screens.CrrHomeScreen.route){
-            //TODO
-            Text("CRR HOME SCREEN")
-        }
-
-        composable(route = Screens.CrrProfileScreen.route){
-            //TODO
-            Text("CRR PROFILE SCREEN")
-        }
-
-        composable(route = Screens.CrrCameraScreen.route){
-            //TODO
-            Text("CRR CAMERA SCREEN")
-        }
-        */
 
         //ADMIN BRANCH (ADM)
         admNavGraph(navController, viewModel)
-        /*
-        composable(route = Screens.AdmHomeScreen.route){
-            //TODO
-            Text("ADM HOME SCREEN")
-        }
-
-         */
     }
 }

@@ -48,7 +48,7 @@ import it.polito.did.g2.shopdrop.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CameraScreen(navController : NavController, viewModel: MainViewModel){
+fun CameraScreen(navController : NavController, viewModel: MainViewModel, orderID : String?){
     var code by remember{ mutableStateOf("") }
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current

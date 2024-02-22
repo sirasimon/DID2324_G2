@@ -1,10 +1,8 @@
 package it.polito.did.g2.shopdrop.data.users
 
-import it.polito.did.g2.shopdrop.data.OrderStateName
-
 //data class User(val uid: String, val email: String, val password: String, val name: String, val role: UserRole)
 
-abstract class User (
+open class User (
     val uid: String,
     val email: String,
     val password: String,
@@ -12,6 +10,7 @@ abstract class User (
     val role: UserRole
 )
 
+/*
 class AdmUser(
     uid: String,
     email: String,
@@ -38,3 +37,4 @@ class CrrUser(
     role: UserRole,
     var isFree : Boolean = false
 ) : User(uid, email, password, name, role)
+*/

@@ -95,31 +95,6 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
-    /*
-    fun checkForm(navController: NavController, userData : User, viewModel: MainViewModel){
-
-        if(userData.email.contains("@shopdrop.com")){
-            Log.i("FORM_CHECK", "email contains company domain")
-            /*
-            if(viewModel.login(UserQuery(userData.email, userData.password, UserRole.DLV))) {
-                Log.i("FORM_CHECK", "data is correct, redirecting to Delivery Home")
-                navController.navigate("DeliveryHome")
-            }
-            */
-            navController.navigate(Screens.CrrHomeScreen.route)
-            /*
-            else {
-                Log.i("FORM_CHECK", "data is incorrect ($userData)")
-                emailError = false
-                passwordError = false
-            }
-             */
-        }else{
-            navController.navigate(Screens.CstHomeScreen.route)
-        }
-    }
-     */
-
     fun login(){
         Log.i("BTN_LOGIN", "LOGIN PRESSED")
         Log.i("BTN_LOGIN", "\tisLoading = $isLoading, setting it to true")
@@ -135,7 +110,9 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
             var userQuery = UserQuery(email, password)
             Log.i("BTN_LOGIN", "\tCreating login query: $userQuery")
 
-            viewModel.login(userQuery)
+            //viewModel.login(userQuery)
+            viewModel.validateCredentials(userQuery)
+
             delay(1500)
             Log.i("BTN_LOGIN", "\tQuery changed to: $userQuery")
 
@@ -144,6 +121,8 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
             Log.i("BTN_LOGIN", "\tisLoading = $isLoading, setting it to false")
 
             if (userQuery.role!=null && userQuery.errType==null) {
+                viewModel.login(userQuery.email)
+
                 when(userQuery.role){
                     UserRole.ADM ->{
                         Log.i("BTN_LOGIN", "\tVALID CREDENTIALS: role is ${userQuery.role} (exp ADM), navigating to Carrier Home")

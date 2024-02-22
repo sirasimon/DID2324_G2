@@ -95,7 +95,7 @@ fun CSTProfileScreen(navController: NavController, viewModel: MainViewModel){
                             .padding(16.dp)
                     ) {
                         Column{
-                            Text("${viewModel.currUser.value?.name}")   //TODO mettere credenziali vere
+                            Text("${viewModel.currUser.value?.name} (${viewModel.currUser.value?.uid})")   //TODO mettere credenziali vere
                             Text("${viewModel.currUser.value?.email}")
                             Text("(+39) 333 1234567")
                         }

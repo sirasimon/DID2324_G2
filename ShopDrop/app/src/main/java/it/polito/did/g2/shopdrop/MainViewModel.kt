@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import it.polito.did.g2.shopdrop.data.Cart
 import it.polito.did.g2.shopdrop.data.CollectionStep
 import it.polito.did.g2.shopdrop.data.Fees
@@ -24,14 +25,12 @@ import it.polito.did.g2.shopdrop.data.Order
 import it.polito.did.g2.shopdrop.data.OrderStateName
 import it.polito.did.g2.shopdrop.data.Store
 import it.polito.did.g2.shopdrop.data.StoreItem
-import it.polito.did.g2.shopdrop.data.users.AdmUser
-import it.polito.did.g2.shopdrop.data.users.CrrUser
-import it.polito.did.g2.shopdrop.data.users.CstUser
 import it.polito.did.g2.shopdrop.data.users.User
 import it.polito.did.g2.shopdrop.data.users.UserQuery
 import it.polito.did.g2.shopdrop.data.users.UserRole
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -54,83 +53,172 @@ class MainViewModel() : ViewModel(){
         loginSP = sp
     }
 
+    private fun loadCurrentUser(email: String){
+        Log.i("LOAD_USER", "LOADING CURRENT USER INFO")
+
+        _currUser.value = fbRepo.getUserByEmail(email)
+
+        //val user = fbRepo.getUser(email)
+        /*
+        val user : User? = if(loginSP.getString("uid", null) != null ){
+            User(
+                loginSP.getString("uid", null)!!,
+                loginSP.getString("email", null)!!,
+                loginSP.getString("password", null)!!,
+                loginSP.getString("name", null)!!,
+                UserRole.valueOf(loginSP.getString("role", null)!!)
+            )
+        }else{
+            fbRepo.usersList.value?.find { it.email == email }
+        }
+
+         */
+/*
+        when(user?.role){
+            UserRole.ADM -> {
+                _currUser.value = AdmUser(
+                    user.uid,
+                    user.email,
+                    user.password,
+                    user.name,
+                    user.role
+                )
+            }
+            UserRole.CST -> {
+                _currUser.value = CstUser(
+                    user.uid,
+                    user.email,
+                    user.password,
+                    user.name,
+                    user.role,
+                    null
+                )
+            }
+            UserRole.CRR -> {
+                _currUser.value = CrrUser(
+                    user.uid,
+                    user.email,
+                    user.password,
+                    user.name,
+                    user.role,
+                    (user as CrrUser).isFree
+                )
+            }
+            else -> _currUser.value = null
+        }
+*/
+        Log.i("LOAD_USER", "\tNow current user is: ${_currUser.value?.uid} (${currUser.value?.uid})")
+    }
+
     fun loadCredentials(){
         Log.i("LOADING CR", "LOADING CREDENTIALS")
 
         if(loginSP.getString("uid", null) != null ){
-            when(UserRole.valueOf(loginSP.getString("role", "NUL")!!)){
-                UserRole.ADM -> {
-                    _currUser.value = AdmUser(
-                        loginSP.getString("uid", "ERR")!!,
-                        loginSP.getString("email", "ERR")!!,
-                        loginSP.getString("password", "ERR")!!,
-                        loginSP.getString("name", "ERR")!!,
-                        UserRole.valueOf(loginSP.getString("role", "")!!)
-                    )
-                }
+            //loadCurrentUser(loginSP.getString("uid", null)!!)
+
+            _currUser.value = User(
+                loginSP.getString("uid", null)!!,
+                loginSP.getString("email", null)!!,
+                loginSP.getString("password", null)!!,
+                loginSP.getString("name", null)!!,
+                UserRole.valueOf(loginSP.getString("role", null)!!)
+            )
+            /*
+            when(UserRole.valueOf(loginSP.getString("role", null)!!)){
                 UserRole.CST -> {
                     _currUser.value = CstUser(
-                        loginSP.getString("uid", "ERR")!!,
-                        loginSP.getString("email", "ERR")!!,
-                        loginSP.getString("password", "ERR")!!,
-                        loginSP.getString("name", "ERR")!!,
-                        UserRole.valueOf(loginSP.getString("role", "")!!)
+                        loginSP.getString("uid", null)!!,
+                        loginSP.getString("email", null)!!,
+                        loginSP.getString("password", null)!!,
+                        loginSP.getString("name", null)!!,
+                        UserRole.valueOf(loginSP.getString("role", null)!!)
                     )
                 }
                 UserRole.CRR -> {
                     _currUser.value = CrrUser(
-                        loginSP.getString("uid", "ERR")!!,
-                        loginSP.getString("email", "ERR")!!,
-                        loginSP.getString("password", "ERR")!!,
-                        loginSP.getString("name", "ERR")!!,
-                        UserRole.valueOf(loginSP.getString("role", "")!!)
+                        loginSP.getString("uid", null)!!,
+                        loginSP.getString("email", null)!!,
+                        loginSP.getString("password", null)!!,
+                        loginSP.getString("name", null)!!,
+                        UserRole.valueOf(loginSP.getString("role", null)!!)
                     )
                 }
-                else -> _currUser.value = null
+                UserRole.ADM -> {
+                    _currUser.value = AdmUser(
+                        loginSP.getString("uid", null)!!,
+                        loginSP.getString("email", null)!!,
+                        loginSP.getString("password", null)!!,
+                        loginSP.getString("name", null)!!,
+                        UserRole.valueOf(loginSP.getString("role", null)!!)
+                    )
+                }
+                UserRole.NUL -> TODO()
             }
+            */
         }else{
             Log.i("LOADING CR", "\tNo credentials saved yet")
         }
     }
 
-    fun saveCredentials(newCredentials: User){
-        Log.i("SAVE_CREDS", "SAVING CREDENTIALS INTO SHARED PREFERENCES")
+    fun validateCredentials(userQuery: UserQuery){
+        Log.i("VALIDATE CR", "VALIDATING CREDENTIALS")
 
-        loginSP.edit().apply{
-            putString("uid", newCredentials.uid)
-            putString("email", newCredentials.email)
-            putString("password", newCredentials.password)
-            putString("role", newCredentials.role.toString())
-            apply()
-        }
-
-        Log.i("SAVE_CREDS", "DONE!")
-    }
-
-    fun login(userQuery: UserQuery){
+        userQuery.errType = null
 
         val targetUID = fbRepo.usersList.value?.find { it.email == userQuery.email }?.uid
 
         if(targetUID != null){
-            userQuery.errType = null
-
-            if(fbRepo.usersList.value?.find { it.uid == targetUID }?.password == userQuery.password){
-                _currUser.value = fbRepo.usersList.value!!.find { it.uid == targetUID }
-                userQuery.role = _currUser.value?.role
-
-                saveCredentials(_currUser.value!!)
-
-            }else{
+            if(fbRepo.usersList.value?.find { it.uid == targetUID }?.password != userQuery.password){
                 userQuery.errType = UserQuery.LOGIN_ERROR_TYPE.PASSWORD
+            }else{
+                userQuery.role = fbRepo.usersList.value?.find { it.uid == targetUID }?.role
             }
         }else{
             userQuery.errType = UserQuery.LOGIN_ERROR_TYPE.NOT_FOUND
         }
     }
 
+    private fun saveCredentials(){
+        Log.i("SAVE_CREDS", "SAVING CREDENTIALS INTO SHARED PREFERENCES")
+
+        val newCredentials = _currUser.value
+
+        Log.i("SAVE_CREDS", "\tSaving into $loginSP data of _currUser (${_currUser.value?.uid})")
+
+        loginSP.edit().apply{
+            putString("uid", newCredentials?.uid)
+            putString("email", newCredentials?.email)
+            putString("password", newCredentials?.password)
+            putString("name", newCredentials?.name)
+            putString("role", newCredentials?.role.toString())
+            apply()
+        }
+
+        Log.i("SAVE_CREDS", "DONE!")
+        Log.i("SAVE_CREDS", "\tData saved is: " +
+                "${loginSP.getString("uid", "[uid here]")} – " +
+                "${loginSP.getString("email", "[email here]")} – " +
+                "${loginSP.getString("password", "[password here]")} – " +
+                "${loginSP.getString("role", "[role here]")}")
+    }
+
+    private fun deleteCredentials(){
+        Log.i("DELETE CR", "DELETING CREDENTIALS")
+
+        loginSP.edit().clear().apply()
+    }
+
+    fun login(email: String){
+        Log.i("LOGIN", "LOGGING IN WITH EMAIL $email")
+        loadCurrentUser(email)
+        Log.i("LOGIN", "SAVING CREDENTIALS")
+        saveCredentials()
+    }
+
     fun logout(){
         Log.i("LOGOUT", "Removing login data from shared preferences")
-        loginSP.edit().clear().apply()
+
+        deleteCredentials()
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////        PRODUCTS
@@ -146,6 +234,14 @@ class MainViewModel() : ViewModel(){
     val usersList : LiveData<MutableList<User>> = fbRepo.usersList
 
     ////////////////////////////////////////////////////////////////////////////////////////////////        SHOPPING AND ORDER DATA
+
+    // PENDING ORDERS
+    private val _userOrders : MutableLiveData<MutableList<Order>> = MutableLiveData(fbRepo.ordersList.value?.filter { it.customerID == _currUser.value?.uid }?.toMutableList())
+    val userOrders : LiveData<MutableList<Order>> = _userOrders
+
+    private val _pendingOrders : MutableLiveData<MutableList<Order>> = MutableLiveData(_userOrders.value?.filter { it.stateList?.last()?.state?.isPending() == true }?.toMutableList())
+    val pendingOrders : LiveData<MutableList<Order>> = _pendingOrders
+
 
     //CART DATA
     private val _cart : MutableLiveData<Cart?> = MutableLiveData(null)
@@ -222,15 +318,9 @@ class MainViewModel() : ViewModel(){
         _currOrder.value = null
     }
 
-    fun getPendingOrders(): List<String>?{
-        val currentUser = _currUser.value
-        var orders : List<String>? = null
-
-        if(currentUser is CstUser){
-            orders = currentUser.orders?.map { it.key }
-        }
-
-        return orders
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateOrderState(id: String){
+        fbRepo.updateOrderState(id)
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////        OPENING PROCEDURE
@@ -249,108 +339,19 @@ class MainViewModel() : ViewModel(){
     var targetOrderID : String? = null
 
 
-    //TODO Adesso HARDCODED ma da fare su server
-    /*
-    @RequiresApi(Build.VERSION_CODES.O)
-    private val _pendingOrdersList : MutableLiveData<MutableList<Order>> = MutableLiveData(
-        mutableListOf(
-            Order("0x11", "STO_01", "0x13", "0x14", "LTO_01",
-                listOf(
-                    OrderState(OrderStateName.CREATED, LocalDateTime.now().minusHours(3)),
-                    OrderState(OrderStateName.RECEIVED, LocalDateTime.now().minusHours(3).plusMinutes(35)),
-                    OrderState(OrderStateName.CARRIED, LocalDateTime.now().minusHours(2).plusMinutes(15)),
-                    OrderState(OrderStateName.AVAILABLE, LocalDateTime.now().minusMinutes(47)),
-                )
-            ),
-            Order("0x21", "STO_01", "0x23", "0x24", "LTO_01",
-                listOf(
-                    OrderState(OrderStateName.CREATED, LocalDateTime.now().minusHours(2)),
-                    OrderState(OrderStateName.RECEIVED, LocalDateTime.now().minusHours(2).plusMinutes(35)),
-                    OrderState(OrderStateName.CARRIED, LocalDateTime.now().minusHours(1).plusMinutes(15)),
-                )
-            ),
-            Order("0x31", "STO_01", "0x33", "0x34", "LTO_01",
-                listOf(
-                    OrderState(OrderStateName.CREATED, LocalDateTime.now().minusHours(1)),
-                )
-            )
-        )
-    )
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    val pendingOrdersList : LiveData<MutableList<Order>> = _ordersList
-    */
-
-    /*
-    class OrdersList(
-        pending : MutableList<Order>? = null,
-        archived : MutableList<Order>? = null,
-        cancelled : MutableList<Order>? = null
-    )
-
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private val _ordersList : MutableLiveData<OrdersList> = MutableLiveData<OrdersList>(OrdersList())
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    val ordersList : LiveData<OrdersList> = _ordersList
-    */
-
-
-    //DEBUG
-
-    /*
-    private val _apriVal : MutableLiveData<String> = MutableLiveData("")
-    val apriVal : LiveData<String> = _apriVal
-
-    private val orders = dbRef.child("debug").addValueEventListener(
-        object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                Log.i("DBCON", "Listening to value in orders")
-                //Looking for orders for UID
-
-                _apriVal.value = snapshot.child("apri").getValue<String>()
-
-                Log.i("DBCON", "\t${_apriVal.value} ++ ${apriVal.value}")
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                //TODO
-                Log.i("DB CON", "CANCELLED")
-            }
-        }
-    )
-     */
-
-    //LOGIN
-
-
-    //DEBUG FUNS
-    /*
-    fun debugInit(){
-        Log.i("DBCON", "Store value BEFORE init is ${apriVal.value}")
-        dbRef.child("debug").child("apri").setValue("false")
-        Log.i("DBCON", "Store value AFTER init is ${apriVal.value}")
-    }
-
-    fun debugOpen(){
-        dbRef.child("debug").child("apri").setValue("true")
-    }
-
-    fun debugSetDefault(){
-        dbRef.child("debug").child("apri").setValue("null")
-    }
-     */
-
     init{
         Log.i("MVM INIT", "####################")
-        fbRepo.initUsers()
-        fbRepo.initProducts()
-        fbRepo.initOrders()
-        fbRepo.initLockers()
-        fbRepo.initStores()
+        viewModelScope.launch {
+            fbRepo.initUsers()
+            fbRepo.initProducts()
+            fbRepo.initOrders()
+            fbRepo.initLockers()
+            fbRepo.initStores()
+        }
 
         _isLoading.value = false
+
+        Log.i("MVM INIT", "END ####################")
     }
 
     /*
@@ -431,7 +432,7 @@ class MainViewModel() : ViewModel(){
         when(target){
             db_reset.ORDERS -> {
                 Log.w("RESET", "RESETTING ORDERS DB")
-                fbRepo.DebugResetOrders()
+                fbRepo.debugResetOrders()
             }
 
             db_reset.LOCKERS -> {

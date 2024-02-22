@@ -20,5 +20,12 @@ enum class OrderStateName {
     AVAILABLE,
     COLLECTED,
     ERROR,
-    CANCELLED
+    CANCELLED;
+
+    fun isPending(): Boolean{
+        return when (this){
+            CREATED, RECEIVED, CARRIED, AVAILABLE -> true
+            COLLECTED, ERROR, CANCELLED -> false
+        }
+    }
 }
