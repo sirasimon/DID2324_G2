@@ -117,7 +117,7 @@ fun CRRHomeScreen(navController : NavController, viewModel: MainViewModel){
                         }
                         composable(CrrFilterChip.DELI.toString()){
                             viewModel.ordersList.observeAsState().value
-                                ?.filter { it.carrierID == viewModel.currUser.value?.uid && it.stateList?.map{s -> s.state}?.contains(OrderStateName.RECEIVED)==true && it.stateList?.map{s -> s.state}?.contains(OrderStateName.CARRIED)==true}
+                                ?.filter { it.carrierID == viewModel.currUser.value?.uid && it.stateList?.map{s -> s.state}?.contains(OrderStateName.RECEIVED)==true && it.stateList?.map{s -> s.state}?.contains(OrderStateName.CARRIED)==true && it.stateList?.map{s -> s.state}?.contains(OrderStateName.AVAILABLE)==false}
                                 ?.forEach{
                                     val onMore = {id : String -> /*navController.navigate(Screens.CrrOrderDetail.route+"/$id")*/ }  //TODO
                                     val onScan = {id : String -> navController.navigate(Screens.CrrDepositCameraScreen.route+"/$id")}

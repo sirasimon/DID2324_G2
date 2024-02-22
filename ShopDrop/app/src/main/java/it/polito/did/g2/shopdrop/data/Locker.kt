@@ -9,6 +9,8 @@ class Locker(
     var isWorking : Boolean = false,
     var isFull : Boolean = false,
     var isEmpty : Boolean = false,
+    var isInteracting: Boolean = false,
+    var otp: String = "9999",
     var showCode: Boolean = false
 ){
     fun checkAvailability(): List<Int>?{

@@ -333,6 +333,8 @@ class FirebaseRepository {
                             address = snap.child("address").getValue<String>()?:"ERR",
                             isOnline = snap.child("isOnline").getValue<Boolean>()?:false,
                             isWorking = snap.child("isWorking").getValue<Boolean>()?:false,
+                            isInteracting = snap.child("isInteracting").getValue<Boolean>()?:false,
+                            otp = snap.child("otp").getValue<String>()?:"9999",
                             compartments = compsList.toList()
                         )
 
@@ -573,7 +575,7 @@ class FirebaseRepository {
         Log.i("CST_COLLECTION", "\tChecking if correct locker")
 
         if(_ordersList.value?.find { it.id==orderID }?.lockerID != lockerID) {
-            Log.w("CST_COLLECTION", "\tWrong locker")
+            Log.w("CST_COLLECTION", "\tWrong locker (${_ordersList.value?.find { it.id==orderID }?.lockerID}) and orderID = $orderID")
             return false
         }
 
@@ -581,22 +583,17 @@ class FirebaseRepository {
 
         Log.i("CST_COLLECTION", "\tChecking OTP")
 
-        val currOTP : String = dbRefLockers.child(lockerID)
-            .child("otp")
-            .get().toString()
-
-        if(currOTP!=otp){
+        if(_lockersList.value?.find{it.id == lockerID}?.otp != otp){
             Log.w("CST_COLLECTION", "\tWrong OTP")
             return false
         }
 
         Log.i("CST_COLLECTION", "\tRight OTP")
 
-        var success = false
 
-        dbRefLockers.child(lockerID).child("showCode").setValue(false)
-            .addOnSuccessListener { Log.i("CST_COLLECTION", "\tShow code is now false, the locker results occupied"); success = true }
-            .addOnFailureListener { Log.e("CST_COLLECTION", "\tFAILED TO OCCUPY THE LOCKER") ; success = false }
+        Log.i("CRR_OCC_LOCK", "\tRight OTP")
+
+        dbRefLockers.child(lockerID).child("isInteracting").setValue(true)
 
         //TODO apertura
         dbRefLockers.child(lockerID)
@@ -607,18 +604,17 @@ class FirebaseRepository {
                         for(snap in snapshot.children){
                             if(snap.child("orderID").getValue<String>()==orderID) {
                                 snap.child("isOpen").ref.setValue(true)
-                                success = true
                             }
                         }
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        success = false
+                        TODO()
                     }
                 }
             )
 
-        return success
+        return true
     }
 
     fun crrOccupyLocker(lockerCode: String, orderID: String) : Boolean{
@@ -639,23 +635,34 @@ class FirebaseRepository {
 
         Log.i("CRR_OCC_LOCK", "\tChecking OTP")
 
-        val currOTP : String = dbRefLockers.child(lockerID)
-            .child("otp")
-            .get().toString()
+        //var currOTP : String? = null
 
-        if(currOTP!=otp){
-            Log.w("CRR_OCC_LOCK", "\tWrong OTP")
+        /*
+        dbRefLockers.child(lockerID)    //TODO cambiare a lettura in locale
+            .child("otp")
+            .get()
+            .addOnSuccessListener {
+                Log.i("CRR_OCC_LOCK", "\tCurrent OTP is ${it.getValue<String>()}")
+                currOTP = it.getValue<String>()
+            }
+            .addOnFailureListener {
+                Log.e("ERRORE","ERRORE $it")
+            }
+        */
+
+        if(_lockersList.value?.find{it.id == lockerID}?.otp != otp){
+            Log.w("CRR_OCC_LOCK", "\tWrong OTP (${_lockersList.value?.find { it.id == lockerID }?.otp})")
             return false
         }
 
         Log.i("CRR_OCC_LOCK", "\tRight OTP")
 
         var success = false
-        dbRefLockers.child(lockerID).child("showCode").setValue(false)
-            .addOnSuccessListener { Log.i("CRR_OCC_LOCK", "\tShow code is now false, the locker results occupied"); success = true }
-            .addOnFailureListener { Log.e("CRR_OCC_LOCK", "\tFAILED TO OCCUPY THE LOCKER") ; success = false }
+        dbRefLockers.child(lockerID).child("isInteracting").setValue(true)
+            //.addOnSuccessListener { Log.i("CRR_OCC_LOCK", "\tisInteracting is now false, the locker results occupied"); success = true }
+            //.addOnFailureListener { Log.e("CRR_OCC_LOCK", "\tFAILED TO OCCUPY THE LOCKER") ; success = false }
 
-        return success
+        return true
     }
 
     fun crrDepositing(orderID: String){

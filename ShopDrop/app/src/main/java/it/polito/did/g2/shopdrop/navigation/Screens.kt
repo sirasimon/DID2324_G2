@@ -38,4 +38,5 @@ sealed class Screens(val route: String) {
 
     //ADMIN SCREENS ################################################################################
     object AdmHomeScreen : Screens("AdmHomeScreen")
+    object AdmCameraTest : Screens("AdmCameraTest")
 }

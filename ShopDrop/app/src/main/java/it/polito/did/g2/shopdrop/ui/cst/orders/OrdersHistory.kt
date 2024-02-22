@@ -99,9 +99,9 @@ fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
                                             it.stateList?.last()?.state != OrderStateName.CANCELLED
                                 }?.toMutableList(),
                                 viewModel
-                            ) {
+                            ) { id ->
                                 navController.navigate(
-                                    Screens.CstOrderDetail.route + "/${it.id}"
+                                    Screens.CstOrderDetail.route + "/$id"
                                 )
                             }
                         }
@@ -112,9 +112,9 @@ fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
                                             it.stateList?.last()?.state == OrderStateName.COLLECTED
                                 }?.toMutableList(),
                                 viewModel
-                            ) {
+                            ) {id ->
                                 navController.navigate(
-                                    Screens.CstOrderDetail.route + "/${it.id}"
+                                    Screens.CstOrderDetail.route + "/${id}"
                                 )
                             }
                         }
@@ -125,9 +125,9 @@ fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
                                             it.stateList?.last()?.state == OrderStateName.CANCELLED
                                 }?.toMutableList(),
                                 viewModel
-                            ) {
+                            ) {id ->
                                 navController.navigate(
-                                    Screens.CstOrderDetail.route + "/${it.id}"
+                                    Screens.CstOrderDetail.route + "/${id}"
                                 )
                             }
                         }
@@ -140,7 +140,7 @@ fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ListedOrders(list: MutableList<Order>?, viewModel: MainViewModel, onClick: () -> Unit) {
+fun ListedOrders(list: MutableList<Order>?, viewModel: MainViewModel, onClick: (String) -> Unit) {
 
     Column(Modifier.fillMaxWidth()){
         if(!list.isNullOrEmpty()){
@@ -150,7 +150,7 @@ fun ListedOrders(list: MutableList<Order>?, viewModel: MainViewModel, onClick: (
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 4.dp)
                         .height(64.dp)
-                        .clickable(onClick = onClick)
+                        .clickable(onClick = { onClick(item.id!!) })
                 ) {
                     ListItem(
                         headlineContent = {

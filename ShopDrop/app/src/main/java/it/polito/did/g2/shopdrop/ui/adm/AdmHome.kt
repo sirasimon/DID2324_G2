@@ -1,5 +1,5 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
-    ExperimentalMaterial3Api::class
+    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class
 )
 
 package it.polito.did.g2.shopdrop.ui.adm
@@ -197,6 +197,13 @@ fun ADMHomeScreen(navController : NavController, viewModel: MainViewModel){
                                     }) {
                                     Text("RESET ORDERS DB")
                                 }
+
+                                Button(
+                                    onClick = {
+                                        navController.navigate(Screens.AdmCameraTest.route)
+                                    }) {
+                                    Text("TEST CAMERA")
+                                }
                             }
                         }
                     }
@@ -229,6 +236,7 @@ fun ADMHomeScreen(navController : NavController, viewModel: MainViewModel){
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ADMTopBar(title: String, icon: ImageVector, openMenu: ()-> Unit){
     CenterAlignedTopAppBar(
