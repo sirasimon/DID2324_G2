@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -36,11 +36,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -61,15 +61,15 @@ import it.polito.did.g2.shopdrop.ui.cst.common.TopBar
 @Composable
 fun CSTCartScreen(navController: NavController, viewModel: MainViewModel){
     val currentTab = TabScreen.CART
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val subtotal = mutableStateOf(viewModel.cart.value?.subtot)
 
     val hasItems = viewModel.cart.value?.totalItems != 0
 
     Scaffold(
-        topBar = { TopBar(navController, stringResource(id = R.string.title_cart), scrollBehavior) },
+        topBar = { TopBar(null, stringResource(id = R.string.title_cart), scrollBehavior) },
         bottomBar = { BottomBar(currentTab, navController, viewModel) },
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         floatingActionButton = { if(hasItems) CheckoutButton { navController.navigate(Screens.CstCheckout.route); viewModel.createOrder() } },
         floatingActionButtonPosition = FabPosition.Center
     ) { paddingValues ->
@@ -80,12 +80,25 @@ fun CSTCartScreen(navController: NavController, viewModel: MainViewModel){
                 .padding(paddingValues),
             color = MaterialTheme.colorScheme.background
         ) {
-            Column( modifier = Modifier
-                .fillMaxHeight()
-                .verticalScroll(rememberScrollState())){
 
-                if(!viewModel.cart.value?.items.isNullOrEmpty()){
-                    viewModel.cart.value?.items?.forEach {
+
+            if(!viewModel.cart.observeAsState().value?.items.isNullOrEmpty()){
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ){
+                    Row(
+                        horizontalArrangement = Arrangement.End,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        TextButton(onClick = { viewModel.emptyCart() }) {
+                            Text(stringResource(id = R.string.btn_delete_all).capitalize())
+                        }
+                    }
+
+                    viewModel.cart.observeAsState().value?.items?.forEach {
                         //ProductListItem(viewModel.storeItems.value?.find { item -> item.name==it.key }, it.value)
                         ProductListItem(viewModel, it.key)
                     }
@@ -95,23 +108,46 @@ fun CSTCartScreen(navController: NavController, viewModel: MainViewModel){
                     Column(
                         Modifier
                             .fillMaxWidth()
-                            .padding(8.dp)){
+                            .padding(8.dp)
+                    ) {
                         Row(
                             Modifier
                                 .fillMaxWidth()
-                                .height(24.dp)){}
+                                .height(24.dp)
+                        ) {}
 
-                        PriceItemList(stringResource(R.string.price_subtotal).capitalize(), String.format("%.2f €", subtotal.value))  //TODO
-                        PriceItemList(stringResource(R.string.price_shipment).capitalize(), String.format("%.2f €", Fees.SHIPMENT))
-                        PriceItemList(stringResource(R.string.price_service).capitalize(), String.format("%.2f €", Fees.SERVICE))
-                        PriceListTotal(stringResource(R.string.price_total).uppercase(), String.format("%.2f €", (subtotal.value?:0f)+Fees.total()))
+                        PriceItemList(
+                            stringResource(R.string.price_subtotal).capitalize(),
+                            String.format("%.2f €", subtotal.value)
+                        )  //TODO
+                        PriceItemList(
+                            stringResource(R.string.price_shipment).capitalize(),
+                            String.format("%.2f €", Fees.SHIPMENT)
+                        )
+                        PriceItemList(
+                            stringResource(R.string.price_service).capitalize(),
+                            String.format("%.2f €", Fees.SERVICE)
+                        )
+                        PriceListTotal(
+                            stringResource(R.string.price_total).uppercase(),
+                            String.format("%.2f €", (subtotal.value ?: 0f) + Fees.total())
+                        )
 
                         Spacer(Modifier.height(80.dp))
                     }
-                }else{
-                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()){
-                        Text(text = stringResource(id = R.string.txt_empty_cart))
-                    }
+                }
+            }else{
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                ){
+                    Text(
+                        text = stringResource(id = R.string.txt_empty_cart),
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        textAlign = TextAlign.Center,
+                        fontStyle = FontStyle.Italic
+                    )
                 }
             }
         }

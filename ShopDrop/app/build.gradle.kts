@@ -108,7 +108,7 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences-core:1.0.0")
 
-    //implementation("com.google.android.gms:play-services-vision:20.1.3")
+    implementation("com.google.android.gms:play-services-vision:20.1.3")
     /*
     implementation("com.google.dagger:hilt-android:2.45")
     kapt("com.google.dagger:hilt-android-compiler:2.45")

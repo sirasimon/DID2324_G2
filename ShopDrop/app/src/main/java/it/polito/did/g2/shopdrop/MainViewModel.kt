@@ -233,7 +233,7 @@ class MainViewModel() : ViewModel(){
 
     val usersList : LiveData<MutableList<User>> = fbRepo.usersList
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////        SHOPPING AND ORDER DATA
+    ////////////////////////////////////////////////////////////////////////////////////////////////        CART AND ORDER DATA
 
     // PENDING ORDERS
     private val _userOrders : MutableLiveData<MutableList<Order>> = MutableLiveData(fbRepo.ordersList.value?.filter { it.customerID == _currUser.value?.uid }?.toMutableList())
@@ -264,9 +264,16 @@ class MainViewModel() : ViewModel(){
             _cart.value?.modify(item, quantity)
 
             Log.i("MODIFY_CART", "\tUpdated quantity of \"${item.name}\" in map is ${_cart.value?.items?.get(item.name) ?:"[ERROR]"} (desired change was $quantity)")
+
+            if(_cart.value?.totalItems == 0)
+                _cart.value = null
         }else{
             Log.w("MODIFY_CART", "\tITEM IS NULL")
         }
+    }
+
+    fun emptyCart(){
+        _cart.value = null
     }
 
     /**

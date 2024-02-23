@@ -16,7 +16,7 @@ import it.polito.did.g2.shopdrop.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(navController: NavController,
+fun TopBar(navController: NavController?,
            screenTitle: String,
            scrollBehavior: TopAppBarScrollBehavior
 ){
@@ -34,11 +34,13 @@ fun TopBar(navController: NavController,
             )
         },
         navigationIcon = {
-            IconButton(onClick = { navController.navigateUp() }) {
-                Image(
-                    painter = painterResource(id = R.drawable.btn_back),
-                    contentDescription = "Localized description"
-                )
+            if(navController!=null){
+                IconButton(onClick = { navController.navigateUp() }) {
+                    Image(
+                        painter = painterResource(id = R.drawable.btn_back),
+                        contentDescription = "Localized description"
+                    )
+                }
             }
         },
         scrollBehavior = scrollBehavior,
