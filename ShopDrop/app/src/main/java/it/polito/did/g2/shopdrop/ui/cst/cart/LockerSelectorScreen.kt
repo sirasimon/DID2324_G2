@@ -3,19 +3,25 @@ package it.polito.did.g2.shopdrop.ui.cst.cart
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccessTime
+import androidx.compose.material.icons.outlined.FmdGood
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
@@ -38,6 +44,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -83,13 +91,21 @@ fun LockerSelectorScreen(navController: NavController, viewModel: MainViewModel)
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
             ) {
-                Text("[Searchbar]") //TODO: search bar for locker (not working)
+                OutlinedTextField(
+                    value = "",
+                    placeholder = { Text(text = stringResource(R.string.placeholder_search_locker).capitalize(), fontStyle = FontStyle.Italic)},
+                    enabled = false,
+                    onValueChange = {},
+                    shape = RoundedCornerShape(8.dp),
+                    maxLines = 1,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                )
 
                 SecondaryTabRow(
-                    selectedTabIndex = ViewTab.MAP.ordinal,
-                    indicator = {}
+                    selectedTabIndex = ViewTab.MAP.ordinal
                 ) {
                     Tab(
                         selected = selectedTab == ViewTab.MAP.ordinal,
@@ -107,15 +123,46 @@ fun LockerSelectorScreen(navController: NavController, viewModel: MainViewModel)
                 Column(Modifier.fillMaxWidth()){
                     NavHost(navController = listViewNC, startDestination = ViewTab.MAP.toString()){
                         composable(ViewTab.MAP.toString()){
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .background(Color.LightGray, RoundedCornerShape(16.dp))
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                                    .clickable { performDevMsg(scope, snackbarHostState, context) }
-                            ){
-                                Text("[Locker selector]")
+                            Column {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center,
+                                    modifier = Modifier
+                                        .background(Color.Yellow)
+                                        .fillMaxWidth()
+                                        .height(400.dp)
+                                        .clickable {
+                                            performDevMsg(
+                                                scope,
+                                                snackbarHostState,
+                                                context
+                                            )
+                                        }
+                                ){
+                                    Text("[LOCKER MAP]")
+                                }
+
+                                Row(Modifier.padding(horizontal = 16.dp, vertical = 24.dp)){
+                                    Icon(Icons.Outlined.Lock, contentDescription = null)
+                                    Text(
+                                        viewModel.lockersList.value?.find { it.id == selectedLocker }?.name?:"[LOCKER NAME]",
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+
+                                Row(Modifier.padding(horizontal = 16.dp)){
+                                    Icon(Icons.Outlined.FmdGood, contentDescription = null)
+                                    Text(
+                                        viewModel.lockersList.value?.find { it.id == selectedLocker }?.address?:"[LOCKER ADDRESS]",
+                                        maxLines = 1,
+                                        softWrap = true
+                                    )
+                                }
+                                Spacer(Modifier.height(4.dp))
+                                Row(Modifier.padding(horizontal = 16.dp)){
+                                    Icon(Icons.Outlined.AccessTime, contentDescription = null)
+                                    Text("${stringResource(id = R.string.available_in).capitalize()} 40-45 ${stringResource(id = R.string.minutes)}")
+                                }
                             }
                         }
 
@@ -138,32 +185,6 @@ fun LockerSelectorScreen(navController: NavController, viewModel: MainViewModel)
                                         }
                                     )
                                 }
-                                /*
-                                ListItem(
-                                    headlineContent = { Text(text = "Locker #1") },
-                                    trailingContent = {
-                                        RadioButton(
-                                            selected = true,
-                                            onClick = { /*TODO*/ })
-                                    },
-                                    modifier = Modifier.clickable {
-                                        //TODO
-                                    }
-                                )
-
-                                ListItem(
-                                    headlineContent = { Text(text = "Locker #2") },
-                                    trailingContent = {
-                                        RadioButton(
-                                            selected = true,
-                                            onClick = { /*TODO*/ })
-                                    },
-                                    modifier = Modifier.clickable {
-                                        //TODO
-                                    }
-                                )
-
-                                 */
                             }
                         }
                     }

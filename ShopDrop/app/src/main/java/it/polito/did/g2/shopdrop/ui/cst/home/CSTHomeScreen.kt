@@ -169,6 +169,8 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
                             }
                         }
 
+                        //https://developer.android.com/jetpack/compose/animation/quick-guide?hl=it#switch-different
+
                         itemList.value?.filter{it.name.contains(query)}
                             ?.map{it.category}
                             ?.distinct()

@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
@@ -47,7 +48,7 @@ fun BottomBar(currentTab : TabScreen, navController: NavController, vm : MainVie
                     badge = {
                         if((badgeNumber?.totalItems?:0) !=0){
                             Badge{
-                                Text("${badgeNumber?.totalItems}")
+                                Text("${badgeNumber?.totalItems}", color = Color.White)
                             }
                         }
                     }

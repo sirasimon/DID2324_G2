@@ -80,4 +80,13 @@
     <string name="txt_item">oggetto</string>
     <string name="txt_items">oggetti</string>
     <string name="txt_no_orders_yet">Non ci sono ordini da visualizzare</string>
+    <string name="order_state_cancelled">annullato</string>
+    <string name="order_state_error">errore</string>
+    <string name="order">ordine</string>
+    <string name="btn_delete_all">cancella tutto</string>
+    <string name="btn_see_less">vedi meno</string>
+    <string name="selected_locker">locker selezionato</string>
+    <string name="minutes">minuti</string>
+    <string name="available_in">disponibile al ritiro in</string>
+    <string name="placeholder_search_locker">cerca locker...</string>
 </resources>

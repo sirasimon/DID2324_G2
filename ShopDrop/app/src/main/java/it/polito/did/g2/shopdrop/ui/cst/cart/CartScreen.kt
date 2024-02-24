@@ -64,13 +64,14 @@ fun CSTCartScreen(navController: NavController, viewModel: MainViewModel){
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val subtotal = mutableStateOf(viewModel.cart.value?.subtot)
 
-    val hasItems = viewModel.cart.value?.totalItems != 0
-
     Scaffold(
         topBar = { TopBar(null, stringResource(id = R.string.title_cart), scrollBehavior) },
         bottomBar = { BottomBar(currentTab, navController, viewModel) },
         //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        floatingActionButton = { if(hasItems) CheckoutButton { navController.navigate(Screens.CstCheckout.route); viewModel.createOrder() } },
+        floatingActionButton = {
+            if(!viewModel.cart.observeAsState().value?.items.isNullOrEmpty())
+                CheckoutButton { navController.navigate(Screens.CstCheckout.route); viewModel.createOrder() }
+                               },
         floatingActionButtonPosition = FabPosition.Center
     ) { paddingValues ->
 
@@ -80,7 +81,6 @@ fun CSTCartScreen(navController: NavController, viewModel: MainViewModel){
                 .padding(paddingValues),
             color = MaterialTheme.colorScheme.background
         ) {
-
 
             if(!viewModel.cart.observeAsState().value?.items.isNullOrEmpty()){
 
@@ -144,7 +144,9 @@ fun CSTCartScreen(navController: NavController, viewModel: MainViewModel){
                 ){
                     Text(
                         text = stringResource(id = R.string.txt_empty_cart),
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                         textAlign = TextAlign.Center,
                         fontStyle = FontStyle.Italic
                     )

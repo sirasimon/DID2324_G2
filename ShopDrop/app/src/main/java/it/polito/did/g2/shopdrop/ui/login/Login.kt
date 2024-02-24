@@ -65,8 +65,8 @@ import it.polito.did.g2.shopdrop.navigation.CRR_ROUTE
 import it.polito.did.g2.shopdrop.navigation.CST_ROUTE
 import it.polito.did.g2.shopdrop.ui.cst.common.WIPMessage
 import it.polito.did.g2.shopdrop.ui.cst.common.performDevMsg
-import it.polito.did.g2.shopdrop.ui.theme.AlarmRed
-import it.polito.did.g2.shopdrop.ui.theme.Green100
+import it.polito.did.g2.shopdrop.ui.theme.errorContainerLight
+import it.polito.did.g2.shopdrop.ui.theme.secondaryLight
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -196,7 +196,7 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
 
                     Spacer(Modifier.height(16.dp))
 
-                    var emlColor = if(emailError) AlarmRed else Green100
+                    var emlColor = if(emailError) errorContainerLight else secondaryLight
 
                     // EMAIL
                     OutlinedTextField(
@@ -223,15 +223,15 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                         modifier = baseMod,
                         supportingText = {if(emailError) Text(stringResource(id = R.string.err_email_not_found))},
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = Green100,
-                            unfocusedBorderColor = Green100,
-                            errorPrefixColor = AlarmRed
+                            focusedBorderColor = secondaryLight,
+                            unfocusedBorderColor = secondaryLight,
+                            errorPrefixColor = errorContainerLight
                         )
                     )
 
                     Spacer(Modifier.height(8.dp))
 
-                    var pwdColor = if(passwordError) AlarmRed else Green100
+                    var pwdColor = if(passwordError) errorContainerLight else secondaryLight
 
                     // PASSWORD
                     OutlinedTextField(
@@ -274,9 +274,9 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                         isError = passwordError,
                         supportingText = {if(passwordError) Text(stringResource(id = R.string.err_pwd_not_valid))},
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = Green100,
-                            unfocusedBorderColor = Green100,
-                            errorPrefixColor = AlarmRed
+                            focusedBorderColor = secondaryLight,
+                            unfocusedBorderColor = secondaryLight,
+                            errorPrefixColor = errorContainerLight
                         )
                     )
 
@@ -285,7 +285,7 @@ fun LoginScreen(navController : NavController, viewModel: MainViewModel){
                         onClick = { performDevMsg(scope, snackbarHostState, context) },
                         modifier = Modifier.align(Alignment.End)
                     ) {
-                        Text(text = stringResource(R.string.forgot_pwd).capitalize(), color = Green100)
+                        Text(text = stringResource(R.string.forgot_pwd).capitalize(), color = secondaryLight)
                     }
 
                     Spacer(Modifier.height(32.dp))

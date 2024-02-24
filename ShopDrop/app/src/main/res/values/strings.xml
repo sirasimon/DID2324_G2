@@ -85,4 +85,9 @@
     <string name="order_state_error">error</string>
     <string name="order">order</string>
     <string name="btn_delete_all">delete all</string>
+    <string name="btn_see_less">see less</string>
+    <string name="selected_locker">selected locker</string>
+    <string name="minutes">minutes</string>
+    <string name="available_in">available for collection in</string>
+    <string name="placeholder_search_locker">search locker...</string>
 </resources>

@@ -29,7 +29,7 @@ val Typography = Typography(
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp,
-        color = DarkGrey
+        //color = onBackgroundLight
     ),
     headlineLarge = TextStyle(
         fontFamily = Inter,
@@ -37,7 +37,15 @@ val Typography = Typography(
         fontSize = 32.sp,
         lineHeight = 44.sp,
         letterSpacing = 0.5.sp,
-        color = Orange100
+        //color = primaryContainerLight
+    ),
+    headlineMedium = TextStyle(
+        fontFamily = Inter,
+        fontWeight = FontWeight.Bold,
+        fontSize = 28.sp,
+        lineHeight = 44.sp,
+        letterSpacing = 0.5.sp,
+        //color = Color.Black
     ),
     titleSmall = TextStyle(
         fontFamily = Inter,
@@ -45,7 +53,7 @@ val Typography = Typography(
         fontSize = 24.sp,
         lineHeight = 44.sp,
         letterSpacing = 0.5.sp,
-        color = Green100,
+        //color = secondaryLight,
     ),
     headlineSmall = TextStyle(
         fontWeight = FontWeight.Bold,
