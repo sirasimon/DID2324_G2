@@ -33,6 +33,20 @@ class Order(
         }
     }
 
+    fun isPending(): Boolean{
+        return stateList?.map{it.state}?.contains(OrderStateName.COLLECTED)==false
+                && stateList?.map{it.state}?.contains(OrderStateName.CANCELLED)==false
+                && stateList?.map{it.state}?.contains(OrderStateName.ERROR)==false
+    }
+
+    fun isCollected(): Boolean{
+        return stateList?.map{it.state}?.contains(OrderStateName.COLLECTED) ?: false
+    }
+
+    fun isCancelled(): Boolean{
+        return stateList?.map{it.state}?.contains(OrderStateName.CANCELLED) ?: false
+    }
+
     override fun toString(): String {
 
         var statesString = ""

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +26,8 @@ import it.polito.did.g2.shopdrop.navigation.Screens
 fun OrderSent(navController: NavController){
 
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
     ){
         Row(
             horizontalArrangement = Arrangement.Center,
@@ -44,23 +44,31 @@ fun OrderSent(navController: NavController){
             )
         }
 
-        Text(
-            stringResource(id = R.string.title_order_done).capitalize(),
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(vertical = 16.dp)
-        )
-        Text(
-            stringResource(id = R.string.txt_order_done).capitalize(),
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-
-        ExtendedFloatingActionButton(onClick = { navController.navigate(Screens.CstOrderHistory.route) }, modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 32.dp)) {
-            Text(stringResource(id = R.string.btn_my_orders).capitalize())
+        Column(){
+            Text(
+                stringResource(id = R.string.title_order_done).capitalize(),
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(vertical = 16.dp)
+            )
+            Text(
+                stringResource(id = R.string.txt_order_done).capitalize(),
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
         }
-        TextButton(onClick = { navController.navigate(Screens.CstHome.route) }) {
-            Text(stringResource(id = R.string.btn_goto_home).capitalize())
+
+        Column {
+            ExtendedFloatingActionButton(
+                onClick = { navController.navigate(Screens.CstOrderHistory.route) },
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp)
+            ) {
+                Text(stringResource(id = R.string.btn_my_orders).capitalize())
+            }
+            ExtendedFloatingActionButton(
+                onClick = { navController.navigate(Screens.CstHome.route) },
+                containerColor = Color.LightGray
+            ) {
+                Text(stringResource(id = R.string.btn_goto_home).capitalize())
+            }
         }
     }
 }

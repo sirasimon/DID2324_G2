@@ -90,4 +90,9 @@
     <string name="minutes">minutes</string>
     <string name="available_in">available for collection in</string>
     <string name="placeholder_search_locker">search locker...</string>
+    <string name="in_progress">in progress</string>
+    <string name="show">visualizza</string>
+    <string name="hide">hide</string>
+    <string name="items_ordered">items ordered</string>
+    <string name="btn_cancelled_order">cancelled order</string>
 </resources>

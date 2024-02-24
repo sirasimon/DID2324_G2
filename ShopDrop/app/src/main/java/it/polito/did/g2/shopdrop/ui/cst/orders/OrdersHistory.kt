@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -39,7 +41,6 @@ import androidx.navigation.compose.rememberNavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.data.Order
-import it.polito.did.g2.shopdrop.data.OrderStateName
 import it.polito.did.g2.shopdrop.data.TabScreen
 import it.polito.did.g2.shopdrop.navigation.Screens
 import it.polito.did.g2.shopdrop.ui.cst.common.ArrowRt
@@ -65,7 +66,7 @@ fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
     )
 
     Scaffold(
-        topBar = { TopBar(navController, stringResource(id = R.string.title_history), scrollBehavior) },
+        topBar = { TopBar({navController.navigate(Screens.CstProfile.route)}, stringResource(id = R.string.title_history), scrollBehavior) },
         bottomBar = { BottomBar(currentTab, navController, viewModel) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
@@ -93,11 +94,7 @@ fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
                     NavHost(navController = listNavController, startDestination = CstFilterChip.PEND.toString()){
                         composable(CstFilterChip.PEND.toString()) {
                             ListedOrders(
-                                viewModel.ordersList.observeAsState().value?.filter {
-                                    it.customerID==viewModel.currUser.value?.uid &&
-                                            it.stateList?.last()?.state != OrderStateName.COLLECTED &&
-                                            it.stateList?.last()?.state != OrderStateName.CANCELLED
-                                }?.toMutableList(),
+                                viewModel.ordersList.observeAsState().value?.filter { it.customerID == viewModel.currUser.value?.uid && it.isPending() }?.toMutableList(),
                                 viewModel
                             ) { id ->
                                 navController.navigate(
@@ -105,13 +102,16 @@ fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
                                 )
                             }
                         }
+
+                        /*
+                        viewModel.userOrders.observeAsState().value?.filter {
+                                    it.stateList?.map{s -> s.state}?.contains(OrderStateName.COLLECTED)==true
+                                }?.toMutableList()
+                         */
+
                         composable(CstFilterChip.ARCH.toString()){
                             ListedOrders(
-                                viewModel.ordersList.observeAsState().value?.filter {
-                                    it.customerID==viewModel.currUser.value?.uid &&
-                                            it.stateList?.last()?.state == OrderStateName.COLLECTED
-                                }?.toMutableList(),
-                                viewModel
+                                viewModel.ordersList.observeAsState().value?.filter { it.customerID == viewModel.currUser.value?.uid && it.isCollected() }?.toMutableList(),                                viewModel
                             ) {id ->
                                 navController.navigate(
                                     Screens.CstOrderDetail.route + "/${id}"
@@ -120,11 +120,7 @@ fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
                         }
                         composable(CstFilterChip.CANC.toString()){
                             ListedOrders(
-                                viewModel.ordersList.observeAsState().value?.filter {
-                                    it.customerID==viewModel.currUser.value?.uid &&
-                                            it.stateList?.last()?.state == OrderStateName.CANCELLED
-                                }?.toMutableList(),
-                                viewModel
+                                viewModel.ordersList.observeAsState().value?.filter { it.customerID == viewModel.currUser.value?.uid && it.isCancelled() }?.toMutableList(),                                viewModel
                             ) {id ->
                                 navController.navigate(
                                     Screens.CstOrderDetail.route + "/${id}"
@@ -164,7 +160,12 @@ fun ListedOrders(list: MutableList<Order>?, viewModel: MainViewModel, onClick: (
                 }
             }
         }else{
-            Text(stringResource(id = R.string.txt_no_orders_yet))
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize()
+            ){
+                Text(stringResource(id = R.string.txt_no_orders_yet), fontStyle = FontStyle.Italic)
+            }
         }
     }
 }

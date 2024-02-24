@@ -60,7 +60,7 @@ fun CSTProfileScreen(navController: NavController, viewModel: MainViewModel){
     val context = LocalContext.current
 
     Scaffold(
-        topBar = { TopBar(navController, stringResource(id = R.string.title_profile), scrollBehavior) },
+        topBar = { TopBar(null, stringResource(id = R.string.title_profile), scrollBehavior) },
         bottomBar = { BottomBar(currentTab, navController, viewModel) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         snackbarHost = { WIPMessage(snackbarHostState) }

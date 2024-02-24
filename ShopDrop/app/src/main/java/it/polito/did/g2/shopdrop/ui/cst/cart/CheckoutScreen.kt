@@ -80,7 +80,7 @@ fun CSTCheckoutScreen(navController: NavController, viewModel: MainViewModel) {
     }
 
     Scaffold(
-        topBar = { TopBar(navController, stringResource(id = R.string.title_order_summary), scrollBehavior) },
+        topBar = { TopBar({navController.navigateUp()}, stringResource(id = R.string.title_order_summary), scrollBehavior) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         floatingActionButton = { FabProceed(viewModel.getCartTotal()) { placeOrder() } },
         floatingActionButtonPosition = FabPosition.Center,
@@ -104,7 +104,7 @@ fun CSTCheckoutScreen(navController: NavController, viewModel: MainViewModel) {
                 val fontHeight = 16.sp
                 val lineHeight = 25.dp
                 val defaultUnexpH = 100f
-                val totalListHeight = lineHeight.value * currCart!!.items.size
+                val totalListHeight = lineHeight.value * (currCart?.items?.size?:0)
                 val maxBoxHeight = min(defaultUnexpH, totalListHeight).dp
 
                 Log.i("SUMMARY", "Parametri box espandibile: fontHeight=$fontHeight, totalListHeight=$totalListHeight, maxBoxHeight=$maxBoxHeight")

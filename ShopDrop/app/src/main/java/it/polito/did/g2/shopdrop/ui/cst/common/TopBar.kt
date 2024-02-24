@@ -11,12 +11,11 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(navController: NavController?,
+fun TopBar(onBack: (()->Unit)?,
            screenTitle: String,
            scrollBehavior: TopAppBarScrollBehavior
 ){
@@ -34,8 +33,8 @@ fun TopBar(navController: NavController?,
             )
         },
         navigationIcon = {
-            if(navController!=null){
-                IconButton(onClick = { navController.navigateUp() }) {
+            if(onBack!=null){
+                IconButton(onClick = { onBack() }) {
                     Image(
                         painter = painterResource(id = R.drawable.btn_back),
                         contentDescription = "Localized description"

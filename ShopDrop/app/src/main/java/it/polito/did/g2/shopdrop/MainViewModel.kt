@@ -239,10 +239,6 @@ class MainViewModel() : ViewModel(){
     private val _userOrders : MutableLiveData<MutableList<Order>> = MutableLiveData(fbRepo.ordersList.value?.filter { it.customerID == _currUser.value?.uid }?.toMutableList())
     val userOrders : LiveData<MutableList<Order>> = _userOrders
 
-    private val _pendingOrders : MutableLiveData<MutableList<Order>> = MutableLiveData(_userOrders.value?.filter { it.stateList?.last()?.state?.isPending() == true }?.toMutableList())
-    val pendingOrders : LiveData<MutableList<Order>> = _pendingOrders
-
-
     //CART DATA
     private val _cart : MutableLiveData<Cart?> = MutableLiveData(null)
     val cart : LiveData<Cart?> = _cart
@@ -250,6 +246,10 @@ class MainViewModel() : ViewModel(){
     //CURRENT ORDER DATA
     private val _currOrder : MutableLiveData<Order?> = MutableLiveData(null)
     val currOrder : LiveData<Order?> = _currOrder
+
+    fun getPendingOrders() : List<Order>?{
+        return ordersList.value?.filter { it.customerID == _currUser.value?.uid && it.isPending() }
+    }
 
     /**
      * Modifica della quantità degli elementi del carrello
@@ -328,6 +328,11 @@ class MainViewModel() : ViewModel(){
     @RequiresApi(Build.VERSION_CODES.O)
     fun updateOrderState(id: String){
         fbRepo.updateOrderState(id)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun cancelOrder(id: String){
+        fbRepo.cancelOrder(id)
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////        CRR COLLECTION + DEPOSIT
@@ -437,8 +442,13 @@ class MainViewModel() : ViewModel(){
     ////////////////////////////////////////////////////////////////////////////////////////////////        UTILITIES
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getDateString(date: LocalDateTime): String{
-        return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+    fun getDateString(date: LocalDateTime?): String{
+        return date?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))?:"ERR"
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getTimeString(date: LocalDateTime): String{
+        return date.format(DateTimeFormatter.ofPattern("HH:mm"))
     }
 
     fun getOrderStateStringId(state: OrderStateName?): Int{

@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesomeMosaic
 import androidx.compose.material.icons.filled.Computer
@@ -56,6 +58,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -281,7 +284,9 @@ fun UsersScreen(viewModel: MainViewModel) {
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(16.dp)) {
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
         Text("Total users: ${viewModel.usersList.observeAsState().value?.size}")
 
         viewModel.usersList.observeAsState().value?.forEach {
@@ -299,13 +304,22 @@ fun OrdersScreen(viewModel: MainViewModel) {
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(4.dp)){
+            .padding(4.dp)
+            .verticalScroll(rememberScrollState())
+    ){
+        Text("TOTAL ORDERS IN DB: ${viewModel.ordersList.observeAsState().value?.size}")
+
         viewModel.ordersList.observeAsState().value?.forEach {
             Card(
                 Modifier
                     .fillMaxWidth()
+                    .padding(8.dp)
             ){
-                Column(Modifier.fillMaxWidth().padding(8.dp)){
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ){
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier.fillMaxWidth()
@@ -324,6 +338,18 @@ fun OrdersScreen(viewModel: MainViewModel) {
                         Text("${it.lockerID}")
                         Text("->")
                         Text("${it.customerID}")
+                    }
+
+                    HorizontalDivider(thickness = 2.dp)
+
+                    it.stateList?.sortedBy { it.timestamp }?.forEach { os ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ){
+                            Text(text = os.state.name, fontWeight = FontWeight.Bold)
+                            Text(text = os.timestamp.toString())
+                        }
                     }
 
                     Row(
@@ -347,7 +373,9 @@ fun LockersScreen(viewModel: MainViewModel) {
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(16.dp)) {
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
         viewModel.lockersList.observeAsState().value?.forEach {
             Row(
                 Modifier

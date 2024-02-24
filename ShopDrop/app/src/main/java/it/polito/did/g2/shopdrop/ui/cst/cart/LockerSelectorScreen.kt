@@ -76,7 +76,7 @@ fun LockerSelectorScreen(navController: NavController, viewModel: MainViewModel)
     val context = LocalContext.current
 
     Scaffold(
-        topBar = { TopBar(navController, stringResource(id = R.string.title_select_locker), scrollBehavior) },
+        topBar = { TopBar({navController.navigateUp()}, stringResource(id = R.string.title_select_locker), scrollBehavior) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         floatingActionButton = { FabSelectLocker(navController, viewModel, selectedLocker) },
         floatingActionButtonPosition = FabPosition.Center,
@@ -189,7 +189,6 @@ fun LockerSelectorScreen(navController: NavController, viewModel: MainViewModel)
                         }
                     }
                 }
-
             }
         }
     }
