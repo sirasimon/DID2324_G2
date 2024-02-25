@@ -127,7 +127,7 @@ fun CSTOrderDetail(navController : NavController, viewModel : MainViewModel, ord
                         navController.navigate(Screens.CstOrderDetail.route+"$orderID")
                     }
                 }
-                OrderStateName.AVAILABLE -> ScanButton(true, navController)
+                OrderStateName.AVAILABLE -> ScanButton(true, navController, orderID)
                 OrderStateName.CANCELLED -> CancelledLabel()
                 else -> null
             }
