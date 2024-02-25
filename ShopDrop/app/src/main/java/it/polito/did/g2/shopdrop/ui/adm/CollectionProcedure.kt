@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.navigation.Screens
@@ -49,12 +48,22 @@ fun CollectionProcedure(navController: NavController, viewModel: MainViewModel, 
 
     val timerValue = viewModel.timerValue.observeAsState()
 
+    val isOpen by viewModel.isCompartmentOpen.observeAsState()
+
+    /*
     viewModel.isOpenFieldState.observe(lifecycleOwner, Observer { newVal ->
         val previousValue = viewModel.previousisOpenVal
         if (previousValue==true && newVal==false) {
             navController.navigate(Screens.CstCollectionDoneScreen.route)
         }
     })
+    */
+
+    LaunchedEffect(isOpen){
+        if (isOpen==true) {
+            navController.navigate(Screens.CstCollectionDoneScreen.route)
+        }
+    }
 
 
     //val currentProgress = remember { Animatable(viewModel.getProgress()) }

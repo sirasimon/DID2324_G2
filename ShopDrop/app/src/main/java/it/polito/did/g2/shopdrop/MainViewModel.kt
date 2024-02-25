@@ -347,12 +347,14 @@ class MainViewModel() : ViewModel(){
     private var _isTimeout = MutableLiveData<Boolean>().also{it.value=false}
     val isTimeout: LiveData<Boolean> = _isTimeout
 
-    var previousisOpenVal : Boolean? = null
-    private val _isOpenFieldState = MutableLiveData<Boolean?>(null)
-    val isOpenFieldState : LiveData<Boolean?> = _isOpenFieldState
+    //var previousisOpenVal : Boolean? = null
+    //private val _isOpen = MutableLiveData<Boolean?>(null)
+    //val isOpen : LiveData<Boolean?> = _isOpen
+    val isCompartmentOpen : LiveData<Boolean> = fbRepo.isCompartmentOpen
 
     fun createTimer(timeout:Long){
-        //fbRepo.startObserveCompartment()
+        fbRepo.startObserveCompartment()
+        ///_isOpen.value = true
 
         _timer = object : CountDownTimer(timeout, 1000){
 
@@ -379,6 +381,8 @@ class MainViewModel() : ViewModel(){
 
     fun cancelTimer(){
         _timer?.cancel()
+
+        //_isOpen.value = null
     }
 
 
@@ -444,6 +448,7 @@ class MainViewModel() : ViewModel(){
 
         _isLoading.value = false
 
+        /*
         viewModelScope.launch {
             fbRepo.startObserveCompartment()?.collect(){newVal ->
                 previousisOpenVal?.let{oldVal ->
@@ -456,7 +461,9 @@ class MainViewModel() : ViewModel(){
                 _isOpenFieldState.value = newVal
 
             }
+
         }
+        */
 
         Log.i("MVM INIT", "END ####################")
     }

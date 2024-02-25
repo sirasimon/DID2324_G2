@@ -20,8 +20,6 @@ import it.polito.did.g2.shopdrop.data.StoreItem
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
 import it.polito.did.g2.shopdrop.data.users.User
 import it.polito.did.g2.shopdrop.data.users.UserRole
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDateTime
 
 //DEBUG
@@ -635,33 +633,29 @@ class FirebaseRepository {
     data class TargetCompartment(var locker : String?, var compartment : String?)
 
     private val targetCompartment = MutableLiveData<TargetCompartment>()
-    private var isOpenValueEventLister : ValueEventListener? = null
 
-    fun startObserveCompartment(): Flow<Boolean>? {
+    private val _isCompartmentOpen = MutableLiveData(false)
+    val isCompartmentOpen : LiveData<Boolean> = _isCompartmentOpen
+
+    fun startObserveCompartment() {
         if(targetCompartment.value?.locker!=null && targetCompartment.value?.compartment!=null){
-            val compartimentoRef = dbRefLockers.child(targetCompartment.value!!.locker!!)
+
+            dbRefLockers.child(targetCompartment.value!!.locker!!)
                 .child("compartments")
                 .child(targetCompartment.value!!.compartment!!)
                 .child("isOpen")
-            val isOpenStateFlow = MutableStateFlow(false) // Default value
+                .addValueEventListener(
+                    object : ValueEventListener{
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            _isCompartmentOpen.value = snapshot.getValue<Boolean>()
+                        }
 
-            isOpenValueEventLister = object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val isOpen = snapshot.getValue(Boolean::class.java) ?: false
-                    isOpenStateFlow.value = isOpen
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    // Handle error
-                }
-            }
-
-            compartimentoRef.addValueEventListener(isOpenValueEventLister!!)
-
-            return isOpenStateFlow
+                        override fun onCancelled(error: DatabaseError) {
+                            TODO("Not yet implemented")
+                        }
+                    }
+                )
         }
-
-        return null
     }
 
     fun resetTargetComp(){
