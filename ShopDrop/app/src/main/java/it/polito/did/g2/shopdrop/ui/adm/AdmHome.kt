@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesomeMosaic
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Computer
 import androidx.compose.material.icons.filled.DeliveryDining
 import androidx.compose.material.icons.filled.Fastfood
@@ -205,7 +206,18 @@ fun ADMHomeScreen(navController : NavController, viewModel: MainViewModel){
                                     onClick = {
                                         navController.navigate(Screens.AdmCameraTest.route)
                                     }) {
-                                    Text("TEST CAMERA")
+                                    Icon(Icons.Filled.CameraAlt , contentDescription = null)
+                                    Text("TEST CAMERA", Modifier.padding(horizontal = 8.dp))
+                                    Icon(Icons.Filled.CameraAlt , contentDescription = null)
+                                }
+
+                                Button(
+                                    onClick = {
+                                        navController.navigate(Screens.AdmCollectionTest.route)
+                                    }) {
+                                    Icon(Icons.Filled.AutoAwesomeMosaic , contentDescription = null)
+                                    Text("TEST COLLECTION PROCEDURE")
+                                    Icon(Icons.Filled.AutoAwesomeMosaic , contentDescription = null)
                                 }
                             }
                         }

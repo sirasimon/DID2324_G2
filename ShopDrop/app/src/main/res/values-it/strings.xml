@@ -89,4 +89,9 @@
     <string name="minutes">minuti</string>
     <string name="available_in">disponibile al ritiro in</string>
     <string name="placeholder_search_locker">cerca locker...</string>
+    <string name="show">visualizza</string>
+    <string name="in_progress">in corso</string>
+    <string name="hide">nascondi</string>
+    <string name="items_ordered">oggetti ordinati</string>
+    <string name="btn_cancelled_order">ordine cancellato</string>
 </resources>

@@ -4,6 +4,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -13,7 +14,7 @@ import it.polito.did.g2.shopdrop.ui.login.LoginScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Nav(viewModel: MainViewModel){
+fun Nav(viewModel: MainViewModel, lifecycleOwner: LifecycleOwner){
     val navController = rememberNavController()
 
     val startDestination = when(viewModel.currUser.value?.role){
@@ -39,12 +40,12 @@ fun Nav(viewModel: MainViewModel){
         }
 
         //CUSTOMER BRANCH (CST)
-        cstNavGraph(navController, viewModel)
+        cstNavGraph(navController, viewModel, lifecycleOwner)
 
         //CARRIER BRANCH (CRR)
         crrNavGraph(navController, viewModel)
 
         //ADMIN BRANCH (ADM)
-        admNavGraph(navController, viewModel)
+        admNavGraph(navController, viewModel, lifecycleOwner)
     }
 }

@@ -2,6 +2,7 @@ package it.polito.did.g2.shopdrop
 
 import android.content.SharedPreferences
 import android.os.Build
+import android.os.CountDownTimer
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
@@ -335,8 +336,52 @@ class MainViewModel() : ViewModel(){
         fbRepo.cancelOrder(id)
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////        CRR COLLECTION + DEPOSIT
+    ////////////////////////////////////////////////////////////////////////////////////////////////        CST COLLECTION
     //TODO: unire con script dopo
+
+    private val _timerValue = MutableLiveData<Long>().also { it.value=0 }
+    val timerValue: LiveData<Long> = _timerValue
+
+    private var _timer : CountDownTimer?= null
+
+    private var _isTimeout = MutableLiveData<Boolean>().also{it.value=false}
+    val isTimeout: LiveData<Boolean> = _isTimeout
+
+    var previousisOpenVal : Boolean? = null
+    private val _isOpenFieldState = MutableLiveData<Boolean?>(null)
+    val isOpenFieldState : LiveData<Boolean?> = _isOpenFieldState
+
+    fun createTimer(timeout:Long){
+        //fbRepo.startObserveCompartment()
+
+        _timer = object : CountDownTimer(timeout, 1000){
+
+            override fun onTick(remainingTime: Long) {
+                if(_isTimeout.value==true)
+                    _isTimeout.value = false
+
+                Log.d("onTick", "Remaining time is $remainingTime")
+
+                _timerValue.value = remainingTime
+
+                Log.d("onTick", "Updated timer value is ${_timerValue.value}")
+            }
+
+            override fun onFinish() {
+                _isTimeout.value = true;
+            }
+        }.start()
+    }
+
+    fun getTimerValue() : Long{
+        return _timerValue.value ?: 0;
+    }
+
+    fun cancelTimer(){
+        _timer?.cancel()
+    }
+
+
 
     fun cstStartsCollection(lockerCode : String, orderID: String) : Boolean{
         return fbRepo.cstStartsCollection(lockerCode, orderID)
@@ -398,6 +443,20 @@ class MainViewModel() : ViewModel(){
         }
 
         _isLoading.value = false
+
+        viewModelScope.launch {
+            fbRepo.startObserveCompartment()?.collect(){newVal ->
+                previousisOpenVal?.let{oldVal ->
+                    if(oldVal && !newVal){
+                        cancelTimer()
+                    }
+                }
+
+                previousisOpenVal = newVal
+                _isOpenFieldState.value = newVal
+
+            }
+        }
 
         Log.i("MVM INIT", "END ####################")
     }

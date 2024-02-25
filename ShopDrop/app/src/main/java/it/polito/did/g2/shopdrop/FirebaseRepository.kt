@@ -20,6 +20,8 @@ import it.polito.did.g2.shopdrop.data.StoreItem
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
 import it.polito.did.g2.shopdrop.data.users.User
 import it.polito.did.g2.shopdrop.data.users.UserRole
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDateTime
 
 //DEBUG
@@ -525,6 +527,9 @@ class FirebaseRepository {
                         for(snap in snapshot.children){
                             if(snap.child("orderID").getValue<String>()==orderID) {
                                 snap.child("isOpen").ref.setValue(true)
+
+                                targetCompartment.value?.locker = lockerID
+                                targetCompartment.value?.compartment = snap.key.toString()
                             }
                         }
                     }
@@ -625,6 +630,43 @@ class FirebaseRepository {
         }else{
             "ERR"
         }
+    }
+
+    data class TargetCompartment(var locker : String?, var compartment : String?)
+
+    private val targetCompartment = MutableLiveData<TargetCompartment>()
+    private var isOpenValueEventLister : ValueEventListener? = null
+
+    fun startObserveCompartment(): Flow<Boolean>? {
+        if(targetCompartment.value?.locker!=null && targetCompartment.value?.compartment!=null){
+            val compartimentoRef = dbRefLockers.child(targetCompartment.value!!.locker!!)
+                .child("compartments")
+                .child(targetCompartment.value!!.compartment!!)
+                .child("isOpen")
+            val isOpenStateFlow = MutableStateFlow(false) // Default value
+
+            isOpenValueEventLister = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val isOpen = snapshot.getValue(Boolean::class.java) ?: false
+                    isOpenStateFlow.value = isOpen
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    // Handle error
+                }
+            }
+
+            compartimentoRef.addValueEventListener(isOpenValueEventLister!!)
+
+            return isOpenStateFlow
+        }
+
+        return null
+    }
+
+    fun resetTargetComp(){
+        targetCompartment.value?.locker = null
+        targetCompartment.value?.compartment = null
     }
 
     // DEBUG

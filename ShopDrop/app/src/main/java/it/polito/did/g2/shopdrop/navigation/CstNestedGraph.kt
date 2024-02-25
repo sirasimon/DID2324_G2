@@ -2,6 +2,7 @@ package it.polito.did.g2.shopdrop.navigation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -10,8 +11,9 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
+import it.polito.did.g2.shopdrop.ui.adm.CollectionProcedure
 import it.polito.did.g2.shopdrop.ui.camera.CameraScreen
-import it.polito.did.g2.shopdrop.ui.cst.CSTCollection
+import it.polito.did.g2.shopdrop.ui.cst.CSTCollectionDone
 import it.polito.did.g2.shopdrop.ui.cst.cart.CSTCartScreen
 import it.polito.did.g2.shopdrop.ui.cst.cart.CSTCheckoutScreen
 import it.polito.did.g2.shopdrop.ui.cst.cart.LockerSelectorScreen
@@ -25,7 +27,8 @@ import it.polito.did.g2.shopdrop.ui.cst.profile.CSTProfileScreen
 @RequiresApi(Build.VERSION_CODES.O)
 fun NavGraphBuilder.cstNavGraph(
     navController: NavHostController,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    lifecycleOwner: LifecycleOwner
 ){
     navigation(
         startDestination = Screens.CstHome.route,
@@ -97,6 +100,13 @@ fun NavGraphBuilder.cstNavGraph(
             CSTOrderDetail(navController, viewModel, it.arguments?.getString("orderID") )
         }
 
+        composable(
+            route = Screens.CstCollectionDoneScreen.route
+        )
+        {
+            CSTCollectionDone(navController)
+        }
+
         // UNLOCK PROCEDURE ////////////////////////////////////////////////////////////////////////
 
         composable(route = Screens.CstCamera.route+"/{orderID}",
@@ -105,10 +115,16 @@ fun NavGraphBuilder.cstNavGraph(
             CameraScreen(navController, viewModel, it.arguments?.getString("orderID")!!)
         }
 
+        /*
         composable(route = Screens.CstCollectionScreen.route+"/{orderID}",
             arguments = listOf(navArgument("orderID") { type = NavType.StringType })
         ){
             CSTCollection(navController, viewModel, it.arguments?.getString("orderID")!!)
+        }
+         */
+
+        composable(route = Screens.CstCollectionScreen.route){
+            CollectionProcedure(navController, viewModel, lifecycleOwner)
         }
     }
 }
