@@ -4,8 +4,13 @@
 
 package it.polito.did.g2.shopdrop.ui.adm
 
+import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -56,6 +61,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -67,8 +73,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.qrcode.QRCodeWriter
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
+import it.polito.did.g2.shopdrop.data.OrderStateName
 import it.polito.did.g2.shopdrop.navigation.Screens
 import kotlinx.coroutines.launch
 
@@ -196,7 +205,7 @@ fun ADMHomeScreen(navController : NavController, viewModel: MainViewModel){
                             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                                 Button(
                                     onClick = {
-                                        onClick = { viewModel.debugDBReset(MainViewModel.db_reset.ORDERS) }
+                                        onClick = { viewModel.debugDBReset(MainViewModel.db_reset.ORDERS) ; dialogOpen = false}
                                         dialogOpen = true
                                     }) {
                                     Text("RESET ORDERS DB")
@@ -297,7 +306,7 @@ fun UsersScreen(viewModel: MainViewModel) {
         Modifier
             .fillMaxWidth()
             .padding(16.dp)
-            .verticalScroll(rememberScrollState())
+            //.verticalScroll(rememberScrollState())
     ) {
         Text("Total users: ${viewModel.usersList.observeAsState().value?.size}")
 
@@ -313,19 +322,26 @@ fun UsersScreen(viewModel: MainViewModel) {
 @Composable
 fun OrdersScreen(viewModel: MainViewModel) {
 
+    var qrOrderID by remember { mutableStateOf("") }
+    var openDialog by remember { mutableStateOf(false) }
+
     Column(
         Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(4.dp)
-            .verticalScroll(rememberScrollState())
+            //.verticalScroll(rememberScrollState())
     ){
         Text("TOTAL ORDERS IN DB: ${viewModel.ordersList.observeAsState().value?.size}")
 
-        viewModel.ordersList.observeAsState().value?.forEach {
+        viewModel.ordersList.observeAsState().value?.sortedBy { it.stateList?.find { sl -> sl.state == OrderStateName.CREATED }?.timestamp }?.reversed()?.forEach {
             Card(
                 Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
+                    .clickable {
+                        qrOrderID = it.id.toString()
+                        openDialog = true
+                    }
             ){
                 Column(
                     Modifier
@@ -354,7 +370,7 @@ fun OrdersScreen(viewModel: MainViewModel) {
 
                     HorizontalDivider(thickness = 2.dp)
 
-                    it.stateList?.sortedBy { it.timestamp }?.forEach { os ->
+                    it.stateList?.sortedBy { it.state.ordinal }?.forEach { os ->
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
@@ -364,19 +380,73 @@ fun OrdersScreen(viewModel: MainViewModel) {
                         }
                     }
 
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                    ) {
-                        Button(onClick = { viewModel.updateOrderState(it.id!!) }) {
-                            Text(text = "UPDATE STATE")
+                    if(it.stateList?.maxByOrNull { it.state.ordinal }?.state != OrderStateName.COLLECTED && it.stateList?.maxByOrNull { it.state.ordinal }?.state != OrderStateName.CANCELLED){
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                        ) {
+                            Button(onClick = { viewModel.updateOrderState(it.id!!) }) {
+                                Text(text = "UPDATE STATE")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if(openDialog){
+            Log.i("QR_CREATE", "DIALOG OPENS")
+
+            fun onClose(){
+                openDialog = false
+            }
+
+            Dialog(
+                onDismissRequest = { onClose() }
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        //.height(375.dp)
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                ){
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ){
+                        Image(
+                            bitmap = generateQrCode(qrOrderID).asImageBitmap(),
+                            contentDescription = "QR corrispondente al codice $qrOrderID",
+                            modifier = Modifier.padding(16.dp)
+                        )
+
+                        Button(
+                            onClick = { onClose() }
+                        ){
+                            Text(text = "Done")
                         }
                     }
                 }
             }
         }
     }
+}
+
+fun generateQrCode(text: String): Bitmap {
+    val writer = QRCodeWriter()
+    val bitMatrix = writer.encode(text, BarcodeFormat.QR_CODE, 1000, 1000)
+
+    return Bitmap.createBitmap(bitMatrix.width, bitMatrix.height, Bitmap.Config.ARGB_8888)
+        .apply {
+            for (x in 0 until bitMatrix.width) {
+                for (y in 0 until bitMatrix.height) {
+                    setPixel(x, y, if (bitMatrix[x, y]) Color.BLACK else Color.WHITE)
+                }
+            }
+        }
 }
 
 @Composable

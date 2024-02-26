@@ -10,7 +10,6 @@ import androidx.navigation.navigation
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.ui.adm.ADMCameraTest
 import it.polito.did.g2.shopdrop.ui.adm.ADMHomeScreen
-import it.polito.did.g2.shopdrop.ui.adm.CollectionProcedure
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun NavGraphBuilder.admNavGraph(
@@ -30,8 +29,10 @@ fun NavGraphBuilder.admNavGraph(
             ADMCameraTest(navController = navController, viewModel = viewModel)
         }
 
+        /*
         composable(route = Screens.AdmCollectionTest.route){
-            CollectionProcedure(navController, viewModel, lifecycleOwner)
+            CollectionProcedure(navController, viewModel)
         }
+         */
     }
 }

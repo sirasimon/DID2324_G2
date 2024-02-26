@@ -55,8 +55,10 @@ fun NavGraphBuilder.crrNavGraph(
             CrrDeposited(navController, viewModel, it.arguments?.getString("orderID")!!)
         }
 
-        composable(route = Screens.CrrCollectedScreen.route){
-            CrrCollected(navController)
+        composable(route = Screens.CrrCollectedScreen.route+"/{orderID}",
+            arguments = listOf(navArgument("orderID") { type = NavType.StringType })){
+
+            CrrCollected(viewModel, navController, it.arguments?.getString("orderID")!!)
         }
     }
 }

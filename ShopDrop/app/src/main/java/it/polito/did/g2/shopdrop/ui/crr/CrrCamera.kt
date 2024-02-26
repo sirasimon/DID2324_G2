@@ -114,8 +114,7 @@ fun CrrCamera(navController : NavController, viewModel: MainViewModel, orderID :
 
                         //TODO Forse è qui il pezzo dove intervenire
                         if(code==orderID) {
-                            viewModel.crrHasCollected(orderID)
-                            navController.navigate(Screens.CrrCollectedScreen.route)
+                            navController.navigate(Screens.CrrCollectedScreen.route+"/$orderID")
                         }
 
                     }

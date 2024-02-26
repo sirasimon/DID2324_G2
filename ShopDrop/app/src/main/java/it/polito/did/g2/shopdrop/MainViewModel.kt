@@ -350,10 +350,11 @@ class MainViewModel() : ViewModel(){
     //var previousisOpenVal : Boolean? = null
     //private val _isOpen = MutableLiveData<Boolean?>(null)
     //val isOpen : LiveData<Boolean?> = _isOpen
-    val isCompartmentOpen : LiveData<Boolean> = fbRepo.isCompartmentOpen
+    val is1Open : MutableStateFlow<Boolean?> = fbRepo.isComp1Open
+    val is2Open : MutableStateFlow<Boolean?> = fbRepo.isComp2Open
 
     fun createTimer(timeout:Long){
-        fbRepo.startObserveCompartment()
+        //fbRepo.startObserveCompartment()
         ///_isOpen.value = true
 
         _timer = object : CountDownTimer(timeout, 1000){
@@ -400,16 +401,21 @@ class MainViewModel() : ViewModel(){
             ?:false
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun cstHasCollected(orderID: String){
+        fbRepo.updateToCollected(orderID)
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////        CRR COLLECTION + DEPOSIT
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun crrHasCollected(orderID: String){
-        updateOrderState(orderID)
+        fbRepo.updateToCarried(orderID)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun crrHasDeposited(orderID: String){
-        updateOrderState(orderID)
+        fbRepo.updateToAvailable(orderID)
     }
 
     fun crrStartsDeposit(lockerCode: String, orderID: String) : Boolean{

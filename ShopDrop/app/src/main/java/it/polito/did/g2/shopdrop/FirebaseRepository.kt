@@ -3,6 +3,7 @@ package it.polito.did.g2.shopdrop
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.database.DataSnapshot
@@ -20,6 +21,7 @@ import it.polito.did.g2.shopdrop.data.StoreItem
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
 import it.polito.did.g2.shopdrop.data.users.User
 import it.polito.did.g2.shopdrop.data.users.UserRole
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDateTime
 
 //DEBUG
@@ -422,27 +424,103 @@ class FirebaseRepository {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
+    fun updateToCarried(id: String){
+        dbRefOrders.child(id)
+            .child("stateList")
+            .child(OrderStateName.CARRIED.toString())
+            .setValue(LocalDateTime.now().toString())
+            .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in Order DB") }
+            .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateToAvailable(id: String){
+        dbRefOrders.child(id)
+            .child("stateList")
+            .child(OrderStateName.AVAILABLE.toString())
+            .setValue(LocalDateTime.now().toString())
+            .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in Order DB") }
+            .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateToCollected(id: String){
+        dbRefOrders.child(id)
+            .child("stateList")
+            .child(OrderStateName.COLLECTED.toString())
+            .setValue(LocalDateTime.now().toString())
+            .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in Order DB") }
+            .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     fun updateOrderState(id: String){
-        val targetOrder : Order? = _ordersList.value?.find { it.id==id }
-        val lastState = targetOrder?.stateList?.last()?.state // TODO prendere quello giusto
+        //val targetOrder : Order? = _ordersList.value?.find { it.id==id }
+        //val lastState = targetOrder?.stateList?.map { it.state }?.sortedBy { it.ordinal }?.last()
+        //val lastState = targetOrder?.stateList?.maxByOrNull { it.state.ordinal }?.state
+        val lastState = mutableStateOf<OrderStateName?>(null)
 
-        if(targetOrder!=null && lastState!=null){
-            val nextStateName = OrderStateName.values()[lastState.ordinal+1]
+        dbRefOrders.child(id).child("stateList").addListenerForSingleValueEvent(
+            object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val statelist = mutableListOf<OrderStateName>()
 
-            dbRefOrders.child(id)
-                .child("stateList")
-                .child(nextStateName.toString())
-                .setValue(LocalDateTime.now().toString())
-                .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in Order DB") }
-                .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
+                    for(snap in snapshot.children){
+                        Log.i("######", snap.key.toString())
+                        statelist.add(OrderStateName.valueOf(snap.key.toString()))
+                    }
 
-            dbRefUsers.child(targetOrder.customerID!!)
-                .child("orders")
-                .child(targetOrder.id!!)
-                .setValue(nextStateName.toString())
-                .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in User DB") }
-                .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
-        }
+                    lastState.value = statelist.sortedBy { it.ordinal }.last()
+                    Log.i("######", "Ultimo stato ${lastState.value}")
+
+                    if(/*targetOrder!=null && */ lastState.value!=null){
+                        val nextStateName = OrderStateName.values()[lastState.value!!.ordinal+1]
+                        Log.i("######", "Prossimo stato $nextStateName")
+
+                        dbRefOrders.child(id)
+                            .child("stateList")
+                            .child(nextStateName.toString())
+                            .setValue(LocalDateTime.now().toString())
+                            .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in Order DB") }
+                            .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
+
+                        Log.i("######", "orderID $id")
+
+                        var userID : String? = null
+                        dbRefOrders.child(id).child("customerID").get()
+                            .addOnSuccessListener {
+                                userID = it.value.toString()
+
+                                Log.i("######", "UID $userID.")
+
+                                if(userID!=null){
+                                    dbRefUsers.child(userID!!)
+                                        .child("orders")
+                                        .child(id)
+                                        .setValue(nextStateName.toString())
+                                        .addOnSuccessListener {
+                                            Log.i(
+                                                "UPDATE_ORDERSTATE",
+                                                "Aggiornamento dell'ordine avvenuto con successo in User DB"
+                                            )
+                                        }
+                                        .addOnFailureListener {
+                                            Log.e(
+                                                "UPDATE_ORDERSTATE",
+                                                "FAILED UPDATE"
+                                            )
+                                        }
+                                }
+                            }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+
+            }
+        )
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -634,9 +712,10 @@ class FirebaseRepository {
 
     private val targetCompartment = MutableLiveData<TargetCompartment>()
 
-    private val _isCompartmentOpen = MutableLiveData(false)
-    val isCompartmentOpen : LiveData<Boolean> = _isCompartmentOpen
+    val isComp1Open = MutableStateFlow<Boolean?>(null)
+    val isComp2Open = MutableStateFlow<Boolean?>(null)
 
+    /*
     fun startObserveCompartment() {
         if(targetCompartment.value?.locker!=null && targetCompartment.value?.compartment!=null){
 
@@ -647,7 +726,8 @@ class FirebaseRepository {
                 .addValueEventListener(
                     object : ValueEventListener{
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            _isCompartmentOpen.value = snapshot.getValue<Boolean>()
+                            isCompOpen.value = snapshot.getValue<Boolean>()
+                            Log.i("COMP ${targetCompartment.value!!.compartment}", "Target compartment at locker ${targetCompartment.value!!.locker} changed value to ${snapshot.getValue<Boolean>()} (${isCompOpen.value})")
                         }
 
                         override fun onCancelled(error: DatabaseError) {
@@ -657,6 +737,7 @@ class FirebaseRepository {
                 )
         }
     }
+    */
 
     fun resetTargetComp(){
         targetCompartment.value?.locker = null
@@ -708,5 +789,41 @@ class FirebaseRepository {
     fun DebugResetLockers(){
         //TODO
         Log.w("RESET LOCKERS", "TODO")
+    }
+
+    init{
+        dbRefLockers.child("LTO_01")
+            .child("compartments")
+            .child("1")
+            .child("isOpen")
+            .addValueEventListener(
+                object : ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        isComp1Open.value = snapshot.getValue<Boolean>()
+                        Log.i("LTO_01.1", "Target compartment at locker changed value to ${snapshot.getValue<Boolean>()} (${isComp1Open.value})")
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        TODO("Not yet implemented")
+                    }
+                }
+            )
+
+        dbRefLockers.child("LTO_01")
+            .child("compartments")
+            .child("2")
+            .child("isOpen")
+            .addValueEventListener(
+                object : ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        isComp2Open.value = snapshot.getValue<Boolean>()
+                        Log.i("LTO_01.2", "Target compartment at locker changed value to ${snapshot.getValue<Boolean>()} (${isComp2Open.value})")
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        TODO("Not yet implemented")
+                    }
+                }
+            )
     }
 }

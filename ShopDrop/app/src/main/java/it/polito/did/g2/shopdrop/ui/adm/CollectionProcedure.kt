@@ -1,5 +1,8 @@
 package it.polito.did.g2.shopdrop.ui.adm
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +16,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -25,7 +29,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.navigation.Screens
@@ -39,8 +42,9 @@ enum class TimerPhase {
 
 const val ANIM_TIMING = 500
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CollectionProcedure(navController: NavController, viewModel: MainViewModel, lifecycleOwner: LifecycleOwner){
+fun CollectionProcedure(navController: NavController, viewModel: MainViewModel, orderID: String){
 
     val timerMax = 3*60000L
     var timerState by remember { mutableStateOf(TimerPhase.Phase1) }
@@ -48,7 +52,8 @@ fun CollectionProcedure(navController: NavController, viewModel: MainViewModel, 
 
     val timerValue = viewModel.timerValue.observeAsState()
 
-    val isOpen by viewModel.isCompartmentOpen.observeAsState()
+    val is1Open = viewModel.is1Open.collectAsState()
+    val is2Open = viewModel.is2Open.collectAsState()
 
     /*
     viewModel.isOpenFieldState.observe(lifecycleOwner, Observer { newVal ->
@@ -58,13 +63,6 @@ fun CollectionProcedure(navController: NavController, viewModel: MainViewModel, 
         }
     })
     */
-
-    LaunchedEffect(isOpen){
-        if (isOpen==true) {
-            navController.navigate(Screens.CstCollectionDoneScreen.route)
-        }
-    }
-
 
     //val currentProgress = remember { Animatable(viewModel.getProgress()) }
 
@@ -164,6 +162,12 @@ fun CollectionProcedure(navController: NavController, viewModel: MainViewModel, 
         color = MaterialTheme.colorScheme.background,
         modifier = Modifier.fillMaxSize()
     ) {
+        if(is1Open.value == false && is2Open.value == false){
+            Log.i("#####", "Sportello chiuso, deve cambiare")
+            viewModel.cstHasCollected(orderID)
+            navController.navigate(Screens.CstCollectionDoneScreen.route)
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize(),
