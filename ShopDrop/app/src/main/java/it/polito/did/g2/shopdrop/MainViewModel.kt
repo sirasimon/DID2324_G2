@@ -36,6 +36,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class MainViewModel() : ViewModel(){
+    val bldNum = "alpha-0008"
+
     ////////////////////////////////////////////////////////////////////////////////////////////////        GLOBAL DATA
     private val fbRepo = FirebaseRepository()
 
@@ -237,8 +239,8 @@ class MainViewModel() : ViewModel(){
     ////////////////////////////////////////////////////////////////////////////////////////////////        CART AND ORDER DATA
 
     // PENDING ORDERS
-    private val _userOrders : MutableLiveData<MutableList<Order>> = MutableLiveData(fbRepo.ordersList.value?.filter { it.customerID == _currUser.value?.uid }?.toMutableList())
-    val userOrders : LiveData<MutableList<Order>> = _userOrders
+    //private val _userOrders : MutableLiveData<MutableList<Order>> = MutableLiveData(fbRepo.ordersList.value?.filter { it.customerID == _currUser.value?.uid }?.toMutableList())
+    //val userOrders : LiveData<MutableList<Order>> = _userOrders
 
     //CART DATA
     private val _cart : MutableLiveData<Cart?> = MutableLiveData(null)

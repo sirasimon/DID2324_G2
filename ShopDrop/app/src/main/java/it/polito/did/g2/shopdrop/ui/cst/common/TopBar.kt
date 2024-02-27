@@ -37,7 +37,7 @@ fun TopBar(onBack: (()->Unit)?,
                 IconButton(onClick = { onBack() }) {
                     Image(
                         painter = painterResource(id = R.drawable.btn_back),
-                        contentDescription = "Localized description"
+                        contentDescription = "back"
                     )
                 }
             }

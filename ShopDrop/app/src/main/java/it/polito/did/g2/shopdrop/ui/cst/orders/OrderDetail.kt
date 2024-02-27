@@ -321,39 +321,3 @@ fun OrderStateList(msg : String, time : String?){
         Text(text = time?: stringResource(id = R.string.in_progress), fontStyle = if(time!=null) FontStyle.Normal else FontStyle.Italic)
     }
 }
-
-//UTILI e vecchi
-//TODO Utile per la spesa sotto, qui non ha bisogno di essere scrollabile
-/*
-val updateScrollState = rememberScrollState()
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp)
-                    .verticalScroll(updateScrollState)
-                    .graphicsLayer { alpha = .99f }
-                    .drawWithContent {
-                        val colors = listOf(Color.Transparent, Color.Black)
-                        drawContent()
-                        drawRect(
-                            brush = Brush.verticalGradient(colors),
-                            blendMode = BlendMode.DstIn
-                        )
-                    }
-                ){
-                    updateList.forEachIndexed{index, it->
-                        OrderStateList(info = it)
-                        if(index == updateList.size-1)
-                            LaunchedEffect(true){
-                                updateScrollState.scrollTo(updateScrollState.maxValue)
-                            }
-                    }
-                }
-*/
-
-/*
-                val topFade = Brush.verticalGradient(0f to Color.Transparent, 0.3f to Color.Red)
-                Box(modifier = Modifier
-                    .fadingEdge(topFade)
-                    .background(Color.Blue)
-                    .size(200.dp))
-                */

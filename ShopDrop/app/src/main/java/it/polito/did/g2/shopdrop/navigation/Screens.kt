@@ -30,12 +30,21 @@ sealed class Screens(val route: String) {
 
     // CARRIER SCREENS #############################################################################
     object CrrHomeScreen : Screens("CrrHomeScreen")
-    object CrrCollectionCameraScreen : Screens("CrrCollectionCameraScreen")
-    object CrrDepositCameraScreen : Screens("CrrDepositCameraScreen")
     object CrrProfileScreen : Screens("CrrProfileScreen")
+
+    object CrrOrderDetail: Screens("CrrOrderDetailScreen")
+
+    object CrrCollectionCamera : Screens("CrrCollectionCameraScreen")
+    object CrrDepositCameraLocker : Screens("CrrDepositCameraLockerScreen")
+    object CrrDepositCameraOrder : Screens("CrrDepositCameraOrderScreen")
+
+    object CrrBeforeDeposit : Screens("CrrBeforeDepositScreen")
+    object CrrDepositing : Screens("CrrDepositingScreen")
+
     object CrrDeliveryScreen: Screens("CrrDeliveryScreen")
     object CrrCollectedScreen: Screens("CrrCollectedScreen")
     object CrrDepositedScreen: Screens("CrrDepositedScreen")
+
 
     //ADMIN SCREENS ################################################################################
     object AdmHomeScreen : Screens("AdmHomeScreen")

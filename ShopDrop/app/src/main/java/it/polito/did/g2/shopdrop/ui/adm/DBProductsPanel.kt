@@ -5,6 +5,6 @@ import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
 
 @Composable
-fun DBLockersOverview(viewModel: MainViewModel, navController: NavController) {
+fun DBProductsPanel(viewModel: MainViewModel, navController: NavController) {
 
 }

@@ -1,4 +1,4 @@
-package it.polito.did.g2.shopdrop.ui.adm
+package it.polito.did.g2.shopdrop.ui.cst.unlocker
 
 import android.os.Build
 import android.util.Log
@@ -44,7 +44,7 @@ const val ANIM_TIMING = 500
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CollectionProcedure(navController: NavController, viewModel: MainViewModel, orderID: String){
+fun CSTCollectionProcedure(navController: NavController, viewModel: MainViewModel, orderID: String){
 
     val timerMax = 3*60000L
     var timerState by remember { mutableStateOf(TimerPhase.Phase1) }

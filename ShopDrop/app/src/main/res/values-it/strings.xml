@@ -75,7 +75,7 @@
     <string name="tab_list">lista</string>
     <string name="btn_goto_home">vai all\'home</string>
     <string name="chip_to_collect">da ritirare</string>
-    <string name="chip_to_deliver">da consegnare</string>
+    <string name="chip_to_deposit">da consegnare</string>
     <string name="btn_select_locker">seleziona il locker</string>
     <string name="txt_item">oggetto</string>
     <string name="txt_items">oggetti</string>
@@ -94,4 +94,12 @@
     <string name="hide">nascondi</string>
     <string name="items_ordered">oggetti ordinati</string>
     <string name="btn_cancelled_order">ordine cancellato</string>
+    <string name="welcome_back">bentornato</string>
+    <string name="crr_state_active">attivo</string>
+    <string name="crr_profile_settings">impostazioni</string>
+    <string name="crr_profile_personal_info">info personali</string>
+    <string name="crr_profile_delivery_history">storico consegne</string>
+    <string name="crr_profile_assistance">assistenza</string>
+    <string name="btn_take_charge">prendi in carico</string>
+    <string name="btn_deposit_order">deposita l\'ordine</string>
 </resources>

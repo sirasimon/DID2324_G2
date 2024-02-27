@@ -76,7 +76,7 @@
     <string name="tab_list">list</string>
     <string name="btn_goto_home">go to home</string>
     <string name="chip_to_collect">to collect</string>
-    <string name="chip_to_deliver">to deliver</string>
+    <string name="chip_to_deposit">to deliver</string>
     <string name="btn_select_locker">select locker</string>
     <string name="txt_item">item</string>
     <string name="txt_items">items</string>
@@ -95,4 +95,24 @@
     <string name="hide">hide</string>
     <string name="items_ordered">items ordered</string>
     <string name="btn_cancelled_order">cancelled order</string>
+    <string name="welcome_back">welcome back</string>
+    <string name="crr_state_active">active</string>
+    <string name="crr_profile_settings">settings</string>
+    <string name="crr_profile_personal_info">personal info</string>
+    <string name="crr_profile_delivery_history">delivery history</string>
+    <string name="crr_profile_assistance">assistance</string>
+    <string name="btn_take_charge">take charge</string>
+    <string name="btn_deposit_order">deposit order</string>
+    <string name="crr_scan_parcel">scan order\'s QR code</string>
+    <string name="done_order_collected">order collected!</string>
+    <string name="done_btn_see_order">see order</string>
+    <string name="crr_scan_locker">scan locker\'s QR code</string>
+    <string name="title_deposit">deposit</string>
+    <string name="info_scan_locker">scan locker\'s QR</string>
+    <string name="info_scan_order">scan order\'s QR</string>
+    <string name="info_deposit_order">deposit the order in the locker</string>
+    <string name="info_close_locker">close locker\'s compartment</string>
+    <string name="btn_proceed">proceed</string>
+    <string name="title_locker_unlocked">locker unlocked</string>
+    <string name="txt_remember_to_close">Remember to close the compartment lockers opened after you\'re done with the depositing</string>
 </resources>
