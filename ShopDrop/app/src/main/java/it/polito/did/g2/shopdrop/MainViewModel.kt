@@ -242,6 +242,10 @@ class MainViewModel() : ViewModel(){
     //private val _userOrders : MutableLiveData<MutableList<Order>> = MutableLiveData(fbRepo.ordersList.value?.filter { it.customerID == _currUser.value?.uid }?.toMutableList())
     //val userOrders : LiveData<MutableList<Order>> = _userOrders
 
+    //private val _pendingOrders = MutableLiveData(0)
+    //val pendingOrders : LiveData<Int?> = fbRepo.pendingOrders
+
+
     //CART DATA
     private val _cart : MutableLiveData<Cart?> = MutableLiveData(null)
     val cart : LiveData<Cart?> = _cart
@@ -343,7 +347,7 @@ class MainViewModel() : ViewModel(){
 
     //private val _timerValue = MutableLiveData<Long>().also { it.value=0 }
     //val timerValue: LiveData<Long> = _timerValue
-    val timerValue = MutableStateFlow<Long>(0L)
+    val timerValue = MutableStateFlow(0L)
 
     private var _timer : CountDownTimer?= null
 
@@ -447,6 +451,9 @@ class MainViewModel() : ViewModel(){
 
     var targetOrderID : String? = null
 
+    fun hasPendings() : Boolean{
+        return ordersList.value?.filter { it.customerID == _currUser.value?.uid && it.isPending() }.isNullOrEmpty()
+    }
 
     init{
         Log.i("MVM INIT", "####################")

@@ -1,6 +1,8 @@
 package it.polito.did.g2.shopdrop.ui.cst.unlocker
 
+import android.content.Context
 import android.os.Build
+import android.os.Vibrator
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
@@ -25,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -75,6 +78,18 @@ fun CSTCollectionProcedure(navController: NavController, viewModel: MainViewMode
             timerState = TimerPhase.PhaseOver
         }
     }
+
+    val vibrator = LocalContext.current.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
+
+    if(timerValue.value ==timerMax || timerValue.value == 2*timerMax/3 || timerValue.value == timerMax/3)
+        vibrator?.vibrate(1000)
+
+    if(timerValue.value == timerMax/6)
+        vibrator?.vibrate(2000)
+
+    if(timerValue.value == 0L)
+        vibrator?.vibrate(5000)
+
 
 
     fun formatTime(milliseconds: Long?): String {
