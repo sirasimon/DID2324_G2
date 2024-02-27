@@ -36,7 +36,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class MainViewModel() : ViewModel(){
-    val bldNum = "alpha-0008"
+    val bldNum = "alpha-0013"
 
     ////////////////////////////////////////////////////////////////////////////////////////////////        GLOBAL DATA
     private val fbRepo = FirebaseRepository()

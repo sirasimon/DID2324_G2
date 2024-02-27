@@ -40,7 +40,7 @@ fun Nav(viewModel: MainViewModel, lifecycleOwner: LifecycleOwner){
         }
 
         //CUSTOMER BRANCH (CST)
-        cstNavGraph(navController, viewModel, lifecycleOwner)
+        cstNavGraph(navController, viewModel)
 
         //CARRIER BRANCH (CRR)
         crrNavGraph(navController, viewModel)

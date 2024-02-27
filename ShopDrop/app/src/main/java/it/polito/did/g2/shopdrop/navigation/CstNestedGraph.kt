@@ -2,7 +2,6 @@ package it.polito.did.g2.shopdrop.navigation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -11,7 +10,6 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
-import it.polito.did.g2.shopdrop.ui.camera.CameraScreen
 import it.polito.did.g2.shopdrop.ui.cst.CSTCollectionDone
 import it.polito.did.g2.shopdrop.ui.cst.cart.CSTCartScreen
 import it.polito.did.g2.shopdrop.ui.cst.cart.CSTCheckoutScreen
@@ -22,12 +20,13 @@ import it.polito.did.g2.shopdrop.ui.cst.home.CategoryScreen
 import it.polito.did.g2.shopdrop.ui.cst.orders.CSTOrderDetail
 import it.polito.did.g2.shopdrop.ui.cst.orders.CstOrdersHistory
 import it.polito.did.g2.shopdrop.ui.cst.profile.CSTProfileScreen
+import it.polito.did.g2.shopdrop.ui.cst.unlocker.CSTCamera
+import it.polito.did.g2.shopdrop.ui.cst.unlocker.CSTCollectionProcedure
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun NavGraphBuilder.cstNavGraph(
     navController: NavHostController,
-    viewModel: MainViewModel,
-    lifecycleOwner: LifecycleOwner
+    viewModel: MainViewModel
 ){
     navigation(
         startDestination = Screens.CstHome.route,
@@ -111,7 +110,8 @@ fun NavGraphBuilder.cstNavGraph(
         composable(route = Screens.CstCamera.route+"/{orderID}",
             arguments = listOf(navArgument("orderID") { type = NavType.StringType })
         ){
-            CameraScreen(navController, viewModel, it.arguments?.getString("orderID")!!)
+            //CameraScreen(navController, viewModel, it.arguments?.getString("orderID")!!)
+            CSTCamera(navController, viewModel, it.arguments?.getString("orderID")!!)
         }
 
         /*
@@ -125,7 +125,7 @@ fun NavGraphBuilder.cstNavGraph(
         composable(route = Screens.CstCollectionScreen.route+"/{orderID}",
             arguments = listOf(navArgument("orderID") { type = NavType.StringType })
         ){
-            //CSTCollectionProcedure(navController, viewModel, it.arguments?.getString("orderID")!!)
+            CSTCollectionProcedure(navController, viewModel, it.arguments?.getString("orderID")!!)
         }
     }
 }
