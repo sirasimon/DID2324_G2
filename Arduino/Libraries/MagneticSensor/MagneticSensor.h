@@ -7,7 +7,7 @@ class MagneticSensor {
     static const int calibrationReadings = 10000;
     static const int readings = 10;
     long calibrationValue;
-    MagneticSensor(int pin, int sensitivity);
+    MagneticSensor(int pin, int sensitivity, int tolerance);
     MagneticSensor();
     void init();
     long read();
@@ -15,6 +15,7 @@ class MagneticSensor {
     long readTimeAverage(long time);
     long lastCheckValue;
     long lastCheckDelta;
+    int _tolerance;
   private:
     int _pin;
     int _sensitivity;

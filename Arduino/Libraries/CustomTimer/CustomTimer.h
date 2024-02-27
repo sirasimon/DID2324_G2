@@ -7,6 +7,8 @@ class CustomTimer {
     CustomTimer(unsigned long duration);
     CustomTimer();
     bool checkAndUpdate();
+    bool check();
+    void Update();
 
   private:
     unsigned long _duration;

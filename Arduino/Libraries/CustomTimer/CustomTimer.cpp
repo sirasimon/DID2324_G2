@@ -17,3 +17,14 @@ bool CustomTimer::checkAndUpdate() {
   }
   return false;
 }
+
+bool CustomTimer::check() {
+  if (millis() >= _timestamp) {
+    return true;
+  }
+  return false;
+}
+
+void CustomTimer::Update() {
+  _timestamp = millis() + _duration;
+}

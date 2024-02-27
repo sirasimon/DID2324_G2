@@ -5,17 +5,26 @@
 #include "CustomTimer.h"
 #include "Locker.h"
 
-Locker::Locker(CustomServo& servo, CustomServo& bumpServo, MagneticSensor& sensor, String id): _servo(servo), _bumpServo(bumpServo), _sensor(sensor) {
+Locker::Locker(CustomServo& servo, CustomServo& bumpServo, MagneticSensor& sensor, String id, bool leftLocker): _servo(servo), _bumpServo(bumpServo), _sensor(sensor) {
   _id = id;
+  _leftLocker = leftLocker;
+  if (leftLocker) {
+    startPos = 0;
+    endPos = 90;
+  }
+  else {
+    startPos = 180;
+    endPos = 90;
+  }
 }
 
 #pragma region OpenUnlock State
 void Locker::_openUnlock_enter() {
   Serial.println("Locker " + String(_id) + " STATE has changed to OPEN UNLOCK");
-  _servo.sweep(0);
+  _servo.sweep(startPos);
 }
 void Locker::_openUnlock_update() {
-  if (_servo._currentAngle == 0) {
+  if (_servo._currentAngle == startPos) {
     _change_state(openBump);
   }
 }
@@ -24,10 +33,10 @@ void Locker::_openUnlock_exit() { }
 
 #pragma region OpenBump State
 void Locker::_openBump_enter() { 
-  _bumpServo.sweep(180);
+  _bumpServo.sweep(endPos);
 }
 void Locker::_openBump_update() {
-  if (_bumpServo._currentAngle == 180) {
+  if (_bumpServo._currentAngle == endPos) {
     _change_state(open);
   }
 }
@@ -37,10 +46,17 @@ void Locker::_openBump_exit() { }
 #pragma region Open State
 void Locker::_open_enter() {
   Serial.println("Locker " + String(_id) + " STATE has changed to OPEN");
-  _bumpServo.sweep(0);
+  _bumpServo.sweep(startPos);
   _closeEnabled = false;
 }
 void Locker::_open_update() {
+  if (_sensor.read() - _sensor._tolerance < _sensor.calibrationValue || _sensor.read() + _sensor._tolerance > _sensor.calibrationValue) {
+    _closeEnabled = true;
+  }
+  if (_closeEnabled && _sensor.check()) {
+    _change_state(closed);
+  }
+  /*
   if (!debugMode) {
     if (!_closeEnabled && (!_sensor.check())) {
       _closeEnabled = true;
@@ -54,6 +70,7 @@ void Locker::_open_update() {
       _change_state(closed);
     }
   }
+  */
 }
 void Locker::_open_exit() { }
 #pragma endregion 
@@ -61,7 +78,7 @@ void Locker::_open_exit() { }
 #pragma region Closed State
 void Locker::_closed_enter() {
   Serial.println("Locker " + String(_id) + " state has changed to CLOSED");
-  _servo.sweep(90);
+  _servo.sweep(endPos);
 }
 void Locker::_closed_update() {
   if (_input_sent && _com == 'o') {
@@ -74,16 +91,17 @@ void Locker::_closed_exit() { }
 #pragma region Starting State
 void Locker::_starting_enter() {
   Serial.println("Locker " + String(_id) + " STATE has changed to STARTING");
-  _servo.sweep(90);
+  _bumpServo.sweep(startPos);
+  _servo.sweep(startPos);
 }
 void Locker::_starting_update() {
-  if (_servo._currentAngle == 90) {
-    _change_state(closed);
+  if (_servo._currentAngle == startPos) {
+    _change_state(open);
   }
 }
 void Locker::_starting_exit() {
-  delay(5000);
-  _sensor.calibrationValue = _sensor.readTimeAverage(5000);
+  delay(5000); 
+  _sensor.calibrationValue = _sensor.read();
   Serial.println("Locker " + String(_id) + " magnetic calibration value: " + String(_sensor.calibrationValue));
 }
 #pragma endregion

@@ -4,18 +4,19 @@
 #include "CustomTimer.h"
 #include "CustomServo.h"
 
-CustomServo::CustomServo(Servo& servo, int pin, int sweepSpeed, int sweepResolution): _servo(servo) {
+CustomServo::CustomServo(Servo& servo, int pin, int sweepSpeed, int sweepResolution, int startAngle): _servo(servo) {
   _pin = pin;
   _sweepSpeed = sweepSpeed;
   _sweepResolution = sweepResolution;
+  _startAngle = startAngle;
 }
 
 CustomServo::CustomServo() {
 }
 void CustomServo::init() {
   _servo.attach(_pin);
-  _servo.write(0);
-  _currentAngle = 0;
+  _servo.write(_startAngle);
+  _currentAngle = _startAngle;
 }
 
 void CustomServo::sweep(int angle) {

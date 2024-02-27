@@ -7,7 +7,7 @@
 #include "CustomTimer.h"
 class Locker {
   public:
-    Locker(CustomServo& servo, CustomServo& bumpServo, MagneticSensor& sensor, String id);
+    Locker(CustomServo& servo, CustomServo& bumpServo, MagneticSensor& sensor, String id, bool leftLocker);
     void send_input(char com);
     void update();
     void init();
@@ -23,6 +23,9 @@ class Locker {
     String _id;
     state _currentState;
     bool debugMode;
+    int startPos;
+    int endPos;
+    bool _leftLocker;
   private:
     CustomServo& _servo;
     CustomServo& _bumpServo;

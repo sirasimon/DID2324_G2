@@ -18,14 +18,14 @@ Servo lockServoA;
 Servo bumpServoA;
 Servo lockServoB;
 Servo bumpServoB;
-MagneticSensor doorSensorA(A0, 35);
-MagneticSensor doorSensorB(A1, 100);
-CustomServo lockCustomServoA(lockServoA, 11, 200, 1);
-CustomServo bumpCustomServoA(bumpServoA, 10, 200, 1);
-CustomServo lockCustomServoB(lockServoB, 6, 200, 1);
-CustomServo bumpCustomServoB(bumpServoB, 9, 200, 1);
-Locker lockerA(lockCustomServoA, bumpCustomServoA, doorSensorA, "LT02_1");
-Locker lockerB(lockCustomServoB, bumpCustomServoB, doorSensorB, "LT02_2");
+MagneticSensor doorSensorA(A0, 80, 20);
+MagneticSensor doorSensorB(A1, 65, 20);
+CustomServo lockCustomServoA(lockServoA, 11, 200, 1, 0);
+CustomServo bumpCustomServoA(bumpServoA, 10, 200, 1, 0);
+CustomServo lockCustomServoB(lockServoB, 5, 200, 1, 180);
+CustomServo bumpCustomServoB(bumpServoB, 6, 200, 1, 180);
+Locker lockerA(lockCustomServoA, bumpCustomServoA, doorSensorA, "LT02_1", true);
+Locker lockerB(lockCustomServoB, bumpCustomServoB, doorSensorB, "LT02_2", false);
 int charCounter = 0;
 int locker;
 bool espReady = false;
@@ -33,6 +33,7 @@ bool espReady = false;
 void i2cReceiveCallback(int size) {
   while (Wire.available() > 0) {
     char data = Wire.read();
+    Serial.println("data received from esp");
     if (data == 'a') {
       lockerA.send_input('o');
     }
@@ -60,25 +61,32 @@ void i2cRequestCallback() {
 }
 void setup() {
   Serial.begin(115200);
-  delay(1000);
   Serial.println(" ");
   Serial.println("=======================================================================");
   Serial.println("STARTING UNO");
-  lockCustomServoA.init();
-  bumpCustomServoA.init();
-  lockCustomServoB.init();
-  bumpCustomServoB.init();
-  lockerA.init();
-  lockerB.init();
+  delay(20000);
   Wire.begin(8);
   Wire.onReceive(i2cReceiveCallback);
   Wire.onRequest(i2cRequestCallback);
   delay(1000);
+  /*
   Serial.println("WAITING FOR ESP");
   while (!espReady) {
     Serial.print(".");
     delay(300);
   }
+  */
+
+
+  bumpCustomServoA.init();
+  bumpCustomServoB.init();
+  delay(3000);
+  lockCustomServoB.init();
+  lockCustomServoA.init();
+  delay(3000);
+  lockerA.init();
+  lockerB.init();
+
   Serial.print("\n");
   Serial.println("Esp ready");
   Serial.println("UNO STARTED");
@@ -87,68 +95,4 @@ void setup() {
 void loop() {
   lockerA.update();
   lockerB.update();
-  //simReceiveEvent();
 }
-
-/*
-void simReceiveEvent() {
-  char data = Serial.read();
-  if (data == 'a') {
-    lockerA.send_input('c');
-  }
-  else if (data == 'b') {
-    lockerB.send_input('c');
-  }
-}
-*/
-
-/*
-void simReceiveEvent() {
-  while (Serial.available() > 0) {
-    char c = Serial.read();
-    if (charCounter == 0) {
-      if (c == lockerA._id)
-        locker = 1;
-      else if (c == lockerB._id)
-        locker = 2;
-    }
-    else if (c != '\n') {
-      if (locker == 1)
-      {
-        Serial.println("Received input for locker A " + String(c));
-        lockerA.send_input(c);
-      }
-      else if (locker == 2) {
-        Serial.println("Received input for locker B " + String(c));
-      }
-    }
-  charCounter++;
-  if (c == '\n')
-    charCounter = 0;
-  }
-}
-void i2cReceiveCallback(int size) {
-  while (Wire.available() > 0) {
-    char c = Wire.read();
-    if (charCounter == 0) {
-      if (c == lockerA._id)
-        locker = 1;
-      else if (c == lockerB._id)
-        locker = 2;
-    }
-    else if (c != '\n') {
-      if (locker == 1)
-      {
-        Serial.println("Received input for locker A " + String(c));
-        lockerA.send_input(c);
-      }
-      else if (locker == 2) {
-        Serial.println("Received input for locker B " + String(c));
-      }
-    }
-  charCounter++;
-  if (c == '\n')
-    charCounter = 0;
-  }
-}
-*/

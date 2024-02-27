@@ -1,7 +1,8 @@
 #include "Arduino.h"
 #include "MagneticSensor.h"
 
-MagneticSensor::MagneticSensor(int pin, int sensitivity) {
+MagneticSensor::MagneticSensor(int pin, int sensitivity, int tolerance) {
+  _tolerance = tolerance;
   _pin = pin;
   _sensitivity = sensitivity;
 }
@@ -9,6 +10,7 @@ MagneticSensor::MagneticSensor(int pin, int sensitivity) {
 MagneticSensor::MagneticSensor() {
   _pin = A0;
   _sensitivity = 100;
+  _tolerance = 10;
 }
 
 void MagneticSensor::init() {
