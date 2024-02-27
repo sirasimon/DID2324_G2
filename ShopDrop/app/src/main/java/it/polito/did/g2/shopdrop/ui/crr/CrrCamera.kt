@@ -1,10 +1,12 @@
-package it.polito.did.g2.shopdrop.ui.camera
+package it.polito.did.g2.shopdrop.ui.crr
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Size
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
@@ -47,9 +49,10 @@ import it.polito.did.g2.shopdrop.QrCodeAnalyzer
 import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.navigation.Screens
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CameraScreen(navController : NavController, viewModel: MainViewModel, orderID : String){
+fun CrrCamera(navController : NavController, viewModel: MainViewModel, orderID : String?){
     var code by remember{ mutableStateOf("") }
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -110,8 +113,11 @@ fun CameraScreen(navController : NavController, viewModel: MainViewModel, orderI
                         code = result
 
                         //TODO Forse è qui il pezzo dove intervenire
-                        if(viewModel.cstStartsCollection(code, orderID))
-                            navController.navigate(Screens.CstCollectionScreen.route+"/$orderID")
+                        if(code==orderID) {
+                            viewModel.crrHasCollected(orderID)
+                            navController.navigate(Screens.CrrCollectedScreen.route)
+                        }
+
                     }
                 )
                 try{

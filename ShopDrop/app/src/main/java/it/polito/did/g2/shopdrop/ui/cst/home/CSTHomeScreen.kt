@@ -16,13 +16,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Business
-import androidx.compose.material.icons.filled.DirectionsBusFilled
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.QrCodeScanner
-import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -58,7 +52,6 @@ import it.polito.did.g2.shopdrop.data.StoreItem
 import it.polito.did.g2.shopdrop.data.TabScreen
 import it.polito.did.g2.shopdrop.navigation.Screens
 import it.polito.did.g2.shopdrop.ui.cst.common.BottomBar
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 
@@ -66,6 +59,8 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
+
+    //viewModel.loadOrders()
 
     val currentTab = TabScreen.HOME
 
@@ -127,14 +122,6 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                 ) {
-
-                    // PENDING ORDERS                                                           PENDING ORDERS
-                    //TODO Pending orders
-                    //TODO impedire visualizzazione quando si sta cercando un prodotto
-                    //TODO controllare il vm che ci siano ordini pendenti ed eventualmente mostrarli
-                    if(viewModel.hasPending.value!!)    //Condizione dei pending order
-                        PendingOrdersCard(navController, viewModel)
-
                     if(query==""){
                         itemList.value?.map{it.category}
                             ?.distinct()
@@ -155,6 +142,33 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
                             }
 
                     }else{
+                        // PENDING ORDERS                                                           PENDING ORDERS TODO non funziona!!!
+
+                        if(!viewModel.pendingOrders.value.isNullOrEmpty()) {    //Condizione dei pending order
+                            Log.i("PENDING ORDERS OK", "Sì, ci sono degli ordini pendenti")
+                            Column(modifier = Modifier.padding(vertical = 16.dp)) {
+                                /*
+                                Text("Ordini recenti:",
+                                    fontSize = 18.sp,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                                 */
+
+                                ElevatedCard(
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .fillMaxWidth()
+                                ) {
+                                    viewModel.pendingOrders.value!!.forEach {
+                                        val onMore = {id : String -> navController.navigate(Screens.CstOrderDetail.route+"/$id") }
+                                        val onScan = {id : String -> navController.navigate(Screens.CstCamera.route+"/$id")}
+                                        PendingItemList(it, viewModel, onMore, onScan)
+                                    }
+                                }
+                            }
+                        }
+
                         itemList.value?.filter{it.name.contains(query)}
                             ?.map{it.category}
                             ?.distinct()
@@ -189,102 +203,29 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PendingOrdersCard(navController: NavController, viewModel: MainViewModel){
+fun PendingItemList(order: Order, viewModel: MainViewModel, onMore : (String) -> Unit, onScan: (String) -> Unit){
 
-    Column(modifier = Modifier.padding(vertical = 16.dp)){
-        /*
-        Text("Ordini recenti:",
-            fontSize = 18.sp,
-            modifier = Modifier.padding(16.dp)
-        )
-         */
-
-        ElevatedCard(
-            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-        ){
-            /*
-            viewModel.pendingOrdersList.value?.forEachIndexed{i, it ->
-                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()){
-                    OrderListItem(order = it, navController, viewModel)
-
-                    if (i < viewModel.pendingOrdersList.value!!.size)
-                        HorizontalDivider()
-                }
-            }
-
-             */
-        }
-
-        /*
-        Box(Modifier){
-            ElevatedCard(
-                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .background(Color.Red)
-            ){
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Cyan)){
-                    ListItem(
-                        headlineContent = { Text("Pacco Halloween") },
-                        trailingContent = {
-                            IconButton(onClick = { /*TODO*/ })
-                            {
-                                Icon(Icons.Filled.QrCodeScanner, contentDescription = null)
-                            }
-                        },    //aggiungere if per farlo apparire solo se è disponibile
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { navController.navigate("COrderDetailScreen") }
-                    )
-                    HorizontalDivider()
-                    ListItem(
-                        headlineContent = {Text("Regalo Matti")},
-                        modifier = Modifier.clickable { /*TODO*/ }
-                    )
-                }
-            }
-        }
-         */
-
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun OrderListItem(order: Order, navController: NavController, viewModel: MainViewModel){
-    val creationTime = order.stateList?.find { it.state==OrderStateName.CREATED }?.timestamp?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
-    val icon = when(order.stateList?.last()?.state){
-        OrderStateName.CREATED -> Icons.Filled.Add
-        OrderStateName.RECEIVED -> Icons.Filled.Business
-        OrderStateName.CARRIED -> Icons.Filled.DirectionsBusFilled
-        OrderStateName.AVAILABLE -> Icons.Filled.Done
-        OrderStateName.COLLECTED -> Icons.Filled.DoneAll
-        else -> Icons.Filled.QuestionMark
-    }
-
-    val scannable = order.stateList?.last()?.state == OrderStateName.AVAILABLE
+    val lastState = order.stateList?.last()?.state
 
     ListItem(
-        headlineContent = { Text(stringResource(id = R.string.order_dated).capitalize() + " " + creationTime) },
-        leadingContent = { Icon(icon, contentDescription = null) },
-        trailingContent = {
-            if (scannable)
-                IconButton(onClick = { navController.navigate(Screens.CstCamera.route) }) { //TODO: aggiungere qui l'argomento alla navigazione dell'ID dell'ordine
-                    Icon(Icons.Filled.QrCodeScanner, contentDescription = null)
-                }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                viewModel.targetOrderID = order.id
-                navController.navigate(Screens.CstOrderDetail.route) //TODO: aggiungere qui l'argomento alla navigazione dell'ID dell'ordine
+        headlineContent = {
+            Column {
+                Text("${stringResource(id = R.string.order_dated).capitalize()} ${viewModel.getDateString( order.stateList?.first()?.timestamp!! )}")
+                Text( stringResource(id = viewModel.getOrderStateStringId(lastState) ) )
             }
+        },
+        leadingContent = {
+            Icon(viewModel.getOrderStateIcon(lastState), contentDescription = null)
+                         },
+        trailingContent = {
+            IconButton(
+                enabled = lastState==OrderStateName.AVAILABLE,
+                onClick = { onScan(order.id!!) } //TODO: aggiungere qui l'argomento alla navigazione dell'ID dell'ordine
+            ){
+                Icon(Icons.Filled.QrCodeScanner, contentDescription = null)
+            }
+        },
+        modifier = Modifier.clickable { onMore(order.id!!) }
     )
 }
 

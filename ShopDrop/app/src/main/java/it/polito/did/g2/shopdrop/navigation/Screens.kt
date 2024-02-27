@@ -21,6 +21,7 @@ sealed class Screens(val route: String) {
 
     object CstProfile : Screens("CstProfileScreen")
     object CstCamera : Screens("CstCameraScreen")
+    object CstCollectionScreen : Screens("CstCollectionScreen")
 
     // Orders
     object CstOrderHistory : Screens("CstOrdersOverviewScreen")
@@ -28,9 +29,12 @@ sealed class Screens(val route: String) {
 
     // CARRIER SCREENS #############################################################################
     object CrrHomeScreen : Screens("CrrHomeScreen")
-    object CrrCameraScreen : Screens("CrrCameraScreen")
+    object CrrCollectionCameraScreen : Screens("CrrCollectionCameraScreen")
+    object CrrDepositCameraScreen : Screens("CrrDepositCameraScreen")
     object CrrProfileScreen : Screens("CrrProfileScreen")
     object CrrDeliveryScreen: Screens("CrrDeliveryScreen")
+    object CrrCollectedScreen: Screens("CrrCollectedScreen")
+    object CrrDepositedScreen: Screens("CrrDepositedScreen")
 
     //ADMIN SCREENS ################################################################################
     object AdmHomeScreen : Screens("AdmHomeScreen")

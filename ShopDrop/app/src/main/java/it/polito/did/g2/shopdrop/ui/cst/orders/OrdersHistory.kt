@@ -1,7 +1,6 @@
 package it.polito.did.g2.shopdrop.ui.cst.orders
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -23,6 +23,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,7 +38,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
+import it.polito.did.g2.shopdrop.data.Order
+import it.polito.did.g2.shopdrop.data.OrderStateName
 import it.polito.did.g2.shopdrop.data.TabScreen
+import it.polito.did.g2.shopdrop.navigation.Screens
 import it.polito.did.g2.shopdrop.ui.cst.common.ArrowRt
 import it.polito.did.g2.shopdrop.ui.cst.common.BottomBar
 import it.polito.did.g2.shopdrop.ui.cst.common.TopBar
@@ -88,13 +92,44 @@ fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
                 Column {
                     NavHost(navController = listNavController, startDestination = CstFilterChip.PEND.toString()){
                         composable(CstFilterChip.PEND.toString()) {
-                            PendingScreen()
+                            ListedOrders(
+                                viewModel.ordersList.observeAsState().value?.filter {
+                                    it.customerID==viewModel.currUser.value?.uid &&
+                                            it.stateList?.last()?.state != OrderStateName.COLLECTED &&
+                                            it.stateList?.last()?.state != OrderStateName.CANCELLED
+                                }?.toMutableList(),
+                                viewModel
+                            ) {
+                                navController.navigate(
+                                    Screens.CstOrderDetail.route + "/${it.id}"
+                                )
+                            }
                         }
                         composable(CstFilterChip.ARCH.toString()){
-                            ArchivedScreen()
+                            ListedOrders(
+                                viewModel.ordersList.observeAsState().value?.filter {
+                                    it.customerID==viewModel.currUser.value?.uid &&
+                                            it.stateList?.last()?.state == OrderStateName.COLLECTED
+                                }?.toMutableList(),
+                                viewModel
+                            ) {
+                                navController.navigate(
+                                    Screens.CstOrderDetail.route + "/${it.id}"
+                                )
+                            }
                         }
                         composable(CstFilterChip.CANC.toString()){
-                            CancelledScreen()
+                            ListedOrders(
+                                viewModel.ordersList.observeAsState().value?.filter {
+                                    it.customerID==viewModel.currUser.value?.uid &&
+                                            it.stateList?.last()?.state == OrderStateName.CANCELLED
+                                }?.toMutableList(),
+                                viewModel
+                            ) {
+                                navController.navigate(
+                                    Screens.CstOrderDetail.route + "/${it.id}"
+                                )
+                            }
                         }
                     }
                 }
@@ -103,61 +138,33 @@ fun CstOrdersHistory(navController : NavController, viewModel : MainViewModel){
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CancelledScreen() {
-    //TODO
+fun ListedOrders(list: MutableList<Order>?, viewModel: MainViewModel, onClick: () -> Unit) {
 
-    Column() {
-        for(i in 1..3){
-            OrderListItem(label = "TEST $i") {
-                Log.d("CLICK!","Cliccato su $i")
+    Column(Modifier.fillMaxWidth()){
+        if(!list.isNullOrEmpty()){
+            for (item in list) {
+                Card(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .height(64.dp)
+                        .clickable(onClick = onClick)
+                ) {
+                    ListItem(
+                        headlineContent = {
+                            Column {
+                                Text("${stringResource(id = R.string.order_dated).capitalize()} ${viewModel.getDateString( item.stateList?.first()?.timestamp!! )}")
+                                Text("#${item.id} – ${item.items?.count()} ${stringResource(id = if(item.items?.count()==1) R.string.txt_item else R.string.txt_items)}")
+                            }
+                        },
+                        trailingContent = { ArrowRt() }
+                    )
+                }
             }
-        }
-    }
-}
-
-@Composable
-fun ArchivedScreen() {
-    //TODO
-
-    Column(){
-        for(i in 4..9){
-            OrderListItem(label = "TEST $i") {
-                Log.d("CLICK!","Cliccato su $i")
-            }
-        }
-    }
-}
-
-@Composable
-fun PendingScreen() {
-    //TODO
-    Column(){
-        for(i in 11..13){
-            OrderListItem(label = "TEST $i") {
-                Log.d("CLICK!","Cliccato su $i")
-            }
-        }
-    }
-}
-
-@Composable
-fun OrderListItem(label : String, onClick : ()->Unit){
-    Card(
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp)
-            .height(64.dp)
-            .clickable(onClick = onClick)
-    ){
-        Row( verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ){
-            Text(text = label)
-            ArrowRt()
+        }else{
+            Text(stringResource(id = R.string.txt_no_orders_yet))
         }
     }
 }

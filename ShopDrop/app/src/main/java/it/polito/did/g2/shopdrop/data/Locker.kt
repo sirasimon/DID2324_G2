@@ -8,7 +8,8 @@ class Locker(
     var isOnline : Boolean = false,
     var isWorking : Boolean = false,
     var isFull : Boolean = false,
-    var isEmpty : Boolean = false
+    var isEmpty : Boolean = false,
+    var showCode: Boolean = false
 ){
     fun checkAvailability(): List<Int>?{
         var freeCompartment = compartments?.filter { it.isAvailable && it.isEmpty }?.map{it.id}
@@ -23,6 +24,14 @@ class Locker(
         }
 
         return freeCompartment
+    }
+
+    fun showCode(flag : Boolean = true){
+        showCode = flag
+    }
+
+    fun hideCode(flag : Boolean = true){
+        showCode(!flag)
     }
 
     override fun toString(): String {

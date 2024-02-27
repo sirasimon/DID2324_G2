@@ -1,7 +1,6 @@
 package it.polito.did.g2.shopdrop.ui.cst.profile
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,7 +32,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -96,10 +94,10 @@ fun CSTProfileScreen(navController: NavController, viewModel: MainViewModel){
                             .fillMaxSize()
                             .padding(16.dp)
                     ) {
-                        Column(Modifier.background(Color.Cyan)){
-                            Text("[Nome Utente]")   //TODO mettere credenziali vere
-                            Text("[Email")
-                            Text("[Numero di telefono]")
+                        Column{
+                            Text("${viewModel.currUser.value?.name} (${viewModel.currUser.value?.uid})")   //TODO mettere credenziali vere
+                            Text("${viewModel.currUser.value?.email}")
+                            Text("(+39) 333 1234567")
                         }
                         TextButton(onClick = { performDevMsg(scope, snackbarHostState, context) }) {
                             Text("Modifica")

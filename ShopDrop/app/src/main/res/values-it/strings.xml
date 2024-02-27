@@ -76,4 +76,8 @@
     <string name="btn_goto_home">vai all\'home</string>
     <string name="chip_to_collect">da ritirare</string>
     <string name="chip_to_deliver">da consegnare</string>
+    <string name="btn_select_locker">seleziona il locker</string>
+    <string name="txt_item">oggetto</string>
+    <string name="txt_items">oggetti</string>
+    <string name="txt_no_orders_yet">Non ci sono ordini da visualizzare</string>
 </resources>
