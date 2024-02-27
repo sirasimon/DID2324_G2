@@ -122,7 +122,7 @@ fun NavGraphBuilder.cstNavGraph(
         }
          */
 
-        composable(route = Screens.CstCollectionScreen.route+"/{orderID}",
+        composable(route = Screens.CstCollection.route+"/{orderID}",
             arguments = listOf(navArgument("orderID") { type = NavType.StringType })
         ){
             CSTCollectionProcedure(navController, viewModel, it.arguments?.getString("orderID")!!)

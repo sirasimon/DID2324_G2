@@ -441,6 +441,13 @@ class FirebaseRepository {
             .setValue(LocalDateTime.now().toString())
             .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in Order DB") }
             .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
+
+        dbRefUsers.child(ordersList.value?.find { it.id == id }?.customerID?:"")
+            .child("orders")
+            .child(id)
+            .ref.setValue("AVAILABLE")
+            .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in Users DB") }
+            .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -451,6 +458,32 @@ class FirebaseRepository {
             .setValue(LocalDateTime.now().toString())
             .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in Order DB") }
             .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
+
+        dbRefUsers.child(ordersList.value?.find { it.id == id }?.customerID?:"")
+            .child("orders")
+            .child(id)
+            .ref.setValue("COLLECTED")
+            .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in Users DB") }
+            .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
+
+        dbRefLockers.child(ordersList.value?.find { it.id == id }?.lockerID?:"")
+            .addListenerForSingleValueEvent(
+                object : ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        for(snap in snapshot.children){
+                            if(snap.child("orderID").getValue<String>() == id){
+                                snap.child("isAvailable").ref.setValue(true)
+                                snap.child("orderID").ref.setValue("null")
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE")
+                    }
+
+                }
+            )
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

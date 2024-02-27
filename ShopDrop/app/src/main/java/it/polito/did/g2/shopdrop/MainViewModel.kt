@@ -36,7 +36,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class MainViewModel() : ViewModel(){
-    val bldNum = "alpha-0013"
+    val bldNum = "alpha-0014"
 
     ////////////////////////////////////////////////////////////////////////////////////////////////        GLOBAL DATA
     private val fbRepo = FirebaseRepository()
@@ -341,8 +341,9 @@ class MainViewModel() : ViewModel(){
     ////////////////////////////////////////////////////////////////////////////////////////////////        CST COLLECTION
     //TODO: unire con script dopo
 
-    private val _timerValue = MutableLiveData<Long>().also { it.value=0 }
-    val timerValue: LiveData<Long> = _timerValue
+    //private val _timerValue = MutableLiveData<Long>().also { it.value=0 }
+    //val timerValue: LiveData<Long> = _timerValue
+    val timerValue = MutableStateFlow<Long>(0L)
 
     private var _timer : CountDownTimer?= null
 
@@ -367,9 +368,11 @@ class MainViewModel() : ViewModel(){
 
                 Log.d("onTick", "Remaining time is $remainingTime")
 
-                _timerValue.value = remainingTime
+                //_timerValue.value = remainingTime
+                timerValue.value = remainingTime
 
-                Log.d("onTick", "Updated timer value is ${_timerValue.value}")
+                //Log.d("onTick", "Updated timer value is ${_timerValue.value}")
+                Log.d("onTick", "Updated timer value is ${timerValue.value}")
             }
 
             override fun onFinish() {
@@ -378,8 +381,9 @@ class MainViewModel() : ViewModel(){
         }.start()
     }
 
-    fun getTimerValue() : Long{
-        return _timerValue.value ?: 0;
+    fun getTimerValue() : Long {
+        //return _timerValue.value ?: 0
+        return timerValue.value
     }
 
     fun cancelTimer(){

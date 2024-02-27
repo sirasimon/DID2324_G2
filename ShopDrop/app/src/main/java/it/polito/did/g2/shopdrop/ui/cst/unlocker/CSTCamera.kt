@@ -26,7 +26,7 @@ fun CSTCamera(navController: NavController, viewModel: MainViewModel, orderID: S
             //viewModel.cstStartsCollection(it, orderID)
             if(viewModel.cstStartsCollection(it, orderID)) {
                 Log.i("SUCCESS", "Ora naviga verso la pagina di ritiro")
-                navController.navigate(Screens.CstCollectionScreen.route + "/$orderID")
+                navController.navigate(Screens.CstCollection.route + "/$orderID")
             }
         }
     }

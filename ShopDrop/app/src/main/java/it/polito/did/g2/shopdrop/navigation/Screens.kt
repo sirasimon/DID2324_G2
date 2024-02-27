@@ -21,7 +21,7 @@ sealed class Screens(val route: String) {
 
     object CstProfile : Screens("CstProfileScreen")
     object CstCamera : Screens("CstCameraScreen")
-    object CstCollectionScreen : Screens("CstCollectionScreen")
+    object CstCollection : Screens("CstCollectionScreen")
     object CstCollectionDoneScreen : Screens("CstCollectionDoneScreen")
 
     // Orders

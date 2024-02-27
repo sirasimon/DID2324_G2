@@ -18,10 +18,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,37 +48,11 @@ fun CSTCollectionProcedure(navController: NavController, viewModel: MainViewMode
     var timerState by remember { mutableStateOf(TimerPhase.Phase1) }
     var progress by remember { mutableStateOf(1f) }
 
-    val timerValue = viewModel.timerValue.observeAsState()
+    //val timerValue = viewModel.timerValue.observeAsState()
+    val timerValue = viewModel.timerValue.collectAsState()
 
     val is1Open = viewModel.is1Open.collectAsState()
     val is2Open = viewModel.is2Open.collectAsState()
-
-    /*
-    viewModel.isOpenFieldState.observe(lifecycleOwner, Observer { newVal ->
-        val previousValue = viewModel.previousisOpenVal
-        if (previousValue==true && newVal==false) {
-            navController.navigate(Screens.CstCollectionDoneScreen.route)
-        }
-    })
-    */
-
-    //val currentProgress = remember { Animatable(viewModel.getProgress()) }
-
-    val progressScope = rememberCoroutineScope() // Create a coroutine scope
-    var progressColor = Color.Green
-    /*
-    val progressColor by animateColorAsState(
-        when(timerState){
-            TimerPhase.Phase1 -> Color.Green
-            TimerPhase.Phase2 -> Color.Yellow
-            TimerPhase.Phase3 -> Color.Red
-            else -> Color.Transparent
-        },
-        animationSpec = tween(ANIM_TIMING, easing = EaseInOut),
-        label = "ColorChange"
-    )
-
-     */
 
 
     LaunchedEffect(timerValue) {
@@ -116,46 +88,6 @@ fun CSTCollectionProcedure(navController: NavController, viewModel: MainViewMode
         }
     }
 
-    /*
-    LaunchedEffect(timerState) {
-        while (timerState != TimerPhase.PhaseOver && timerValue.value>0f) {
-            timerValue.value -= 1
-            delay(1)
-        }
-    }
-     */
-
-    /*
-    LaunchedEffect(timerState) {
-        when (timerState) {
-            TimerPhase.Phase1 -> {
-                delay(60000) // Wait for 1 minute
-                timerState = TimerPhase.Phase2
-            }
-            TimerPhase.Phase2 -> {
-                delay(120000) // Wait for 2 minutes
-                timerState = TimerPhase.Phase3
-            }
-            TimerPhase.Phase3 -> {
-                delay(60000) // Wait for the last minute
-                timerState = TimerPhase.PhaseOver
-            }
-            TimerPhase.PhaseOver -> {
-
-            }
-        }
-    }
-    */
-
-    /*
-    LaunchedEffect(timerState) {
-        while (timerState != TimerPhase.PhaseOver) {
-            progress -= 0.00000694f // Decrease progress every millisecond to reach 0 in 3 minutes
-            delay(1)
-        }
-    }
-     */
-
     viewModel.createTimer(timerMax)
 
     Surface(
@@ -165,6 +97,7 @@ fun CSTCollectionProcedure(navController: NavController, viewModel: MainViewMode
         if(is1Open.value == false && is2Open.value == false){
             Log.i("#####", "Sportello chiuso, deve cambiare")
             viewModel.cstHasCollected(orderID)
+            viewModel.cancelTimer()
             navController.navigate(Screens.CstCollectionDoneScreen.route)
         }
 
