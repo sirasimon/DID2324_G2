@@ -467,6 +467,7 @@ class FirebaseRepository {
             .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
 
         dbRefLockers.child(ordersList.value?.find { it.id == id }?.lockerID?:"")
+            .child("compartments")
             .addListenerForSingleValueEvent(
                 object : ValueEventListener{
                     override fun onDataChange(snapshot: DataSnapshot) {

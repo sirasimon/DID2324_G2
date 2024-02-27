@@ -14,6 +14,7 @@ import it.polito.did.g2.shopdrop.ui.crr.collection.CrrCollected
 import it.polito.did.g2.shopdrop.ui.crr.collection.CrrCollectionCamera
 import it.polito.did.g2.shopdrop.ui.crr.delivey.CRRDeliveryScreen
 import it.polito.did.g2.shopdrop.ui.crr.depositing.CRRBeforeDeposit
+import it.polito.did.g2.shopdrop.ui.crr.depositing.CRRDepositDone
 import it.polito.did.g2.shopdrop.ui.crr.depositing.CRRDepositing
 import it.polito.did.g2.shopdrop.ui.crr.depositing.CrrDepositCameraLocker
 import it.polito.did.g2.shopdrop.ui.crr.depositing.CrrDepositCameraOrder
@@ -69,6 +70,11 @@ fun NavGraphBuilder.crrNavGraph(
         composable(route = Screens.CrrDepositing.route+"/{orderID}",
             arguments = listOf(navArgument("orderID") { type = NavType.StringType })){
             CRRDepositing(navController, viewModel, it.arguments?.getString("orderID")!!)
+        }
+
+        composable(route = Screens.CrrDepositDone.route+"/{orderID}",
+            arguments = listOf(navArgument("orderID") { type = NavType.StringType })){
+            CRRDepositDone(navController)
         }
 
         composable(route = Screens.CrrDepositedScreen.route+"/{orderID}",

@@ -16,10 +16,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import it.polito.did.g2.shopdrop.R
 
 @Composable
@@ -45,13 +47,16 @@ fun DoneScreen(message : String, buttonTxt: String, onClick: ()->Unit){
             color = MaterialTheme.colorScheme.background
         ) {
             Column(
-                verticalArrangement = Arrangement.Center
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = message,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 36.sp
                 )
-                Spacer(Modifier.height(32.dp))
+                Spacer(Modifier.height(80.dp))
 
                 Image(
                     painter = painterResource(R.drawable.task_completed),

@@ -114,6 +114,12 @@
     <string name="info_close_locker">close locker\'s compartment</string>
     <string name="btn_proceed">proceed</string>
     <string name="title_locker_unlocked">locker unlocked</string>
-    <string name="txt_remember_to_close">Remember to close the compartment lockers opened after you\'re done with the depositing</string>
+    <string name="txt_remember_to_close">Remember to close the compartment lockers\nopened after you\'re done with the depositing</string>
     <string name="cst_scan_locker">scan locker\'s QR code</string>
+    <string name="msg_locker_open">The locker is open!\nCollect your order</string>
+    <string name="msg_remember">Remember to close the locker\nto finalize the collection</string>
+    <string name="msg_locker_still">The locker is still open!</string>
+    <string name="msg_locker_close_now">The locker is still open!\nClose it now!</string>
+    <string name="btn_back_home">go to home</string>
+    <string name="deposit_done">deposit done</string>
 </resources>

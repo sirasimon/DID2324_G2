@@ -44,6 +44,7 @@ sealed class Screens(val route: String) {
     object CrrDeliveryScreen: Screens("CrrDeliveryScreen")
     object CrrCollectedScreen: Screens("CrrCollectedScreen")
     object CrrDepositedScreen: Screens("CrrDepositedScreen")
+    object CrrDepositDone: Screens("CrrDepositDoneScreen")
 
 
     //ADMIN SCREENS ################################################################################

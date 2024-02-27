@@ -198,10 +198,12 @@ fun CSTCheckoutScreen(navController: NavController, viewModel: MainViewModel) {
                             .height(150.dp)
                             .background(Color.Yellow)
                     ){
-                        Text("[MAP PREVIEW HERE]")
+                        Image(painterResource(id = R.drawable.mappa), contentDescription = null, Modifier.fillMaxWidth())   //TODO clippare
                     }
                     Column(
-                        modifier = Modifier.fillMaxWidth().padding(12.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp)
                     ){
                         Text(
                             text = stringResource(id = R.string.selected_locker).capitalize(),
@@ -215,9 +217,6 @@ fun CSTCheckoutScreen(navController: NavController, viewModel: MainViewModel) {
                         )
 
                         Row(){
-                            //Icon(Icons.Filled.PinDrop, contentDescription = null)
-                            //Icon(Icons.Filled.FmdGood, contentDescription = null)
-                            //Icon(Icons.Outlined.PinDrop, contentDescription = null)
                             Icon(Icons.Outlined.FmdGood, contentDescription = null)
                             Text(
                                 viewModel.lockersList.value?.find { it.id == viewModel.currOrder.value?.lockerID }?.address?:"[LOCKER ADDRESS]",

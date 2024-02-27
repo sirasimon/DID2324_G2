@@ -102,4 +102,22 @@
     <string name="crr_profile_assistance">assistenza</string>
     <string name="btn_take_charge">prendi in carico</string>
     <string name="btn_deposit_order">deposita l\'ordine</string>
+    <string name="crr_scan_parcel">inquadra il QR dell\'ordine</string>
+    <string name="done_order_collected">ordine prelevato!</string>
+    <string name="done_btn_see_order">vedi ordine</string>
+    <string name="crr_scan_locker">inquadra il QR del locker</string>
+    <string name="title_deposit">deposita</string>
+    <string name="info_scan_locker">inquadra il QR del locker</string>
+    <string name="info_scan_order">inquadra il QR dell\'ordine</string>
+    <string name="info_deposit_order">deposita l\'ordine nel locker</string>
+    <string name="info_close_locker">chiudi il compartimento</string>
+    <string name="btn_proceed">procedi</string>
+    <string name="title_locker_unlocked">locker aperto</string>
+    <string name="txt_remember_to_close">Ricordati di chiudere il compartimento del\nlocker dopo aver depositato l\'ordine</string>
+    <string name="cst_scan_locker">inquadra il QR del locker</string>
+    <string name="msg_locker_open">Il locker è aperto\nPreleva la tua spesa</string>
+    <string name="msg_remember">Ricorda di chiudere il locker\nper terminare il prelievo</string>
+    <string name="msg_locker_still">Il locker è ancora aperto!</string>
+    <string name="msg_locker_close_now">Il locker è ancora aperto!\nChiudilo adesso!</string>
+    <string name="btn_back_home">torna all\'home</string>
 </resources>

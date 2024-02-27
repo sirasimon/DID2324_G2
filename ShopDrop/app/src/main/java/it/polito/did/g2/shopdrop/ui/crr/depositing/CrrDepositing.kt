@@ -43,7 +43,7 @@ fun CRRDepositing(navController: NavController, viewModel: MainViewModel, orderI
             if(is1Open.value == false && is2Open.value == false){
                 Log.i("#####", "Sportello chiuso, deve cambiare")
                 viewModel.crrHasDeposited(orderID)
-                navController.navigate(Screens.CstCollectionDoneScreen.route)
+                navController.navigate(Screens.CrrDepositDone.route) //TODO
             }
 
             Column(

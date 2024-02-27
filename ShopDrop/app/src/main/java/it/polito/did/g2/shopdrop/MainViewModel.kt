@@ -345,9 +345,9 @@ class MainViewModel() : ViewModel(){
     ////////////////////////////////////////////////////////////////////////////////////////////////        CST COLLECTION
     //TODO: unire con script dopo
 
-    //private val _timerValue = MutableLiveData<Long>().also { it.value=0 }
-    //val timerValue: LiveData<Long> = _timerValue
-    val timerValue = MutableStateFlow(0L)
+    private val _timerValue = MutableLiveData(0L)
+    val timerValue: LiveData<Long> = _timerValue
+    //val timerValue = MutableStateFlow(0L)
 
     private var _timer : CountDownTimer?= null
 
@@ -364,6 +364,8 @@ class MainViewModel() : ViewModel(){
         //fbRepo.startObserveCompartment()
         ///_isOpen.value = true
 
+        Log.i("TIMER", "TIMER CREATED")
+
         _timer = object : CountDownTimer(timeout, 1000){
 
             override fun onTick(remainingTime: Long) {
@@ -372,8 +374,8 @@ class MainViewModel() : ViewModel(){
 
                 Log.d("onTick", "Remaining time is $remainingTime")
 
-                //_timerValue.value = remainingTime
-                timerValue.value = remainingTime
+                _timerValue.value = remainingTime
+                //timerValue.value = remainingTime
 
                 //Log.d("onTick", "Updated timer value is ${_timerValue.value}")
                 Log.d("onTick", "Updated timer value is ${timerValue.value}")
@@ -386,8 +388,12 @@ class MainViewModel() : ViewModel(){
     }
 
     fun getTimerValue() : Long {
-        //return _timerValue.value ?: 0
-        return timerValue.value
+        return _timerValue.value ?: 0
+        //return timerValue.value
+    }
+
+    fun checkTimer(): Boolean {
+        return _timer == null
     }
 
     fun cancelTimer(){

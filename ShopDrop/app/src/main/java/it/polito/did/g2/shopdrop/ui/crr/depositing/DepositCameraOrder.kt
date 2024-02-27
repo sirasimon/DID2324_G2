@@ -22,7 +22,7 @@ fun CrrDepositCameraOrder(navController : NavController, viewModel: MainViewMode
             { navController.navigateUp() }
         ) {
             viewModel.crrDepositing(orderID!!)
-            navController.navigate(Screens.CrrDepositedScreen.route+"/$orderID")
+            navController.navigate(Screens.CrrDepositing.route+"/$orderID")
         }
     }
 }

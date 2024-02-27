@@ -5,6 +5,8 @@ import android.os.Build
 import android.os.Vibrator
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -20,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,10 +32,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
+import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.navigation.Screens
 
 enum class TimerPhase {
@@ -51,8 +60,10 @@ fun CSTCollectionProcedure(navController: NavController, viewModel: MainViewMode
     var timerState by remember { mutableStateOf(TimerPhase.Phase1) }
     var progress by remember { mutableStateOf(1f) }
 
-    //val timerValue = viewModel.timerValue.observeAsState()
-    val timerValue = viewModel.timerValue.collectAsState()
+    var prevOpenVal by remember { mutableStateOf(false) }
+
+    val timerValue = viewModel.timerValue.observeAsState()
+    //val timerValue = viewModel.timerValue.collectAsState()
 
     val is1Open = viewModel.is1Open.collectAsState()
     val is2Open = viewModel.is2Open.collectAsState()
@@ -103,7 +114,10 @@ fun CSTCollectionProcedure(navController: NavController, viewModel: MainViewMode
         }
     }
 
-    viewModel.createTimer(timerMax)
+    if(viewModel.checkTimer()){
+        viewModel.createTimer(timerMax)
+    }
+
 
     Surface(
         color = MaterialTheme.colorScheme.background,
@@ -121,21 +135,33 @@ fun CSTCollectionProcedure(navController: NavController, viewModel: MainViewMode
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            if(viewModel.isTimeout.value==false){
-                when(timerValue.value){
-                    in timerMax*2/3..timerMax -> {
-                        Text(text = "PHASE 1")
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                if(viewModel.isTimeout.observeAsState().value==false){
+                    when(timerValue.value){
+                        in timerMax*2/3..timerMax -> {
+                            Text(stringResource(id = R.string.msg_locker_open), fontWeight = FontWeight.Bold, fontSize = 36.sp)
+                            Image(painterResource(id = R.drawable.collection_1), null, Modifier.size(200.dp))
+                            Text(stringResource(id = R.string.msg_remember))
+                        }
+                        in timerMax/3..timerMax*2/3 -> {
+                            Text(stringResource(id = R.string.msg_locker_still), fontWeight = FontWeight.Bold, fontSize = 36.sp)
+                            Image(painterResource(id = R.drawable.collection_2), null, Modifier.size(200.dp))
+                            Text(stringResource(id = R.string.msg_remember))
+                        }
+                        in 0..timerMax/3 -> {
+                            Text(stringResource(id = R.string.msg_locker_close_now), fontWeight = FontWeight.Bold, fontSize = 36.sp)
+                            Image(painterResource(id = R.drawable.collection_3), null, Modifier.size(200.dp))
+                            Text(stringResource(id = R.string.msg_remember))
+                        }
                     }
-                    in timerMax/3..timerMax*2/3 -> {
-                        Text(text = "PHASE 2")
-                    }
-                    !in timerMax/3..timerMax -> {
-                        Text(text = "PHASE 3")
-                    }
+                }else{
+                    Text("TIME OUT")
                 }
-            }else{
-                Text("TIME OUT")
             }
+
         }
 
         Box(
