@@ -36,7 +36,7 @@ fun OrderSent(navController: NavController){
             modifier = Modifier
                 .fillMaxWidth()
                 .height(500.dp)
-                .background(Color.Green)
+                .background(Color(0xFF4CAF50))
         ){
             Image(
                 painter = painterResource(id = R.drawable.order_sent),
@@ -67,7 +67,7 @@ fun OrderSent(navController: NavController){
 
             ExtendedFloatingActionButton(
                 onClick = { navController.navigate(Screens.CstHome.route) },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
+                modifier = Modifier.fillMaxWidth().padding(32.dp),
                 containerColor = tertiaryLight
             ) {
                 Text(stringResource(id = R.string.btn_goto_home).capitalize())

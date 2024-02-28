@@ -19,7 +19,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
@@ -43,18 +46,24 @@ fun CRRDepositing(navController: NavController, viewModel: MainViewModel, orderI
             if(is1Open.value == false && is2Open.value == false){
                 Log.i("#####", "Sportello chiuso, deve cambiare")
                 viewModel.crrHasDeposited(orderID)
-                navController.navigate(Screens.CrrDepositDone.route) //TODO
+                navController.navigate(Screens.CrrDepositDone.route)
             }
 
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(stringResource(R.string.title_locker_unlocked).capitalize())
+                Text(
+                    stringResource(R.string.title_locker_unlocked).capitalize(),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp,
+                    textAlign = TextAlign.Center
+                )
 
                 Spacer(Modifier.height(64.dp))
 
-                Text(stringResource(R.string.txt_remember_to_close), Modifier.fillMaxWidth(.75f))
+                Text(stringResource(R.string.txt_remember_to_close), Modifier.fillMaxWidth(.75f),
+                    textAlign = TextAlign.Center)
             }
         }
     }

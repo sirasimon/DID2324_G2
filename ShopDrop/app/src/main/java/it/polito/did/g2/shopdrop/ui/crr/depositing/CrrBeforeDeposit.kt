@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -17,11 +18,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.navigation.Screens
+import it.polito.did.g2.shopdrop.ui.theme.inverseSurfaceLight
+import it.polito.did.g2.shopdrop.ui.theme.onPrimaryContainerLight
+import it.polito.did.g2.shopdrop.ui.theme.primaryContainerLight
 
 @Composable
 fun CRRBeforeDeposit(navController: NavController, orderID: String){
@@ -41,7 +46,8 @@ fun CRRBeforeDeposit(navController: NavController, orderID: String){
 
                 Column(
                     verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxSize()
                 ) {
 
                     Text(stringResource(id = R.string.title_deposit).capitalize(), style = MaterialTheme.typography.titleMedium)
@@ -67,7 +73,10 @@ fun CRRBeforeDeposit(navController: NavController, orderID: String){
                         Text(stringResource(R.string.btn_cancel).capitalize())
                     }
 
-                    Button(onClick = { navController.navigate(Screens.CrrDepositCameraLocker.route+"/$orderID") }){
+                    Button(
+                        onClick = { navController.navigate(Screens.CrrDepositCameraLocker.route+"/$orderID")},
+                        colors = ButtonColors(containerColor = primaryContainerLight, onPrimaryContainerLight, Color.LightGray, inverseSurfaceLight)
+                    ){
                         Text(stringResource(R.string.btn_proceed).capitalize())
                     }
                 }

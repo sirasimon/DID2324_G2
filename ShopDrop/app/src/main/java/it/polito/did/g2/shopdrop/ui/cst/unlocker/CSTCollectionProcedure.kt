@@ -149,19 +149,37 @@ fun CSTCollectionProcedure(navController: NavController, viewModel: MainViewMode
                 if(viewModel.isTimeout.observeAsState().value==false){
                     when(timerValue.value){
                         in timerMax*2/3..timerMax -> {
-                            Text(stringResource(id = R.string.msg_locker_open), fontWeight = FontWeight.Bold, fontSize = 36.sp)
+                            Text(stringResource(
+                                id = R.string.msg_locker_open),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 24.sp,
+                                textAlign = TextAlign.Center
+                            )
                             Image(painterResource(id = R.drawable.collection_1), null, Modifier.size(200.dp))
-                            Text(stringResource(id = R.string.msg_remember))
+                            Text(stringResource(id = R.string.msg_remember),
+                                textAlign = TextAlign.Center)
                         }
                         in timerMax/3..timerMax*2/3 -> {
-                            Text(stringResource(id = R.string.msg_locker_still), fontWeight = FontWeight.Bold, fontSize = 36.sp)
+                            Text(stringResource(
+                                id = R.string.msg_locker_still),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 24.sp,
+                                textAlign = TextAlign.Center
+                            )
                             Image(painterResource(id = R.drawable.collection_2), null, Modifier.size(200.dp))
-                            Text(stringResource(id = R.string.msg_remember))
+                            Text(stringResource(id = R.string.msg_remember),
+                                textAlign = TextAlign.Center)
                         }
                         in 0..timerMax/3 -> {
-                            Text(stringResource(id = R.string.msg_locker_close_now), fontWeight = FontWeight.Bold, fontSize = 36.sp)
+                            Text(stringResource(
+                                id = R.string.msg_locker_close_now),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 24.sp,
+                                textAlign = TextAlign.Center
+                            )
                             Image(painterResource(id = R.drawable.collection_3), null, Modifier.size(200.dp))
-                            Text(stringResource(id = R.string.msg_remember))
+                            Text(stringResource(id = R.string.msg_remember),
+                                textAlign = TextAlign.Center)
                         }
                     }
                 }else{
