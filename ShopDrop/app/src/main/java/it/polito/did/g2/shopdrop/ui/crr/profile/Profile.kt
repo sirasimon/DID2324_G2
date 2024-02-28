@@ -92,9 +92,7 @@ fun CRRProfileScreen(navController: NavController, viewModel: MainViewModel) {
                 Spacer(Modifier.height(32.dp))
 
                 profileOptions.forEach {
-                    ProfileItemList(label = it) {
-                        performDevMsg(scope, snackbarHostState, context)
-                    }
+                    ProfileItemList(label = it, { performDevMsg(scope, snackbarHostState, context) })
                 }
 
                 Spacer(Modifier.height(32.dp))

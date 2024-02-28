@@ -460,7 +460,7 @@ class MainViewModel() : ViewModel(){
     var targetOrderID : String? = null
 
     fun hasPendings() : Boolean{
-        return ordersList.value?.filter { it.customerID == _currUser.value?.uid && it.isPending() }.isNullOrEmpty()
+        return !ordersList.value?.filter { it.customerID == _currUser.value?.uid && it.isPending() }.isNullOrEmpty()
     }
 
     init{
