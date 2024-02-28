@@ -122,4 +122,6 @@
     <string name="msg_locker_close_now">The locker is still open!\nClose it now!</string>
     <string name="btn_back_home">go to home</string>
     <string name="deposit_done">deposit done</string>
+    <string name="title_locker_address">locker address</string>
+    <string name="title_store_address">store address</string>
 </resources>

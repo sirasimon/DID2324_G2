@@ -76,7 +76,7 @@ fun CSTProfileScreen(navController: NavController, viewModel: MainViewModel){
                 .verticalScroll(rememberScrollState())
                 .padding(vertical = 36.dp)) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_background),
+                    painter = painterResource(id = R.drawable.crr_profile_pic),
                     contentDescription = null,
                     modifier = Modifier
                         .size(100.dp)

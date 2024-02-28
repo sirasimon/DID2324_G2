@@ -120,4 +120,7 @@
     <string name="msg_locker_still">Il locker è ancora aperto!</string>
     <string name="msg_locker_close_now">Il locker è ancora aperto!\nChiudilo adesso!</string>
     <string name="btn_back_home">torna all\'home</string>
+    <string name="deposit_done">deposito effettuato</string>
+    <string name="title_locker_address">indirizzo del locker</string>
+    <string name="title_store_address">indirizzo del negozio</string>
 </resources>

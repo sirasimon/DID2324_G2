@@ -139,7 +139,7 @@ class FirebaseRepository {
                                 "\tthumbnail: ${snap.child("thumbnail").getValue<String>()}")
 
                         val newItem = StoreItem(
-                            snap.key.toString(),
+                            snap.key.toString().replace("_", " "),
                             snap.child("price").getValue<Float>()?:.0f,
                             StoreItemCategory.valueOf(snap.child("category").getValue<String>()?.uppercase()?:"<null>"),
                             snap.child("thumbnail").getValue<String>()?:""
