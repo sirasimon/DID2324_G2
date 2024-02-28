@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.navigation.Screens
+import it.polito.did.g2.shopdrop.ui.theme.tertiaryLight
 
 @Composable
 fun OrderSent(navController: NavController){
@@ -63,9 +64,11 @@ fun OrderSent(navController: NavController){
             ) {
                 Text(stringResource(id = R.string.btn_my_orders).capitalize())
             }
+
             ExtendedFloatingActionButton(
                 onClick = { navController.navigate(Screens.CstHome.route) },
-                containerColor = Color.LightGray
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
+                containerColor = tertiaryLight
             ) {
                 Text(stringResource(id = R.string.btn_goto_home).capitalize())
             }

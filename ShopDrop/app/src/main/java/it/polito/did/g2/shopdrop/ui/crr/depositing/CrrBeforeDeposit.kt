@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -33,11 +35,18 @@ fun CRRBeforeDeposit(navController: NavController, orderID: String){
             color = MaterialTheme.colorScheme.background
         ) {
             Box(
-
+                modifier = Modifier.fillMaxSize()
             ) {
-                Text(stringResource(id = R.string.title_deposit).capitalize())
 
-                Column(Modifier.align(Alignment.Center)) {
+
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    Text(stringResource(id = R.string.title_deposit).capitalize(), style = MaterialTheme.typography.titleMedium)
+                    Spacer(Modifier.height(64.dp))
+
                     Text(stringResource(R.string.info_scan_locker).capitalize())
                     Text("⬇︎")
                     Text(stringResource(R.string.info_scan_order).capitalize())
