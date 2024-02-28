@@ -118,12 +118,16 @@ fun CSTCollectionProcedure(navController: NavController, viewModel: MainViewMode
         viewModel.createTimer(timerMax)
     }
 
+    if(is1Open.value==true || is2Open.value == true){
+        prevOpenVal = true
+    }
+
 
     Surface(
         color = MaterialTheme.colorScheme.background,
         modifier = Modifier.fillMaxSize()
     ) {
-        if(is1Open.value == false && is2Open.value == false){
+        if(is1Open.value == false && is2Open.value == false && prevOpenVal){
             Log.i("#####", "Sportello chiuso, deve cambiare")
             viewModel.cstHasCollected(orderID)
             viewModel.cancelTimer()

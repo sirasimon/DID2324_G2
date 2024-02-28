@@ -72,8 +72,7 @@ fun NavGraphBuilder.crrNavGraph(
             CRRDepositing(navController, viewModel, it.arguments?.getString("orderID")!!)
         }
 
-        composable(route = Screens.CrrDepositDone.route+"/{orderID}",
-            arguments = listOf(navArgument("orderID") { type = NavType.StringType })){
+        composable(route = Screens.CrrDepositDone.route){
             CRRDepositDone(navController)
         }
 

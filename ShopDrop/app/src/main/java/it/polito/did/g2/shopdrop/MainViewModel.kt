@@ -399,6 +399,8 @@ class MainViewModel() : ViewModel(){
     fun cancelTimer(){
         _timer?.cancel()
 
+        _timer = null
+
         //_isOpen.value = null
     }
 
