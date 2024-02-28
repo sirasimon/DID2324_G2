@@ -42,6 +42,9 @@ import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.navigation.Screens
+import it.polito.did.g2.shopdrop.ui.theme.errorContainerLight
+import it.polito.did.g2.shopdrop.ui.theme.primaryContainerLight
+import it.polito.did.g2.shopdrop.ui.theme.secondaryLight
 
 enum class TimerPhase {
     Phase1,
@@ -194,13 +197,16 @@ fun CSTCollectionProcedure(navController: NavController, viewModel: MainViewMode
                             if(viewModel.isTimeout.value==false){
                                 when(timerValue.value){
                                     in timerMax*2/3..timerMax -> {
-                                        Color.Green
+                                        //Color.Green
+                                        secondaryLight
                                     }
                                     in timerMax/3..timerMax*2/3 -> {
-                                        Color.Yellow
+                                        //Color.Yellow
+                                        primaryContainerLight
                                     }
                                     !in timerMax/3..timerMax -> {
-                                        Color.Red
+                                        //Color.Red
+                                        errorContainerLight
                                     }
                                     else -> Color.Transparent
                                 }
