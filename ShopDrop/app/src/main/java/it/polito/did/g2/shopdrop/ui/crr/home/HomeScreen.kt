@@ -140,22 +140,40 @@ fun CRRHomeScreen(navController : NavController, viewModel: MainViewModel){
                 Column {
                     NavHost(navController = listNavController, startDestination = activeTab.name){
                         composable(CrrFilterChip.COLL.toString()) {
-                            viewModel.ordersList.observeAsState().value
-                                ?.filter { it.carrierID == viewModel.currUser.value?.uid && it.stateList?.map{s -> s.state}?.contains(OrderStateName.RECEIVED)==true && it.stateList?.map{s -> s.state}?.contains(OrderStateName.CARRIED)==false }
-                                ?.forEach{
-                                    val onMore = {id : String -> navController.navigate(Screens.CrrOrderDetail.route+"/$id") }
-                                    val onScan = {id : String -> navController.navigate(Screens.CrrCollectionCamera.route+"/$id")}
-                                    OrderCard(it, onMore, onScan)
-                                }
+
+                            Column(Modifier.fillMaxWidth()){
+                                viewModel.ordersList.observeAsState().value
+                                    ?.filter {
+                                        it.carrierID == viewModel.currUser.value?.uid && it.stateList?.map { s -> s.state }
+                                            ?.contains(OrderStateName.RECEIVED) == true && it.stateList?.map { s -> s.state }
+                                            ?.contains(OrderStateName.CARRIED) == false
+                                    }
+                                    ?.forEach {
+                                        val onMore =
+                                            { id: String -> navController.navigate(Screens.CrrOrderDetail.route + "/$id") }
+                                        val onScan =
+                                            { id: String -> navController.navigate(Screens.CrrCollectionCamera.route + "/$id") }
+                                        OrderCard(it, onMore, onScan)
+                                    }
+                            }
                         }
                         composable(CrrFilterChip.DELI.toString()){
-                            viewModel.ordersList.observeAsState().value
-                                ?.filter { it.carrierID == viewModel.currUser.value?.uid && it.stateList?.map{s -> s.state}?.contains(OrderStateName.RECEIVED)==true && it.stateList?.map{s -> s.state}?.contains(OrderStateName.CARRIED)==true && it.stateList?.map{s -> s.state}?.contains(OrderStateName.AVAILABLE)==false}
-                                ?.forEach{
-                                    val onMore = {id : String -> navController.navigate(Screens.CrrOrderDetail.route+"/$id") }
-                                    val onScan = {id : String -> navController.navigate(Screens.CrrDepositCameraLocker.route+"/$id")}
-                                    OrderCard(it, onMore, onScan)
-                                }
+                            Column(Modifier.fillMaxWidth()) {
+                                viewModel.ordersList.observeAsState().value
+                                    ?.filter {
+                                        it.carrierID == viewModel.currUser.value?.uid && it.stateList?.map { s -> s.state }
+                                            ?.contains(OrderStateName.RECEIVED) == true && it.stateList?.map { s -> s.state }
+                                            ?.contains(OrderStateName.CARRIED) == true && it.stateList?.map { s -> s.state }
+                                            ?.contains(OrderStateName.AVAILABLE) == false
+                                    }
+                                    ?.forEach {
+                                        val onMore =
+                                            { id: String -> navController.navigate(Screens.CrrOrderDetail.route + "/$id") }
+                                        val onScan =
+                                            { id: String -> navController.navigate(Screens.CrrDepositCameraLocker.route + "/$id") }
+                                        OrderCard(it, onMore, onScan)
+                                    }
+                            }
                         }
                     }
                 }
