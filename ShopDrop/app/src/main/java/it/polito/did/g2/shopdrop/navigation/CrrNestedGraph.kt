@@ -9,12 +9,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import it.polito.did.g2.shopdrop.MainViewModel
-import it.polito.did.g2.shopdrop.ui.crr.CrrCamera
-import it.polito.did.g2.shopdrop.ui.crr.CrrCollected
-import it.polito.did.g2.shopdrop.ui.crr.CrrDepositCamera
 import it.polito.did.g2.shopdrop.ui.crr.CrrDeposited
+import it.polito.did.g2.shopdrop.ui.crr.collection.CrrCollected
+import it.polito.did.g2.shopdrop.ui.crr.collection.CrrCollectionCamera
 import it.polito.did.g2.shopdrop.ui.crr.delivey.CRRDeliveryScreen
+import it.polito.did.g2.shopdrop.ui.crr.depositing.CRRBeforeDeposit
+import it.polito.did.g2.shopdrop.ui.crr.depositing.CRRDepositDone
+import it.polito.did.g2.shopdrop.ui.crr.depositing.CRRDepositing
+import it.polito.did.g2.shopdrop.ui.crr.depositing.CrrDepositCameraLocker
+import it.polito.did.g2.shopdrop.ui.crr.depositing.CrrDepositCameraOrder
 import it.polito.did.g2.shopdrop.ui.crr.home.CRRHomeScreen
+import it.polito.did.g2.shopdrop.ui.crr.orders.CRROrderDetail
 import it.polito.did.g2.shopdrop.ui.crr.profile.CRRProfileScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -26,28 +31,49 @@ fun NavGraphBuilder.crrNavGraph(
         startDestination = Screens.CrrHomeScreen.route,
         route = CRR_ROUTE
     ){
+
+        //HOME AND PROFILE
         composable(route = Screens.CrrHomeScreen.route){
-            //TODO
             CRRHomeScreen(navController, viewModel)
-        }
-        composable(route = Screens.CrrDeliveryScreen.route){
-            //TODO
-           CRRDeliveryScreen(navController = navController, viewModel =viewModel )
         }
 
         composable(route = Screens.CrrProfileScreen.route){
-            //TODO
             CRRProfileScreen(navController, viewModel)
         }
 
-        composable(route = Screens.CrrCollectionCameraScreen.route+"/{orderID}",
+        //ORDER DETAIL
+        composable(route = Screens.CrrOrderDetail.route+"/{orderID}",
             arguments = listOf(navArgument("orderID") { type = NavType.StringType })){
-            CrrCamera(navController, viewModel, it.arguments?.getString("orderID"))
+            CRROrderDetail(navController, viewModel, it.arguments?.getString("orderID"))
         }
 
-        composable(route = Screens.CrrDepositCameraScreen.route+"/{orderID}",
+        composable(route = Screens.CrrCollectionCamera.route+"/{orderID}",
             arguments = listOf(navArgument("orderID") { type = NavType.StringType })){
-            CrrDepositCamera(navController, viewModel, it.arguments?.getString("orderID")!!)
+            CrrCollectionCamera(navController, viewModel, it.arguments?.getString("orderID"))
+        }
+
+        composable(route = Screens.CrrDepositCameraLocker.route+"/{orderID}",
+            arguments = listOf(navArgument("orderID") { type = NavType.StringType })){
+            CrrDepositCameraLocker(navController, viewModel, it.arguments?.getString("orderID")!!)
+        }
+
+        composable(route = Screens.CrrDepositCameraOrder.route+"/{orderID}",
+            arguments = listOf(navArgument("orderID") { type = NavType.StringType })){
+            CrrDepositCameraOrder(navController, viewModel, it.arguments?.getString("orderID")!!)
+        }
+
+        composable(route = Screens.CrrBeforeDeposit.route+"/{orderID}",
+            arguments = listOf(navArgument("orderID") { type = NavType.StringType })){
+            CRRBeforeDeposit(navController, it.arguments?.getString("orderID")!!)
+        }
+
+        composable(route = Screens.CrrDepositing.route+"/{orderID}",
+            arguments = listOf(navArgument("orderID") { type = NavType.StringType })){
+            CRRDepositing(navController, viewModel, it.arguments?.getString("orderID")!!)
+        }
+
+        composable(route = Screens.CrrDepositDone.route){
+            CRRDepositDone(navController)
         }
 
         composable(route = Screens.CrrDepositedScreen.route+"/{orderID}",
@@ -55,8 +81,15 @@ fun NavGraphBuilder.crrNavGraph(
             CrrDeposited(navController, viewModel, it.arguments?.getString("orderID")!!)
         }
 
-        composable(route = Screens.CrrCollectedScreen.route){
-            CrrCollected(navController)
+        composable(route = Screens.CrrCollectedScreen.route+"/{orderID}",
+            arguments = listOf(navArgument("orderID") { type = NavType.StringType })){
+
+            CrrCollected(viewModel, navController, it.arguments?.getString("orderID")!!)
+        }
+
+        composable(route = Screens.CrrDeliveryScreen.route){
+            //TODO
+            CRRDeliveryScreen(navController = navController, viewModel =viewModel )
         }
     }
 }

@@ -3,6 +3,7 @@ package it.polito.did.g2.shopdrop.ui.crr
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import android.util.Size
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -119,9 +120,10 @@ fun CrrDepositCamera(navController : NavController, viewModel: MainViewModel, or
                         //TODO Forse è qui il pezzo dove intervenire
                         if(!lockerScanned){
                             lockerScanned = viewModel.crrStartsDeposit(code, orderID)
+                            Log.i("#######", "########### $lockerScanned")
                         }else{
                             if(code == orderID) {
-                                viewModel.crrDepositing(code)
+                                viewModel.crrDepositing(orderID)
                                 navController.navigate(Screens.CrrDepositedScreen.route+"/$orderID")
                             }
                         }

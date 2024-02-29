@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
@@ -29,6 +30,7 @@ import it.polito.did.g2.shopdrop.navigation.Screens
 fun BottomBar(currentTab : TabScreen, navController: NavController, vm : MainViewModel){
     //val hasBadge by remember{ mutableStateOf(vm.cart.value?.count() != 0) }
     val badgeNumber by vm.cart.observeAsState()
+    //val pendingOrders by remember{ mutableStateOf(vm.hasPendings()) }
 
     NavigationBar() {
         NavigationBarItem(  // HOME
@@ -47,7 +49,7 @@ fun BottomBar(currentTab : TabScreen, navController: NavController, vm : MainVie
                     badge = {
                         if((badgeNumber?.totalItems?:0) !=0){
                             Badge{
-                                Text("${badgeNumber?.totalItems}")
+                                Text("${badgeNumber?.totalItems}", color = Color.White)
                             }
                         }
                     }
@@ -64,8 +66,22 @@ fun BottomBar(currentTab : TabScreen, navController: NavController, vm : MainVie
         NavigationBarItem(  // PROFILE
             selected = currentTab== TabScreen.PROFILE,
             onClick = { if(currentTab!= TabScreen.PROFILE) navController.navigate(Screens.CstProfile.route) },
-            icon = { if(currentTab== TabScreen.PROFILE) Icon(Icons.Filled.Person, stringResource(R.string.tab_profile).capitalize()) else Icon(
-                Icons.Outlined.Person, stringResource(R.string.tab_profile).capitalize()) },
+            icon = {
+                BadgedBox(
+                    badge = {
+                        if(vm.hasPendings()){
+                            Badge{
+                                //Text("${badgeNumber?.totalItems}", color = Color.White)
+                            }
+                        }
+                    }
+                ) {
+                    if(currentTab== TabScreen.PROFILE)
+                        Icon(Icons.Filled.Person, stringResource(R.string.tab_profile).capitalize())
+                    else
+                        Icon(Icons.Outlined.Person, stringResource(R.string.tab_profile).capitalize())
+                }
+            },
             label = { Text(text = stringResource(R.string.tab_profile).capitalize()) }
         )
     }

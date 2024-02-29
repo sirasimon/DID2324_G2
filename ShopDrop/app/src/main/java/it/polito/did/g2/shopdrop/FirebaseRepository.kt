@@ -3,6 +3,7 @@ package it.polito.did.g2.shopdrop
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.database.DataSnapshot
@@ -20,6 +21,7 @@ import it.polito.did.g2.shopdrop.data.StoreItem
 import it.polito.did.g2.shopdrop.data.StoreItemCategory
 import it.polito.did.g2.shopdrop.data.users.User
 import it.polito.did.g2.shopdrop.data.users.UserRole
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDateTime
 
 //DEBUG
@@ -69,7 +71,7 @@ class FirebaseRepository {
                 Log.i("DB_USRS", msg)
         }
 
-        val newUserList = mutableListOf<User>()
+        //val newUserList = mutableListOf<User>()
 
         dbRefUsers.addValueEventListener(
             object : ValueEventListener{
@@ -89,76 +91,21 @@ class FirebaseRepository {
                             name = snap.child("name").getValue<String>()?:"ERR",
                             role = UserRole.valueOf(snap.child("role").getValue<String>()?:"ADM"),
                         )
-                        /*
-                        when(UserRole.valueOf(snap.child("role").getValue<String>()?:"NUL")){
-                            UserRole.ADM -> {
-                                cLog("\tNew user has role ADM and id ${snap.key.toString()}")
-
-                                newUser = AdmUser(
-                                    uid = snap.key.toString(),
-                                    email = snap.child("email").getValue<String>()?:"ERR",
-                                    password = snap.child("password").getValue<String>()?:"ERR",
-                                    name = snap.child("name").getValue<String>()?:"ERR",
-                                    role = UserRole.valueOf(snap.child("role").getValue<String>()?:"ADM"),
-                                )
-
-                                cLog("\tNew user is $newUser")
-                            }
-
-                            UserRole.CST -> {
-                                cLog("\tNew user has role CST")
-
-                                cLog("\tPreparing list of orders...")
-
-                                val orderMap = mutableMapOf<String, OrderStateName>()
-                                for(order in snap.child("orders").children){
-                                    orderMap[order.key.toString()] = OrderStateName.valueOf(order.getValue<String>()?:"ERROR")
-                                }
-                                cLog("\tOrder list is ${orderMap.size} item long")
-
-                                newUser = CstUser(
-                                    uid = snap.key.toString(),
-                                    email = snap.child("email").getValue<String>()?:"ERR",
-                                    password = snap.child("password").getValue<String>()?:"ERR",
-                                    name = snap.child("name").getValue<String>()?:"ERR",
-                                    role = UserRole.valueOf(snap.child("role").getValue<String>()?:"ADM"),
-                                    orders = orderMap.toMap(),
-                                    isBanned = snap.child("isBanned").getValue<Boolean>()?:false,
-                                )
-
-                                cLog("\tNew user is $newUser")
-                            }
-
-                            UserRole.CRR -> {
-                                cLog("\tNew user has role CRR")
-
-                                newUser = CrrUser(
-                                    uid = snap.key.toString(),
-                                    email = snap.child("email").getValue<String>()?:"ERR",
-                                    password = snap.child("password").getValue<String>()?:"ERR",
-                                    name = snap.child("name").getValue<String>()?:"ERR",
-                                    role = UserRole.valueOf(snap.child("role").getValue<String>()?:"ADM"),
-                                    isFree = snap.child("isFree").getValue<Boolean>()?:false
-                                )
-
-                                cLog("\tNew user is $newUser")
-                            }
-
-                            else -> {
-                                newUser = null
-                            }
-                        }
-                        */
 
                         if(newUser!=null){
-                            newUserList.add(newUser)
-                            cLog("\tAdded new user to list: ${newUserList.last().name}")
+                            if(_usersList.value?.find { it.uid == newUser.uid }!=null)
+                                _usersList.value?.remove(_usersList.value!!.find { it.uid == newUser.uid }!!)
+
+                            _usersList.value?.add(newUser)
+
+                            cLog("\tAdded new user to list: ${_usersList.value?.last()?.name}")
                         }else{
                             Log.w("DB_USRS", "CONVERSIONE ANDATA STORTO")
                         }
                     }
 
-                    _usersList.value = newUserList.toMutableList()
+                    //_usersList.value?.clear()
+                    //_usersList.value = newUserList.toMutableList()
 
                 }
 
@@ -192,7 +139,7 @@ class FirebaseRepository {
                                 "\tthumbnail: ${snap.child("thumbnail").getValue<String>()}")
 
                         val newItem = StoreItem(
-                            snap.key.toString(),
+                            snap.key.toString().replace("_", " "),
                             snap.child("price").getValue<Float>()?:.0f,
                             StoreItemCategory.valueOf(snap.child("category").getValue<String>()?.uppercase()?:"<null>"),
                             snap.child("thumbnail").getValue<String>()?:""
@@ -217,7 +164,7 @@ class FirebaseRepository {
 
     suspend fun initOrders() {
 
-        var newOrderList = mutableListOf<Order>()
+        //var newOrderList = mutableListOf<Order>()
 
         fun cLog(msg: String){
             if(FB_DEBUG)
@@ -272,11 +219,15 @@ class FirebaseRepository {
 
                         cLog("\tNew object of Order is: ${newOrder}\n\tPutting it inside the list")
 
-                        newOrderList.add(newOrder)
+                        //newOrderList.add(newOrder)
+                        if(_ordersList.value?.find { it.id == newOrder.id }!=null)
+                            _ordersList.value?.remove(_ordersList.value!!.find { it.id == newOrder.id }!!)
+
+                        _ordersList.value?.add(newOrder)
 
                         //_storeItems.value = _storeItems.value
 
-                        cLog("\tList will is now be ${newOrderList.size} items long and the last product added is ${newOrderList.last().toString()}")
+                        cLog("\tList will is now be ${_ordersList.value?.size} items long and the last product added is ${_ordersList.value?.last().toString()}")
                     }
                 }
 
@@ -287,7 +238,8 @@ class FirebaseRepository {
             }
         )
 
-        _ordersList.value = newOrderList
+        //_ordersList.value?.clear()
+        //_ordersList.value = newOrderList
 
     }
 
@@ -298,7 +250,7 @@ class FirebaseRepository {
                 Log.i("DB_LKRS", msg)
         }
 
-        var newLockersList = mutableListOf<Locker>()
+        //var newLockersList = mutableListOf<Locker>()
 
         dbRefLockers.addValueEventListener(
             object : ValueEventListener {
@@ -333,14 +285,21 @@ class FirebaseRepository {
                             address = snap.child("address").getValue<String>()?:"ERR",
                             isOnline = snap.child("isOnline").getValue<Boolean>()?:false,
                             isWorking = snap.child("isWorking").getValue<Boolean>()?:false,
+                            isInteracting = snap.child("isInteracting").getValue<Boolean>()?:false,
+                            otp = snap.child("otp").getValue<String>()?:"9999",
                             compartments = compsList.toList()
                         )
 
                         cLog("\tNew object of Order is: ${newLocker}\n\tPutting it inside the list")
 
-                        newLockersList.add(newLocker)
+                        //newLockersList.add(newLocker)
 
-                        cLog("\tList will now be ${newLockersList.size} items long and the last product added is ${newLockersList.last().toString()}")
+                        if(_lockersList.value?.find { it.id == newLocker.id }!=null)
+                            _lockersList.value?.remove(_lockersList.value!!.find { it.id == newLocker.id }!!)
+
+                        _lockersList.value?.add(newLocker)
+
+                        cLog("\tList will now be ${_lockersList.value?.size} items long and the last product added is ${_lockersList.value?.last().toString()}")
                     }
                 }
 
@@ -351,86 +310,11 @@ class FirebaseRepository {
             }
         )
 
-        _lockersList.value = newLockersList
+        //_lockersList.value = newLockersList
     }
 
     fun getUserByEmail(email : String) : User?{
         var user: User? = null
-
-        /*
-        dbRefUsers.addListenerForSingleValueEvent(
-            object : ValueEventListener{
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    for(snap in snapshot.children){
-                        if(snap.child("email").getValue<String>()==email){
-                            Log.i("getUbE", "TROVATO!")
-
-                            user = User(
-                                uid = snap.key.toString(),
-                                email = snap.child("email").getValue<String>() ?: "ERR",
-                                password = snap.child("password").getValue<String>()
-                                    ?: "ERR",
-                                name = snap.child("name").getValue<String>() ?: "ERR",
-                                role = UserRole.CST
-                            )
-
-                            /*
-                            when(UserRole.valueOf(snap.child("role").getValue<String>()!!)){
-                                UserRole.CST -> {
-                                    val orderMap = mutableMapOf<String, OrderStateName>()
-                                    for(order in snap.child("orders").children){
-                                        orderMap[order.key.toString()] = OrderStateName.valueOf(order.getValue<String>()?:"ERROR")
-                                    }
-
-                                    user = CstUser(
-                                        uid = snap.key.toString(),
-                                        email = snap.child("email").getValue<String>() ?: "ERR",
-                                        password = snap.child("password").getValue<String>()
-                                            ?: "ERR",
-                                        name = snap.child("name").getValue<String>() ?: "ERR",
-                                        role = UserRole.CST,
-                                        orders = orderMap.toMap(),
-                                        isBanned = snap.child("isBanned").getValue<Boolean>()?:false
-                                    )
-                                }
-
-                                UserRole.CRR -> {
-                                    user = CrrUser(
-                                        uid = snap.key.toString(),
-                                        email = snap.child("email").getValue<String>()?:"ERR",
-                                        password = snap.child("password").getValue<String>()?:"ERR",
-                                        name = snap.child("name").getValue<String>()?:"ERR",
-                                        role = UserRole.valueOf(snap.child("role").getValue<String>()?:"ADM"),
-                                        isFree = snap.child("isFree").getValue<Boolean>()?:false
-                                    )
-                                }
-                                UserRole.ADM -> {
-                                    user = AdmUser(
-                                        uid = snap.key.toString(),
-                                        email = snap.child("email").getValue<String>()?:"ERR",
-                                        password = snap.child("password").getValue<String>()?:"ERR",
-                                        name = snap.child("name").getValue<String>()?:"ERR",
-                                        role = UserRole.valueOf(snap.child("role").getValue<String>()?:"ADM"),
-                                    )
-                                }
-                                UserRole.NUL -> {
-                                    user = null
-                                }
-                            }
-                             */
-
-                            break
-                        }
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    TODO("Not yet implemented")
-                }
-            }
-        )
-
-        */
 
         user = _usersList.value?.find { it.email == email }
 
@@ -540,27 +424,178 @@ class FirebaseRepository {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
+    fun updateToCarried(id: String){
+        dbRefOrders.child(id)
+            .child("stateList")
+            .child(OrderStateName.CARRIED.toString())
+            .setValue(LocalDateTime.now().toString())
+            .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in Order DB") }
+            .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateToAvailable(id: String){
+        dbRefOrders.child(id)
+            .child("stateList")
+            .child(OrderStateName.AVAILABLE.toString())
+            .setValue(LocalDateTime.now().toString())
+            .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in Order DB") }
+            .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
+
+        dbRefUsers.child(ordersList.value?.find { it.id == id }?.customerID?:"")
+            .child("orders")
+            .child(id)
+            .ref.setValue("AVAILABLE")
+            .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in Users DB") }
+            .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateToCollected(id: String){
+        dbRefOrders.child(id)
+            .child("stateList")
+            .child(OrderStateName.COLLECTED.toString())
+            .setValue(LocalDateTime.now().toString())
+            .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in Order DB") }
+            .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
+
+        dbRefUsers.child(ordersList.value?.find { it.id == id }?.customerID?:"")
+            .child("orders")
+            .child(id)
+            .ref.setValue("COLLECTED")
+            .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in Users DB") }
+            .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
+
+        dbRefLockers.child(ordersList.value?.find { it.id == id }?.lockerID?:"")
+            .child("compartments")
+            .addListenerForSingleValueEvent(
+                object : ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        for(snap in snapshot.children){
+                            if(snap.child("orderID").getValue<String>() == id){
+                                snap.child("isAvailable").ref.setValue(true)
+                                snap.child("orderID").ref.setValue("null")
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE")
+                    }
+
+                }
+            )
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     fun updateOrderState(id: String){
-        val targetOrder : Order? = ordersList.value?.find { it.id==id }
-        val lastState = targetOrder?.stateList?.last()?.state
+        //val targetOrder : Order? = _ordersList.value?.find { it.id==id }
+        //val lastState = targetOrder?.stateList?.map { it.state }?.sortedBy { it.ordinal }?.last()
+        //val lastState = targetOrder?.stateList?.maxByOrNull { it.state.ordinal }?.state
+        val lastState = mutableStateOf<OrderStateName?>(null)
 
-        if(targetOrder!=null && lastState!=null){
-            val nextStateName = OrderStateName.values()[lastState.ordinal+1]
+        dbRefOrders.child(id).child("stateList").addListenerForSingleValueEvent(
+            object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val statelist = mutableListOf<OrderStateName>()
 
-            dbRefOrders.child(id)
-                .child("stateList")
-                .child(nextStateName.toString())
-                .setValue(LocalDateTime.now().toString())
-                .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in Order DB") }
-                .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
+                    for(snap in snapshot.children){
+                        Log.i("######", snap.key.toString())
+                        statelist.add(OrderStateName.valueOf(snap.key.toString()))
+                    }
 
+                    lastState.value = statelist.sortedBy { it.ordinal }.last()
+                    Log.i("######", "Ultimo stato ${lastState.value}")
+
+                    if(/*targetOrder!=null && */ lastState.value!=null){
+                        val nextStateName = OrderStateName.values()[lastState.value!!.ordinal+1]
+                        Log.i("######", "Prossimo stato $nextStateName")
+
+                        dbRefOrders.child(id)
+                            .child("stateList")
+                            .child(nextStateName.toString())
+                            .setValue(LocalDateTime.now().toString())
+                            .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in Order DB") }
+                            .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
+
+                        Log.i("######", "orderID $id")
+
+                        var userID : String? = null
+                        dbRefOrders.child(id).child("customerID").get()
+                            .addOnSuccessListener {
+                                userID = it.value.toString()
+
+                                Log.i("######", "UID $userID.")
+
+                                if(userID!=null){
+                                    dbRefUsers.child(userID!!)
+                                        .child("orders")
+                                        .child(id)
+                                        .setValue(nextStateName.toString())
+                                        .addOnSuccessListener {
+                                            Log.i(
+                                                "UPDATE_ORDERSTATE",
+                                                "Aggiornamento dell'ordine avvenuto con successo in User DB"
+                                            )
+                                        }
+                                        .addOnFailureListener {
+                                            Log.e(
+                                                "UPDATE_ORDERSTATE",
+                                                "FAILED UPDATE"
+                                            )
+                                        }
+                                }
+                            }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+
+            }
+        )
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun cancelOrder(id: String){
+        val targetOrder : Order? = _ordersList.value?.find { it.id==id }
+
+        dbRefOrders.child(id)
+            .child("stateList")
+            .child(OrderStateName.CANCELLED.toString())
+            .setValue(LocalDateTime.now().toString())
+            .addOnSuccessListener { Log.i("CANCEL_ORDER","Annullamento dell'ordine con id $id") }
+            .addOnFailureListener { Log.e("CANCEL_ORDER", "FAILED CANCEL") }
+
+        if(targetOrder!=null){
             dbRefUsers.child(targetOrder.customerID!!)
                 .child("orders")
                 .child(targetOrder.id!!)
-                .setValue(nextStateName.toString())
-                .addOnSuccessListener { Log.i("UPDATE_ORDERSTATE","Aggiornamento dell'ordine avvenuto con successo in User DB") }
-                .addOnFailureListener { Log.e("UPDATE_ORDERSTATE", "FAILED UPDATE") }
+                .setValue(OrderStateName.CANCELLED.toString())
+                .addOnSuccessListener { Log.i("CANCEL_ORDER","Annullamento dell'ordine con id $id da USERS") }
+                .addOnFailureListener { Log.e("CANCEL_ORDER", "FAILED CANCEL FROM USER") }
+
+            dbRefLockers.child(targetOrder.lockerID!!)
+                .child("compartments")
+                .addListenerForSingleValueEvent(
+                    object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            for(snap in snapshot.children){
+                                if(snap.child("orderID").getValue<String>()==targetOrder.id){
+                                    snap.child("isAvailable").ref.setValue(true)
+                                    snap.child("orderID").ref.setValue("null")
+                                }
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            TODO("Not yet implemented")
+                        }
+                    }
+                )
         }
+
     }
 
     fun cstStartsCollection(lockerCode: String, orderID: String) : Boolean{
@@ -573,7 +608,7 @@ class FirebaseRepository {
         Log.i("CST_COLLECTION", "\tChecking if correct locker")
 
         if(_ordersList.value?.find { it.id==orderID }?.lockerID != lockerID) {
-            Log.w("CST_COLLECTION", "\tWrong locker")
+            Log.w("CST_COLLECTION", "\tWrong locker (${_ordersList.value?.find { it.id==orderID }?.lockerID}) and orderID = $orderID")
             return false
         }
 
@@ -581,22 +616,17 @@ class FirebaseRepository {
 
         Log.i("CST_COLLECTION", "\tChecking OTP")
 
-        val currOTP : String = dbRefLockers.child(lockerID)
-            .child("otp")
-            .get().toString()
-
-        if(currOTP!=otp){
+        if(_lockersList.value?.find{it.id == lockerID}?.otp != otp){
             Log.w("CST_COLLECTION", "\tWrong OTP")
             return false
         }
 
         Log.i("CST_COLLECTION", "\tRight OTP")
 
-        var success = false
 
-        dbRefLockers.child(lockerID).child("showCode").setValue(false)
-            .addOnSuccessListener { Log.i("CST_COLLECTION", "\tShow code is now false, the locker results occupied"); success = true }
-            .addOnFailureListener { Log.e("CST_COLLECTION", "\tFAILED TO OCCUPY THE LOCKER") ; success = false }
+        Log.i("CRR_OCC_LOCK", "\tRight OTP")
+
+        dbRefLockers.child(lockerID).child("isInteracting").setValue(true)
 
         //TODO apertura
         dbRefLockers.child(lockerID)
@@ -607,18 +637,20 @@ class FirebaseRepository {
                         for(snap in snapshot.children){
                             if(snap.child("orderID").getValue<String>()==orderID) {
                                 snap.child("isOpen").ref.setValue(true)
-                                success = true
+
+                                targetCompartment.value?.locker = lockerID
+                                targetCompartment.value?.compartment = snap.key.toString()
                             }
                         }
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        success = false
+                        TODO()
                     }
                 }
             )
 
-        return success
+        return true
     }
 
     fun crrOccupyLocker(lockerCode: String, orderID: String) : Boolean{
@@ -639,23 +671,34 @@ class FirebaseRepository {
 
         Log.i("CRR_OCC_LOCK", "\tChecking OTP")
 
-        val currOTP : String = dbRefLockers.child(lockerID)
-            .child("otp")
-            .get().toString()
+        //var currOTP : String? = null
 
-        if(currOTP!=otp){
-            Log.w("CRR_OCC_LOCK", "\tWrong OTP")
+        /*
+        dbRefLockers.child(lockerID)    //TODO cambiare a lettura in locale
+            .child("otp")
+            .get()
+            .addOnSuccessListener {
+                Log.i("CRR_OCC_LOCK", "\tCurrent OTP is ${it.getValue<String>()}")
+                currOTP = it.getValue<String>()
+            }
+            .addOnFailureListener {
+                Log.e("ERRORE","ERRORE $it")
+            }
+        */
+
+        if(_lockersList.value?.find{it.id == lockerID}?.otp != otp){
+            Log.w("CRR_OCC_LOCK", "\tWrong OTP (${_lockersList.value?.find { it.id == lockerID }?.otp})")
             return false
         }
 
         Log.i("CRR_OCC_LOCK", "\tRight OTP")
 
         var success = false
-        dbRefLockers.child(lockerID).child("showCode").setValue(false)
-            .addOnSuccessListener { Log.i("CRR_OCC_LOCK", "\tShow code is now false, the locker results occupied"); success = true }
-            .addOnFailureListener { Log.e("CRR_OCC_LOCK", "\tFAILED TO OCCUPY THE LOCKER") ; success = false }
+        dbRefLockers.child(lockerID).child("isInteracting").setValue(true)
+            //.addOnSuccessListener { Log.i("CRR_OCC_LOCK", "\tisInteracting is now false, the locker results occupied"); success = true }
+            //.addOnFailureListener { Log.e("CRR_OCC_LOCK", "\tFAILED TO OCCUPY THE LOCKER") ; success = false }
 
-        return success
+        return true
     }
 
     fun crrDepositing(orderID: String){
@@ -697,6 +740,42 @@ class FirebaseRepository {
         }else{
             "ERR"
         }
+    }
+
+    data class TargetCompartment(var locker : String?, var compartment : String?)
+
+    private val targetCompartment = MutableLiveData<TargetCompartment>()
+
+    val isComp1Open = MutableStateFlow<Boolean?>(null)
+    val isComp2Open = MutableStateFlow<Boolean?>(null)
+
+    /*
+    fun startObserveCompartment() {
+        if(targetCompartment.value?.locker!=null && targetCompartment.value?.compartment!=null){
+
+            dbRefLockers.child(targetCompartment.value!!.locker!!)
+                .child("compartments")
+                .child(targetCompartment.value!!.compartment!!)
+                .child("isOpen")
+                .addValueEventListener(
+                    object : ValueEventListener{
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            isCompOpen.value = snapshot.getValue<Boolean>()
+                            Log.i("COMP ${targetCompartment.value!!.compartment}", "Target compartment at locker ${targetCompartment.value!!.locker} changed value to ${snapshot.getValue<Boolean>()} (${isCompOpen.value})")
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            TODO("Not yet implemented")
+                        }
+                    }
+                )
+        }
+    }
+    */
+
+    fun resetTargetComp(){
+        targetCompartment.value?.locker = null
+        targetCompartment.value?.compartment = null
     }
 
     // DEBUG
@@ -744,5 +823,41 @@ class FirebaseRepository {
     fun DebugResetLockers(){
         //TODO
         Log.w("RESET LOCKERS", "TODO")
+    }
+
+    init{
+        dbRefLockers.child("LTO_01")
+            .child("compartments")
+            .child("1")
+            .child("isOpen")
+            .addValueEventListener(
+                object : ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        isComp1Open.value = snapshot.getValue<Boolean>()
+                        Log.i("LTO_01.1", "Target compartment at locker changed value to ${snapshot.getValue<Boolean>()} (${isComp1Open.value})")
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        TODO("Not yet implemented")
+                    }
+                }
+            )
+
+        dbRefLockers.child("LTO_01")
+            .child("compartments")
+            .child("2")
+            .child("isOpen")
+            .addValueEventListener(
+                object : ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        isComp2Open.value = snapshot.getValue<Boolean>()
+                        Log.i("LTO_01.2", "Target compartment at locker changed value to ${snapshot.getValue<Boolean>()} (${isComp2Open.value})")
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        TODO("Not yet implemented")
+                    }
+                }
+            )
     }
 }

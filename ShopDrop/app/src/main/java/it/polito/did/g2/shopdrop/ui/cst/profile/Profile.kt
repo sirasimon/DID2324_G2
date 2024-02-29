@@ -1,10 +1,10 @@
 package it.polito.did.g2.shopdrop.ui.cst.profile
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,11 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
@@ -32,16 +29,19 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.polito.did.g2.shopdrop.MainViewModel
 import it.polito.did.g2.shopdrop.R
 import it.polito.did.g2.shopdrop.data.TabScreen
 import it.polito.did.g2.shopdrop.navigation.Screens
+import it.polito.did.g2.shopdrop.ui.common.ProfileItemList
 import it.polito.did.g2.shopdrop.ui.cst.common.BottomBar
 import it.polito.did.g2.shopdrop.ui.cst.common.TopBar
 import it.polito.did.g2.shopdrop.ui.cst.common.WIPMessage
@@ -60,7 +60,7 @@ fun CSTProfileScreen(navController: NavController, viewModel: MainViewModel){
     val context = LocalContext.current
 
     Scaffold(
-        topBar = { TopBar(navController, stringResource(id = R.string.title_profile), scrollBehavior) },
+        topBar = { TopBar(null, stringResource(id = R.string.title_profile), scrollBehavior) },
         bottomBar = { BottomBar(currentTab, navController, viewModel) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         snackbarHost = { WIPMessage(snackbarHostState) }
@@ -76,7 +76,7 @@ fun CSTProfileScreen(navController: NavController, viewModel: MainViewModel){
                 .verticalScroll(rememberScrollState())
                 .padding(vertical = 36.dp)) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_background),
+                    painter = painterResource(id = R.drawable.crr_profile_pic),
                     contentDescription = null,
                     modifier = Modifier
                         .size(100.dp)
@@ -105,11 +105,17 @@ fun CSTProfileScreen(navController: NavController, viewModel: MainViewModel){
                     }
                 }
 
-                ProfileItemList(label = stringResource(R.string.title_my_orders).capitalize(), onClick = { navController.navigate(Screens.CstOrderHistory.route) })
+                ProfileItemList(label = stringResource(R.string.title_my_orders).capitalize(), onClick = { navController.navigate(Screens.CstOrderHistory.route) }, viewModel.hasPendings())
                 ProfileItemList(label = stringResource(R.string.title_address).capitalize(), onClick = {performDevMsg(scope, snackbarHostState, context)})
                 ProfileItemList(label = stringResource(R.string.title_payment_methods).capitalize(), onClick = {performDevMsg(scope, snackbarHostState, context)})
                 ProfileItemList(label = stringResource(R.string.title_help).capitalize(), onClick = {performDevMsg(scope, snackbarHostState, context)})
                 ProfileItemList(label = stringResource(R.string.title_support).capitalize(), onClick = { performDevMsg(scope, snackbarHostState, context) })
+
+                Spacer(Modifier.height(32.dp))
+
+                Text("v. ${viewModel.bldNum}", fontSize = 10.sp, color = Color.Gray)
+
+                Spacer(Modifier.height(32.dp))
 
                 TextButton(
                     onClick = {
@@ -124,23 +130,3 @@ fun CSTProfileScreen(navController: NavController, viewModel: MainViewModel){
     }
 }
 
-@Composable
-fun ProfileItemList(label : String, onClick : ()->Unit){
-    Card(
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp)
-            .height(64.dp)
-            .clickable(onClick = onClick)
-    ){
-        Row( verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ){
-            Text(text = label)
-            Icon(Icons.Filled.KeyboardArrowRight, "Open")
-        }
-    }
-}

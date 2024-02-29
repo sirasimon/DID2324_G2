@@ -2,6 +2,7 @@ package it.polito.did.g2.shopdrop
 
 import android.content.SharedPreferences
 import android.os.Build
+import android.os.CountDownTimer
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
@@ -35,6 +36,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class MainViewModel() : ViewModel(){
+    val bldNum = "esame 🍀"
+
     ////////////////////////////////////////////////////////////////////////////////////////////////        GLOBAL DATA
     private val fbRepo = FirebaseRepository()
 
@@ -233,14 +236,14 @@ class MainViewModel() : ViewModel(){
 
     val usersList : LiveData<MutableList<User>> = fbRepo.usersList
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////        SHOPPING AND ORDER DATA
+    ////////////////////////////////////////////////////////////////////////////////////////////////        CART AND ORDER DATA
 
     // PENDING ORDERS
-    private val _userOrders : MutableLiveData<MutableList<Order>> = MutableLiveData(fbRepo.ordersList.value?.filter { it.customerID == _currUser.value?.uid }?.toMutableList())
-    val userOrders : LiveData<MutableList<Order>> = _userOrders
+    //private val _userOrders : MutableLiveData<MutableList<Order>> = MutableLiveData(fbRepo.ordersList.value?.filter { it.customerID == _currUser.value?.uid }?.toMutableList())
+    //val userOrders : LiveData<MutableList<Order>> = _userOrders
 
-    private val _pendingOrders : MutableLiveData<MutableList<Order>> = MutableLiveData(_userOrders.value?.filter { it.stateList?.last()?.state?.isPending() == true }?.toMutableList())
-    val pendingOrders : LiveData<MutableList<Order>> = _pendingOrders
+    //private val _pendingOrders = MutableLiveData(0)
+    //val pendingOrders : LiveData<Int?> = fbRepo.pendingOrders
 
 
     //CART DATA
@@ -250,6 +253,10 @@ class MainViewModel() : ViewModel(){
     //CURRENT ORDER DATA
     private val _currOrder : MutableLiveData<Order?> = MutableLiveData(null)
     val currOrder : LiveData<Order?> = _currOrder
+
+    fun getPendingOrders() : List<Order>?{
+        return ordersList.value?.filter { it.customerID == _currUser.value?.uid && it.isPending() }
+    }
 
     /**
      * Modifica della quantità degli elementi del carrello
@@ -264,9 +271,16 @@ class MainViewModel() : ViewModel(){
             _cart.value?.modify(item, quantity)
 
             Log.i("MODIFY_CART", "\tUpdated quantity of \"${item.name}\" in map is ${_cart.value?.items?.get(item.name) ?:"[ERROR]"} (desired change was $quantity)")
+
+            if(_cart.value?.totalItems == 0)
+                _cart.value = null
         }else{
             Log.w("MODIFY_CART", "\tITEM IS NULL")
         }
+    }
+
+    fun emptyCart(){
+        _cart.value = null
     }
 
     /**
@@ -323,8 +337,74 @@ class MainViewModel() : ViewModel(){
         fbRepo.updateOrderState(id)
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////        CRR COLLECTION + DEPOSIT
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun cancelOrder(id: String){
+        fbRepo.cancelOrder(id)
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////        CST COLLECTION
     //TODO: unire con script dopo
+
+    private val _timerValue = MutableLiveData(0L)
+    val timerValue: LiveData<Long> = _timerValue
+    //val timerValue = MutableStateFlow(0L)
+
+    private var _timer : CountDownTimer?= null
+
+    private var _isTimeout = MutableLiveData<Boolean>().also{it.value=false}
+    val isTimeout: LiveData<Boolean> = _isTimeout
+
+    //var previousisOpenVal : Boolean? = null
+    //private val _isOpen = MutableLiveData<Boolean?>(null)
+    //val isOpen : LiveData<Boolean?> = _isOpen
+    val is1Open : MutableStateFlow<Boolean?> = fbRepo.isComp1Open
+    val is2Open : MutableStateFlow<Boolean?> = fbRepo.isComp2Open
+
+    fun createTimer(timeout:Long){
+        //fbRepo.startObserveCompartment()
+        ///_isOpen.value = true
+
+        Log.i("TIMER", "TIMER CREATED")
+
+        _timer = object : CountDownTimer(timeout, 1000){
+
+            override fun onTick(remainingTime: Long) {
+                if(_isTimeout.value==true)
+                    _isTimeout.value = false
+
+                Log.d("onTick", "Remaining time is $remainingTime")
+
+                _timerValue.value = remainingTime
+                //timerValue.value = remainingTime
+
+                //Log.d("onTick", "Updated timer value is ${_timerValue.value}")
+                Log.d("onTick", "Updated timer value is ${timerValue.value}")
+            }
+
+            override fun onFinish() {
+                _isTimeout.value = true;
+            }
+        }.start()
+    }
+
+    fun getTimerValue() : Long {
+        return _timerValue.value ?: 0
+        //return timerValue.value
+    }
+
+    fun checkTimer(): Boolean {
+        return _timer == null
+    }
+
+    fun cancelTimer(){
+        _timer?.cancel()
+
+        _timer = null
+
+        //_isOpen.value = null
+    }
+
+
 
     fun cstStartsCollection(lockerCode : String, orderID: String) : Boolean{
         return fbRepo.cstStartsCollection(lockerCode, orderID)
@@ -339,16 +419,21 @@ class MainViewModel() : ViewModel(){
             ?:false
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun cstHasCollected(orderID: String){
+        fbRepo.updateToCollected(orderID)
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////        CRR COLLECTION + DEPOSIT
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun crrHasCollected(orderID: String){
-        updateOrderState(orderID)
+        fbRepo.updateToCarried(orderID)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun crrHasDeposited(orderID: String){
-        updateOrderState(orderID)
+        fbRepo.updateToAvailable(orderID)
     }
 
     fun crrStartsDeposit(lockerCode: String, orderID: String) : Boolean{
@@ -374,6 +459,9 @@ class MainViewModel() : ViewModel(){
 
     var targetOrderID : String? = null
 
+    fun hasPendings() : Boolean{
+        return !ordersList.value?.filter { it.customerID == _currUser.value?.uid && it.isPending() }.isNullOrEmpty()
+    }
 
     init{
         Log.i("MVM INIT", "####################")
@@ -386,6 +474,23 @@ class MainViewModel() : ViewModel(){
         }
 
         _isLoading.value = false
+
+        /*
+        viewModelScope.launch {
+            fbRepo.startObserveCompartment()?.collect(){newVal ->
+                previousisOpenVal?.let{oldVal ->
+                    if(oldVal && !newVal){
+                        cancelTimer()
+                    }
+                }
+
+                previousisOpenVal = newVal
+                _isOpenFieldState.value = newVal
+
+            }
+
+        }
+        */
 
         Log.i("MVM INIT", "END ####################")
     }
@@ -430,8 +535,13 @@ class MainViewModel() : ViewModel(){
     ////////////////////////////////////////////////////////////////////////////////////////////////        UTILITIES
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getDateString(date: LocalDateTime): String{
-        return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+    fun getDateString(date: LocalDateTime?): String{
+        return date?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))?:"ERR"
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getTimeString(date: LocalDateTime): String{
+        return date.format(DateTimeFormatter.ofPattern("HH:mm"))
     }
 
     fun getOrderStateStringId(state: OrderStateName?): Int{

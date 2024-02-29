@@ -43,8 +43,6 @@ class QrCodeAnalyzer(
                         mapOf(
                             DecodeHintType.POSSIBLE_FORMATS to arrayListOf(
                                 BarcodeFormat.QR_CODE,
-                                BarcodeFormat.AZTEC, // Per Locker?
-                                BarcodeFormat.DATA_MATRIX,// Per corriere
                                 BarcodeFormat.CODE_128,
                                 BarcodeFormat.CODE_93,
                                 BarcodeFormat.CODE_39

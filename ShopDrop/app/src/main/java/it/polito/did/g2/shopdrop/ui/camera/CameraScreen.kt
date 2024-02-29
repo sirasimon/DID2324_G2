@@ -111,7 +111,8 @@ fun CameraScreen(navController : NavController, viewModel: MainViewModel, orderI
 
                         //TODO Forse è qui il pezzo dove intervenire
                         if(viewModel.cstStartsCollection(code, orderID))
-                            navController.navigate(Screens.CstCollectionScreen.route+"/$orderID")
+                            //navController.navigate(Screens.CstCollectionScreen.route+"/$orderID")
+                            navController.navigate(Screens.CstCollection.route+"/$orderID")
                     }
                 )
                 try{

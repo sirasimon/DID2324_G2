@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ShopDropTheme {
-                Nav(viewModel)
+                Nav(viewModel, this@MainActivity)
             }
         }
     }

@@ -18,6 +18,7 @@ import it.polito.did.g2.shopdrop.navigation.Screens
 @Composable
 fun CrrDeposited(navController: NavController, viewmodel : MainViewModel, orderID : String){
 
+
     Column(){
         Text("[Qui immagine]")
         Text("ORDINE DEPOSITATO")

@@ -21,7 +21,7 @@ fun CSTCollection(navController: NavController, viewmodel : MainViewModel, order
         Button(
             onClick = {
                 if(viewmodel.checkClosed(orderID)) {
-                    viewmodel.updateOrderState(orderID)
+                    //viewmodel.updateOrderState(orderID)
                     navController.navigate(Screens.CstHome.route)
                 }
             }

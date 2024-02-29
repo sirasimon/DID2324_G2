@@ -3,6 +3,8 @@ plugins {
     id("org.jetbrains.kotlin.android")
     // Add the Google services Gradle plugin
     id("com.google.gms.google-services")
+    //id("kotlin-kapt")
+    //id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -105,4 +107,13 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     implementation("androidx.datastore:datastore-preferences-core:1.0.0")
+
+    implementation("com.google.android.gms:play-services-vision:20.1.3")
+    /*
+    implementation("com.google.dagger:hilt-android:2.45")
+    kapt("com.google.dagger:hilt-android-compiler:2.45")
+    kapt("androidx.hilt:hilt-compiler:1.2.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
+     */
 }

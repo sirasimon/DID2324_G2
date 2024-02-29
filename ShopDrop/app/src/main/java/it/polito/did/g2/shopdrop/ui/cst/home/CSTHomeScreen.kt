@@ -54,7 +54,6 @@ import it.polito.did.g2.shopdrop.navigation.Screens
 import it.polito.did.g2.shopdrop.ui.cst.common.BottomBar
 import java.util.Locale
 
-
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,6 +76,8 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
     var showBottomSheet by remember { mutableStateOf(false) }
 
     var targetItem by remember{ mutableStateOf<StoreItem?>(null) }
+
+    val pendingOrders = viewModel.getPendingOrders()
 
     Scaffold(
         bottomBar = { BottomBar(currentTab, navController, viewModel) }
@@ -144,7 +145,8 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
                     }else{
                         // PENDING ORDERS                                                           PENDING ORDERS TODO non funziona!!!
 
-                        if(!viewModel.pendingOrders.value.isNullOrEmpty()) {    //Condizione dei pending order
+
+                        if(!pendingOrders.isNullOrEmpty()){
                             Log.i("PENDING ORDERS OK", "Sì, ci sono degli ordini pendenti")
                             Column(modifier = Modifier.padding(vertical = 16.dp)) {
                                 /*
@@ -160,14 +162,24 @@ fun CSTHomeScreen(navController : NavController, viewModel: MainViewModel){
                                         .padding(16.dp)
                                         .fillMaxWidth()
                                 ) {
-                                    viewModel.pendingOrders.value!!.forEach {
+                                    pendingOrders.forEach {
                                         val onMore = {id : String -> navController.navigate(Screens.CstOrderDetail.route+"/$id") }
                                         val onScan = {id : String -> navController.navigate(Screens.CstCamera.route+"/$id")}
+
+                                        PendingItemList(it, viewModel, onMore, onScan)
+                                    }
+
+                                    viewModel.ordersList.observeAsState().value?.filter { it.customerID == viewModel.currUser.value?.uid && it.isPending() }?.forEach {
+                                        val onMore = {id : String -> navController.navigate(Screens.CstOrderDetail.route+"/$id") }
+                                        val onScan = {id : String -> navController.navigate(Screens.CstCamera.route+"/$id")}
+
                                         PendingItemList(it, viewModel, onMore, onScan)
                                     }
                                 }
                             }
                         }
+
+                        //https://developer.android.com/jetpack/compose/animation/quick-guide?hl=it#switch-different
 
                         itemList.value?.filter{it.name.contains(query)}
                             ?.map{it.category}
@@ -220,7 +232,7 @@ fun PendingItemList(order: Order, viewModel: MainViewModel, onMore : (String) ->
         trailingContent = {
             IconButton(
                 enabled = lastState==OrderStateName.AVAILABLE,
-                onClick = { onScan(order.id!!) } //TODO: aggiungere qui l'argomento alla navigazione dell'ID dell'ordine
+                onClick = { onScan(order.id!!) }
             ){
                 Icon(Icons.Filled.QrCodeScanner, contentDescription = null)
             }
