@@ -36,7 +36,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class MainViewModel() : ViewModel(){
-    val bldNum = "🍀"
+    val bldNum = "esame 🍀"
 
     ////////////////////////////////////////////////////////////////////////////////////////////////        GLOBAL DATA
     private val fbRepo = FirebaseRepository()

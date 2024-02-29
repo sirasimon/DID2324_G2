@@ -16,6 +16,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -31,8 +35,14 @@ import it.polito.did.g2.shopdrop.navigation.Screens
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CRRDepositing(navController: NavController, viewModel: MainViewModel, orderID: String){
+    var prevOpenVal by remember { mutableStateOf(false) }
+
     val is1Open = viewModel.is1Open.collectAsState()
     val is2Open = viewModel.is2Open.collectAsState()
+
+    if(is1Open.value==true || is2Open.value == true){
+        prevOpenVal = true
+    }
 
     Scaffold(
     ) { paddingValues ->
@@ -43,7 +53,7 @@ fun CRRDepositing(navController: NavController, viewModel: MainViewModel, orderI
                 .padding(paddingValues),
             color = MaterialTheme.colorScheme.background
         ) {
-            if(is1Open.value == false && is2Open.value == false){
+            if(is1Open.value == false && is2Open.value == false && prevOpenVal){
                 Log.i("#####", "Sportello chiuso, deve cambiare")
                 viewModel.crrHasDeposited(orderID)
                 navController.navigate(Screens.CrrDepositDone.route)
