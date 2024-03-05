@@ -9,7 +9,7 @@ Also, for security reasons, the project is no more able to connect to the databa
 
 ## Project
 
-The final exam of the course of DID required a project that applied all the principles of _interaction design_ learnt during the term. This year the project was about the development of an interaction between a person and al smart-locker in every aspect, from the mobile app to the opening of a compartment in the locker. Every group was free to think a scenario and design with every means provided by the course – but not just that ones – the interaction.
+The final exam of the course of DID required a project that applied all the principles of _interaction design_ learnt during the term. This year the project was about the development of an interaction between a person and a smart-locker in every aspect, from the mobile app to the opening of a compartment in the locker. Every group was free to think a scenario and design with every means provided by the course – but not just that ones – the interaction.
 
 ### Scenario
 
