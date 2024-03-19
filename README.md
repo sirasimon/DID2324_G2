@@ -82,7 +82,7 @@ The group was made up by (in alphabetical order)
 * Alberto Nicco – Social Researcher ([GitHub](https://github.com/albertonicco))
 * Arianna Ferraris – Project Manager ([GitHub](https://github.com/ariannaferraris), [LinkedIn](https://www.linkedin.com/in/ariannaferraris))
 * Lorenzo Dell'Anna – Graphic Designer ([GitHub](https://github.com/Static65), [LinkedIn](www.linkedin.com/in/lorenzodellanna1997))
-* Mattia Scagliola – Maker ([GitHub](https://github.com/JoJoJoJoestar))
+* Mattia Scagliola – Maker ([GitHub](https://github.com/JoJoJoJoestar), [LinkedIn](https://www.linkedin.com/in/mattia-scagliola-105495296/))
 * Simone Siragusa – Software Developer ([GitHub](https://github.com/srgsmn), [LinkedIn](www.linkedin.com/in/simone-siragusa))
 
 
